@@ -6,6 +6,8 @@ import { useState } from "react"
 import { TablePagination } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { TableContent } from "./content"
+import { AddRecordDialog } from "./add-record-dialog"
+import { EmployeeForm } from "../forms/employee"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
@@ -17,6 +19,8 @@ export function DataTable<TData, TValues>({ columns, data } : DataTableProps<TDa
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false)
 
   const table = useReactTable({
     data, 
@@ -39,9 +43,10 @@ export function DataTable<TData, TValues>({ columns, data } : DataTableProps<TDa
 
   return (
     <div className="flex flex-col w-full">
-      <TableToolbar table={table}/>
+      <TableToolbar table={table} onAddRecord={() => setIsAddFormOpen(true)}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
+      <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={<EmployeeForm/>}/>
     </div>
   )
 }

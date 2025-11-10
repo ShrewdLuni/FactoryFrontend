@@ -10,9 +10,10 @@ import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
+  onAddRecord: () => void
 }
 
-export function TableToolbar<TData>({ table }: TableToolbarProps<TData>) {
+export function TableToolbar<TData>({ table, onAddRecord }: TableToolbarProps<TData>) {
 
   const roles = [
     {
@@ -121,7 +122,7 @@ export function TableToolbar<TData>({ table }: TableToolbarProps<TData>) {
           })}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button variant={"outline"}>Add section <CirclePlus/> </Button>
+      <Button variant={"outline"} onClick={onAddRecord}>Add section <CirclePlus/> </Button>
     </div>
   )
 }
