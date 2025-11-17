@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, useContext } from "react"
+import { createContext, useEffect, useState, useContext, useMemo, useCallback } from "react"
 
 interface AuthContextType {
   user: any;
@@ -34,16 +34,15 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
         setLoading(false);
       }
     }
-
     fetchMe();
   }, [])
 
-  const login = async (identity: string, password: string) => {
+  const login = useCallback((async (identity: string, password: string) => {
     const res = await fetch(`${baseURI}/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user: { identity }, password})
+      body: JSON.stringify({username: identity, password})
     })
 
     if (!res.ok) {
@@ -55,19 +54,21 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
     const data = await me.json()
 
     setUser(data);
-  };
+  }), []);
 
-  const logout = async () => {
+  const logout = useCallback((async () => {
     await fetch(`${baseURI}/logout`, {
       method: "POST",
       credentials: "include"
     })
 
     setUser(null);
-  };
+  }), []);
+
+  const values = useMemo(() => { return { user, login, logout, loading }}, [user, login, logout, loading])
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={values}>
       {children}
     </AuthContext.Provider>
   );
