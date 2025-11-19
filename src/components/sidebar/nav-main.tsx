@@ -1,12 +1,11 @@
-import { SidebarGroup, SidebarMenu } from "@/components/ui/sidebar";
+import { SidebarMenu } from "@/components/ui/sidebar";
 import { sidebarElements } from "@/routes";
-import { useAuth } from "@/hooks/useAuth";
 import { SidebarGroupItem } from "./group-item";
 import { SidebarSingleItem } from "./single-item";
+import { useAuth } from "@/AuthProvider";
 
 export function NavMain({}) {
-
-  const user = useAuth()
+  const { user } = useAuth()
 
   const allowedSidebar = sidebarElements.flatMap(element => {
     if ("group" in element) {

@@ -6,19 +6,24 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { NavMain } from "./nav-main";
+import { NavFooter } from "./nav-footer";
 
 
 export const AppSidebar = () =>  {
 
   return (
-    <Sidebar variant="sidebar" >
-      <SidebarHeader>
-        Test
+    <Sidebar variant="sidebar">
+      <SidebarHeader className="mb-4 pl-2">
+        <span className="text-4xl font-bold">
+          WMS 
+        </span>
       </SidebarHeader>
       <SidebarContent>
         <NavMain/>
       </SidebarContent>
-      <SidebarFooter/> 
+      <SidebarFooter className="border-t-2 pb-4"> 
+        <NavFooter/>
+      </SidebarFooter>
       <SidebarRail/>
     </Sidebar>
   )
