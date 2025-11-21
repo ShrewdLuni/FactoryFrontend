@@ -17,7 +17,6 @@ export const AddRecordDialog = ({ open, onOpenChange, contentForm } : AddRecordD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Employee</DialogTitle>
         </DialogHeader>
         {contentForm}
       </DialogContent>

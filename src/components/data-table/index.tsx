@@ -1,20 +1,22 @@
 "use client"
 
-import { flexRender, getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel } from "@tanstack/react-table"
+import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel } from "@tanstack/react-table"
 import { useState } from "react"
 
 import { TablePagination } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { TableContent } from "./content"
 import { AddRecordDialog } from "./add-record-dialog"
-import { EmployeeForm } from "../forms/employee"
+import { type JSX } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
+  contentForm: JSX.Element,
+  filters: JSX.Element,
 }
 
-export function DataTable<TData, TValues>({ columns, data } : DataTableProps<TData, TValues>){
+export function DataTable<TData, TValues>({ columns, data, contentForm, filters } : DataTableProps<TData, TValues>){
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -46,7 +48,7 @@ export function DataTable<TData, TValues>({ columns, data } : DataTableProps<TDa
       <TableToolbar table={table} onAddRecord={() => setIsAddFormOpen(true)}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
-      <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={<EmployeeForm/>}/>
+      <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={contentForm}/>
     </div>
   )
 }

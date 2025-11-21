@@ -1,16 +1,15 @@
 import type { Table } from "@tanstack/react-table"
-
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, CirclePlus } from "lucide-react"
+import { ChevronDown, CirclePlus, CircleSmall, HardHat, Mars, UserCog, UserStar, Venus, ArrowDown, ArrowRight, ArrowUp, CircleCheck, CircleEllipsis, CircleX } from "lucide-react"
 import { DataTableFacetedFilter } from "./filter"
-
-import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react"
+import type { JSX } from "react"
 
 interface TableToolbarProps<TData> {
-  table: Table<TData>
-  onAddRecord: () => void
+  table: Table<TData>,
+  onAddRecord: () => void,
+  filters: JSX.Element,
 }
 
 export function TableToolbar<TData>({ table, onAddRecord }: TableToolbarProps<TData>) {
@@ -19,17 +18,17 @@ export function TableToolbar<TData>({ table, onAddRecord }: TableToolbarProps<TD
     {
       label: "Worker",
       value: "worker",
-      icon: ArrowDown,
+      icon: HardHat,
     },
     {
       label: "Manager",
       value: "manager",
-      icon: ArrowRight,
+      icon: UserStar,
     },
     {
       label: "Master",
       value: "master",
-      icon: ArrowUp,
+      icon: UserCog,
     },
   ]
 
@@ -37,17 +36,17 @@ export function TableToolbar<TData>({ table, onAddRecord }: TableToolbarProps<TD
     {
       label: "Inactive",
       value: "Inactive",
-      icon: ArrowDown,
+      icon: CircleX,
     },
     {
-      label: "Manager",
-      value: "manager",
-      icon: ArrowRight,
+      label: "In-Progress",
+      value: "In-Progress",
+      icon: CircleEllipsis,
     },
     {
-      label: "Master",
-      value: "master",
-      icon: ArrowUp,
+      label: "Completed",
+      value: "Completed",
+      icon: CircleCheck,
     },
   ]
 
@@ -55,17 +54,17 @@ export function TableToolbar<TData>({ table, onAddRecord }: TableToolbarProps<TD
     {
       label: "Male",
       value: "Male",
-      icon: ArrowDown,
+      icon: Mars,
     },
     {
       label: "Female",
       value: "Female",
-      icon: ArrowRight,
+      icon: Venus,
     },
     {
       label: "Other",
       value: "Other",
-      icon: ArrowUp,
+      icon: CircleSmall,
     },
   ]
 
