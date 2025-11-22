@@ -1,4 +1,5 @@
 import { DataTable } from "../data-table";
+import { EmployeeForm } from "../forms/employee";
 import { columns, type EmployeeData } from "./column"
 
 export const EmployeesPage = () => {
@@ -224,8 +225,6 @@ export const EmployeesPage = () => {
 
 
   return (
-    <div>
-      <DataTable columns={columns} data={data}/>
-    </div>
+    <DataTable columns={columns} data={data} contentForm={<EmployeeForm/>}/>
   )
 }
