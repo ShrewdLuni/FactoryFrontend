@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState, useContext, useMemo, useCallback } from "react"
+import { API_URL } from "./config";
 
 interface AuthContextType {
   user: any;
@@ -13,12 +14,10 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const baseURI = "http://localhost:3000/api/auth"
-
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await fetch(`${baseURI}/whoami`, {
+        const res = await fetch(`${API_URL}/auth/whoami`, {
           credentials: "include",
         });
 
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
   }, [])
 
   const login = useCallback((async (identity: string, password: string) => {
-    const res = await fetch(`${baseURI}/login`, {
+    const res = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -49,7 +48,7 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
       throw new Error(`Login failed ${res}`);
     }
     
-    const me = await fetch(`${baseURI}/whoami`, { credentials: "include" })
+    const me = await fetch(`${API_URL}/auth/whoami`, { credentials: "include" })
 
     const data = await me.json()
 
@@ -57,7 +56,7 @@ export const AuthProvider = ({ children } : { children: React.ReactNode }) => {
   }), []);
 
   const logout = useCallback((async () => {
-    await fetch(`${baseURI}/logout`, {
+    await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
       credentials: "include"
     })
