@@ -1,21 +1,11 @@
-import type { EmployeeGender, EmployeeRole } from "@/types/employee";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { IconCircleFilled } from "@tabler/icons-react"
 import { SortableHeader } from "../data-table/sortable-header";
 import { Checkbox } from "../ui/checkbox";
+import type { User } from "@/types/users";
 
-export type EmployeeData = {
-  id: string,
-  role: EmployeeRole,
-  name: string,
-  email: string,
-  phone: string,
-  gender: EmployeeGender,
-  dateOfBirth: string,
-}
-
-export const columns: ColumnDef<EmployeeData>[] = [
+export const columns: ColumnDef<User>[] = [
 {
     id: "select",
     header: ({ table }) => (
@@ -55,7 +45,7 @@ export const columns: ColumnDef<EmployeeData>[] = [
     },
   },
   {
-    accessorKey: "name",
+    accessorKey: "full_name",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Name"}/>
