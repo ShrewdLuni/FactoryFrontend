@@ -1,0 +1,80 @@
+"use client"
+
+import { type ColumnDef } from "@tanstack/react-table"
+import { SortableHeader } from "../data-table/sortable-header"
+import { Checkbox } from "@/components/ui/checkbox";
+
+export type Product = {
+  id: string;
+  code: string;
+  category: string;
+  name: string;
+  measureUnit: string;
+};
+
+
+export const columns: ColumnDef<Product>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "id",
+    header: ({ column }) => {
+      return (
+          <SortableHeader column={column} field={"ID"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "code",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Code"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "category",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Category"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Name"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "measureUnit",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Unit"}/>
+      )
+    }
+  },
+]
+
