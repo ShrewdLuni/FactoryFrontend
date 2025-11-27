@@ -16,6 +16,7 @@ export const AuthenticationPage = () => {
   const [identity, setIdentity] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -35,7 +36,7 @@ export const AuthenticationPage = () => {
               <CardContent>
                 <form onSubmit={(e) => {e.preventDefault(); console.log(identity, password); login(identity, password)}}>
                   <FieldGroup>
-                    <TabsContent value="select"><AuthSelect/></TabsContent>
+                    <TabsContent value="select"><AuthSelect value={identity} onChange={setIdentity}/></TabsContent>
                     <TabsContent value="input"><AuthInput value={identity} onChange={setIdentity}/></TabsContent>
                     <Field>
                       <div className="flex items-center">

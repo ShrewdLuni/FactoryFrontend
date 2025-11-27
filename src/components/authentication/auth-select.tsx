@@ -1,32 +1,27 @@
+import { useUsers } from "@/hooks/useUsers"
 import { Field, FieldLabel } from "../ui/field"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
-export const AuthSelect = () => {
-  const data = [
-    "first",
-    "second",
-    "third",
-    "fourth",
-    "fifth",
-    "sixth",
-    "seventh",
-    "eighth",
-    "nineth",
-    "tenth",
-  ]
+interface AuthSelectProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export const AuthSelect = ({ value, onChange }: AuthSelectProps) => {
+  const { users, loading, error } = useUsers();
 
   return (
     <Field>
       <FieldLabel htmlFor="id">Profile</FieldLabel>
-      <Select>
+      <Select onValueChange={onChange}>
         <SelectTrigger>
           <SelectValue placeholder="Select your login"/>
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            {data.map((item) => {
+            {users.map((item) => {
               return (
-                <SelectItem value={item}>{item}</SelectItem> 
+                <SelectItem value={item.username}>{item.username}</SelectItem> 
               )
             })}
           </SelectGroup>
