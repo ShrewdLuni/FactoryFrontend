@@ -13,7 +13,7 @@ export function AppRoutes() {
         path="/"
         element={
           user 
-            ? (<Navigate to="/batch/in-progress" replace />) 
+            ? (<Navigate to="/employees" replace />) 
             : (<Navigate to="/auth" replace />)
         }
       />

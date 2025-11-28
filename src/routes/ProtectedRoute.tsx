@@ -7,14 +7,14 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({element, roles} : ProtectedRouteProps) => {
-  const { user } = useAuth(); 
+  const { user, loading} = useAuth(); 
 
   if (!user) {
     return <Navigate to="/auth" replace />
   }
 
   if (!roles.includes(user.role) && !roles.includes("*")) {
-    return <Navigate to="/employees" replace />
+    return <Navigate to="/" replace />
   }
 
   return element;

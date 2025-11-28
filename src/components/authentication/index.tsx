@@ -34,7 +34,7 @@ export const AuthenticationPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={(e) => {e.preventDefault(); console.log(identity, password); login(identity, password)}}>
+                <form onSubmit={(e) => {e.preventDefault(); login(identity, password)}}>
                   <FieldGroup>
                     <TabsContent value="select"><AuthSelect value={identity} onChange={setIdentity}/></TabsContent>
                     <TabsContent value="input"><AuthInput value={identity} onChange={setIdentity}/></TabsContent>
