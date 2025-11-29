@@ -1,8 +1,9 @@
 import { API_URL } from "@/config"
+import type { User } from "@/types/users"
 import { useEffect, useState } from "react"
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<any>([])
+  const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | null>(null)
 
