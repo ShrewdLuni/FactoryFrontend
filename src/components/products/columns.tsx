@@ -3,15 +3,7 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { SortableHeader } from "../data-table/sortable-header"
 import { Checkbox } from "@/components/ui/checkbox";
-
-export type Product = {
-  id: string;
-  code: string;
-  category: string;
-  name: string;
-  measureUnit: string;
-};
-
+import type { Product } from "@/types/products";
 
 export const columns: ColumnDef<Product>[] = [
   {

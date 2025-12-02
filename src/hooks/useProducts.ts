@@ -1,6 +1,6 @@
-import type { Product } from "@/components/products/columns"
 import { API_URL } from "@/config"
 import { useEffect, useState } from "react"
+import type { Product } from "@/types/products"
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([])
