@@ -3,20 +3,7 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { SortableHeader } from "../data-table/sortable-header"
 import { Checkbox } from "@/components/ui/checkbox";
-
-export type Batch = {
-  id: string;
-  status:
-    | "Inactive"
-    | "Knitting Workshop"
-    | "Sewing Workshop"
-    | "Molding Workshop"
-    | "Labeling Workshop"
-    | "Turning-Out"
-    | "Finished";
-  productId: string;
-  category: string;
-};
+import type { Batch } from "@/types/batches";
 
 export const columns: ColumnDef<Batch>[] = [
   {

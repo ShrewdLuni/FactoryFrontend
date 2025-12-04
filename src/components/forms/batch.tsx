@@ -14,23 +14,28 @@ import {
 } from "@/components/ui/select"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
+import { useProducts } from "@/hooks/useProducts"
 
 export const BatchForm = () => {
+  const { products } = useProducts()
+
   return (
     <form className="flex flex-col gap-4">
       <FieldSet>
         <FieldLegend>Batch Information</FieldLegend>
         <FieldGroup>
           <Field>
-            <FieldLabel>Batch Name</FieldLabel>
+            <FieldLabel>Batch name</FieldLabel>
+            <Input id="checkout" placeholder="Batch-2351"/>
+          </Field>
+          <Field>
+            <FieldLabel>Product</FieldLabel>
             <Select>
               <SelectTrigger>
                 <SelectValue placeholder="Select a batch" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="batch-a">Batch A</SelectItem>
-                <SelectItem value="batch-b">Batch B</SelectItem>
-                <SelectItem value="batch-c">Batch C</SelectItem>
+                {products.map((product) => {return <SelectItem value={product.name}>{product.name}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>
