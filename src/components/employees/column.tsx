@@ -43,9 +43,14 @@ export const columns: ColumnDef<User>[] = [
         <SortableHeader column={column} field={"Role"}/>
       )
     },
+    cell: ({ row }) => {
+      return (
+        <p>{row.original.role == null ? "Not set" : row.original.role}</p>
+      )
+    },
   },
   {
-    accessorKey: "full_name",
+    accessorKey: "fullName",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Name"}/>

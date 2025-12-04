@@ -21,7 +21,7 @@ export const AuthSelect = ({ value, onChange }: AuthSelectProps) => {
           <SelectGroup>
             {users.map((item) => {
               return (
-                <SelectItem value={item.username}>{item.username}</SelectItem> 
+                <SelectItem value={item.code ? String(item.code) : item.username}>{item.fullName}</SelectItem> 
               )
             })}
           </SelectGroup>
