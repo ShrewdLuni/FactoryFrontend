@@ -3,11 +3,17 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './AuthProvider.tsx'
+import { AuthGate } from './AuthGate.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <AuthProvider>
+      <AuthGate>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthGate>
+    </AuthProvider>
   </StrictMode>,
 )

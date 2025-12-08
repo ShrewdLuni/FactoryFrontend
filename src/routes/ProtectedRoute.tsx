@@ -1,13 +1,13 @@
 import { useAuth } from "@/AuthProvider"
-import { Navigate } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 
 interface ProtectedRouteProps {
-  element: any,
+  element?: any,
   roles: string[],
 }
 
-export const ProtectedRoute = ({element, roles} : ProtectedRouteProps) => {
-  const { user, loading} = useAuth(); 
+export const ProtectedRoute = ({roles} : ProtectedRouteProps) => {
+  const { user } = useAuth(); 
 
   if (!user) {
     return <Navigate to="/auth" replace />
@@ -17,5 +17,5 @@ export const ProtectedRoute = ({element, roles} : ProtectedRouteProps) => {
     return <Navigate to="/" replace />
   }
 
-  return element;
+  return <Outlet/>;
 }
