@@ -13,7 +13,16 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
   contentForm: JSX.Element,
-  filters: JSX.Element,
+  filters?: {
+    column: string;
+    title?: string;
+    options: {
+      label: string;
+      value: string;
+      icon?: React.ComponentType<{ className?: string }>;
+    }[];
+  }[];
+
 }
 
 export function DataTable<TData, TValues>({ columns, data, contentForm, filters } : DataTableProps<TData, TValues>){
@@ -45,7 +54,7 @@ export function DataTable<TData, TValues>({ columns, data, contentForm, filters 
 
   return (
     <div className="flex flex-col w-full">
-      <TableToolbar table={table} onAddRecord={() => setIsAddFormOpen(true)}/>
+      <TableToolbar table={table} onAddRecord={() => setIsAddFormOpen(true)} filters={filters}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
       <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={contentForm}/>
