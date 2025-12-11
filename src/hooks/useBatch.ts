@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { API_URL } from "@/config"
-import { Batch } from "@/types/batches";
+import type { Batch } from "@/types/batches";
 
 export const useBatches = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
