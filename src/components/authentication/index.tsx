@@ -16,7 +16,6 @@ export const AuthenticationPage = () => {
   const [identity, setIdentity] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">

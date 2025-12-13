@@ -8,7 +8,9 @@ interface AuthSelectProps {
 }
 
 export const AuthSelect = ({ value, onChange }: AuthSelectProps) => {
-  const { users, loading, error } = useUsers();
+  const { users } = useUsers();
+
+  console.log(value);
 
   return (
     <Field>
