@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Field, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
+import { useRandomId } from "@/hooks/useRandomId";
 
 interface AuthInputProps {
   value: string;
@@ -8,12 +8,9 @@ interface AuthInputProps {
 }
 
 export const AuthInput = ({ value, onChange }: AuthInputProps) => {
-
   const passwordLength = 8;
-  const min = 100
-  const max = 1000000
-  const [example] = useState<string>(() => String(Math.floor(Math.random() * (max - min + 1)) + min))
-
+  const example = useRandomId(100, 1000000)
+  
   return (
     <Field>
       <FieldLabel htmlFor="userId">Id</FieldLabel>

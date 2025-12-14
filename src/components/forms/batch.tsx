@@ -20,11 +20,13 @@ import { useProducts } from "@/hooks/useProducts"
 import { TabsContent } from "@radix-ui/react-tabs"
 import { Separator } from "../ui/separator"
 import { useState } from "react"
+import { useRandomId } from "@/hooks/useRandomId"
 
 export const BatchForm = () => {
   const { products } = useProducts()
   const [batchSize, setBatchSize] = useState(100);
   const [amount, setAmount] = useState(100);
+  const id = useRandomId(1000, 10000)
 
   return (
     <form className="flex flex-col gap-4">
@@ -33,7 +35,7 @@ export const BatchForm = () => {
         <FieldGroup>
           <Field>
             <FieldLabel>Batch name</FieldLabel>
-            <Input placeholder="Batch-2351"/>
+            <Input placeholder={`Batch-${id}`}/>
           </Field>
           <Field>
             <FieldLabel>Product</FieldLabel>
