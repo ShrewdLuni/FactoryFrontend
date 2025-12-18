@@ -15,7 +15,7 @@ export const SidebarSingleItem = ({name, path, element, roles, icon: Icon, isSub
   const Wrapper = isSub ? SidebarMenuSubItem : SidebarMenuItem
   const Button = isSub ? SidebarMenuSubButton : SidebarMenuButton 
 
-  console.log(element, roles)
+  // console.log(element, roles)
 
   return (
     <Wrapper>

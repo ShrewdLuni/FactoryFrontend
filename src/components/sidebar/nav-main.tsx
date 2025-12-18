@@ -27,11 +27,11 @@ export function NavMain({}) {
 
   return (
     <SidebarMenu>
-      {allowedSidebar.map((element) => 
+      {allowedSidebar.map((element, _) => 
         ("group" in element) ? (
-          <SidebarGroupItem {...element}/>
+          <SidebarGroupItem key={_} {...element}/>
         ) : (
-          <SidebarSingleItem {...element}/>
+          <SidebarSingleItem key={_} {...element}/>
         )
       )}
     </SidebarMenu>
