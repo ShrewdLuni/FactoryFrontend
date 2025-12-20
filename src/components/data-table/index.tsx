@@ -13,6 +13,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
   contentForm: JSX.Element,
+  searchValues?: string,
   filters?: {
     column: string;
     title?: string;
@@ -25,7 +26,7 @@ interface DataTableProps<TData, TValue> {
 
 }
 
-export function DataTable<TData, TValues>({ columns, data, contentForm, filters } : DataTableProps<TData, TValues>){
+export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters } : DataTableProps<TData, TValues>){
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -54,7 +55,7 @@ export function DataTable<TData, TValues>({ columns, data, contentForm, filters 
 
   return (
     <div className="flex flex-col w-full">
-      <TableToolbar table={table} onAddRecord={() => setIsAddFormOpen(true)} filters={filters}/>
+      <TableToolbar table={table} searchBarValue={searchValues} onAddRecord={() => setIsAddFormOpen(true)} filters={filters}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
       <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={contentForm}/>

@@ -4,6 +4,9 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { SortableHeader } from "../data-table/sortable-header"
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Batch } from "@/types/batches";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { MoreHorizontal } from "lucide-react";
 
 export const columns: ColumnDef<Batch>[] = [
   {
@@ -37,7 +40,15 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
-    accessorKey: "status",
+    accessorKey: "name",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Name"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "progressStatus",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Status"}/>
@@ -45,7 +56,15 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
-    accessorKey: "productId",
+    accessorKey: "size",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Batch size"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "productName",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Product"}/>
@@ -53,11 +72,38 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
-    accessorKey: "category",
+    accessorKey: "updatedAt",
     header: ({ column }) => {
       return (
-        <SortableHeader column={column} field={"Category"}/>
+        <SortableHeader column={column} field={"Last updated"}/>
       )
     }
   },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const payment = row.original
+ 
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
+              Generate QR Code
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
 ]
+

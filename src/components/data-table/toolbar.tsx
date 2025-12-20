@@ -7,7 +7,7 @@ import { DataTableFacetedFilter } from "./filter"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>,
-  onAddRecord: () => void,
+  searchBarValue?: string | null,
   filters?: {
     column: string;
     title?: string;
@@ -17,23 +17,25 @@ interface TableToolbarProps<TData> {
       icon?: React.ComponentType<{ className?: string }>;
     }[];
   }[];
+  onAddRecord: () => void,
 }
 
-export function TableToolbar<TData>({ table, onAddRecord, filters }: TableToolbarProps<TData>) {
+export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filters }: TableToolbarProps<TData>) {
 
   return (
     <div className="flex items-center py-4 gap-4">
-      <Input 
+      {searchBarValue && (<Input 
         placeholder="Search..."
-        value={(table.getColumn("email")?.getFilterValue() as string) ?? ""} 
+        value={(table.getColumn(searchBarValue)?.getFilterValue() as string) ?? ""} 
         onChange={(event) => {
-          table.getColumn("email")?.setFilterValue(event.target.value)
+          table.getColumn(searchBarValue)?.setFilterValue(event.target.value)
         }}
         className="max-w-sm"
-      />
+      />)}
       {filters && filters.map((filter) => {
         return table.getColumn(filter.column) && (
           <DataTableFacetedFilter
+            key={filter.title}
             column={table.getColumn(filter.column)}
             title={filter.title}
             options={filter.options}
