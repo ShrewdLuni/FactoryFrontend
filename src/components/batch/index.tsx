@@ -6,7 +6,7 @@ import { CircleX, CircleEllipsis, CircleCheck } from "lucide-react";
 
 export const BatchPage = () => {
 
-  const { batches } = useBatches()
+  const { batches, refetch} = useBatches()
 
   console.log(batches);
 
@@ -28,9 +28,9 @@ export const BatchPage = () => {
     },
   ]
 
-  const filters = [{column: "status", title: "Status", options: status,}]
+  const filters = [{column: "progressStatus", title: "Status", options: status,}]
 
   return (
-    <DataTable columns={columns} data={batches} contentForm={<BatchForm />}  filters={filters}/>
+    <DataTable columns={columns} data={batches} contentForm={<BatchForm onSuccess={refetch}/>}  filters={filters}/>
   );
 };
