@@ -2,7 +2,7 @@ export type Batch = {
   id: string;
   name: string;
   productId: number;
-  productName?: string;
+  assignedMasterId: number;
   size: number;
   progressStatus:
     | "Inactive"
@@ -12,13 +12,19 @@ export type Batch = {
     | "Labeling Workshop"
     | "Turning-Out"
     | "Finished";
+  plannedFor: string;
   updatedAt: string;
   createdAt: string;
+  productName?: string;
 };
 
 export type BatchInitialization = {
   name: string,
   productId: number,
+  assignedMasterId: number,
+  plannedFor?: Date,
   size: number,
   amount: number,
 }
+
+  
