@@ -8,10 +8,9 @@ interface SortableHeaderProps {
 }
 
 export const SortableHeader = ({column, field}: SortableHeaderProps) => {
-  console.log(column.getIsSorted(), field)
 
   return (
-    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+    <Button className="w-full" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
       {field} 
       {column.getIsSorted() === false ? <></> : column.getIsSorted() == "asc" ? <ArrowUpAZ/> : <ArrowDownAZ/>} 
     </Button>

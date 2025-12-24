@@ -54,7 +54,7 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
   })
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full text-center">
       <TableToolbar table={table} searchBarValue={searchValues} onAddRecord={() => setIsAddFormOpen(true)} filters={filters}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
