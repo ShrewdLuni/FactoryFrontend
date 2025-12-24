@@ -8,6 +8,10 @@ import { useProducts } from "@/hooks/useProducts"
 import { Separator } from "../ui/separator"
 import { useRandomId } from "@/hooks/useRandomId"
 import { useInitializeBatch } from "@/hooks/useInitializeBatch"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { CalendarIcon, ChevronDownIcon } from "lucide-react"
+import { Calendar } from "../ui/calendar"
+import { useUsers } from "@/hooks/useUsers"
 
 interface BatchFormProps {
   onSuccess: () =>  void;
@@ -15,7 +19,12 @@ interface BatchFormProps {
 
 export const BatchForm = ({ onSuccess }: BatchFormProps) => {
   const { products } = useProducts()
+  const { users } = useUsers()
+
   const [activeProductId, setActiveProductId] = useState<string | undefined>(undefined);
+  const [activeMasterId, setActiveMasterId] = useState<string | undefined>(undefined);
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [date, setDate] = useState<Date | undefined>(new Date())
   const [batchName, setBatchName] = useState("")
   const [batchSize, setBatchSize] = useState(100);
   const [amount, setAmount] = useState(100);
@@ -25,7 +34,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await initializeBatch({name: batchName, size: batchSize, productId: Number(activeProductId), amount});
+    await initializeBatch({name: batchName, size: batchSize, productId: Number(activeProductId), assignedMasterId: Number(activeMasterId), plannedFor: date, amount});
 
     if (!error) {
       onSuccess()
@@ -51,6 +60,41 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                 {products.map((product) => {return <SelectItem value={String(product.id)}>{product.name}</SelectItem>})}
               </SelectContent>
             </Select>
+          </Field>
+          <Field>
+            <FieldLabel>Master</FieldLabel>
+            <Select value={activeMasterId} onValueChange={setActiveMasterId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Assign a master" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.filter((user) => user.role == "Master").map((user) => {return <SelectItem value={String(user.id)}>{user.fullName}</SelectItem>})}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel>Planned execution date</FieldLabel>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button variant='outline' id='date' className='w-full justify-between font-normal'>
+                  <span className='flex items-center'>
+                    <CalendarIcon className='mr-2' />
+                    {date ? date.toLocaleDateString() : 'Pick a date'}
+                  </span>
+                  <ChevronDownIcon />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-auto overflow-hidden p-0' align='start'>
+                <Calendar
+                  mode='single'
+                  selected={date}
+                  onSelect={date => {
+                    setDate(date)
+                    setCalendarOpen(false)
+                  }}
+                />
+              </PopoverContent>
+            </Popover>
           </Field>
           <Field>
             <FieldLabel>Batch size</FieldLabel>

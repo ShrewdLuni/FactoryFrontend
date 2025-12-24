@@ -7,6 +7,7 @@ import type { Batch } from "@/types/batches";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
+import { formatDateTime } from "@/helpers/formatTime";
 
 export const columns: ColumnDef<Batch>[] = [
   {
@@ -72,12 +73,37 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
+    accessorKey: "assignedMasterName",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Name"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "plannedFor",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Planned for"}/>
+      )
+    },
+    cell: ({ row }) => {
+      const plannedFor = row.getValue("plannedFor") as string;
+      return <span>{formatDateTime(plannedFor)}</span>;
+    }
+  },
+  {
     accessorKey: "updatedAt",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Last updated"}/>
       )
+    },
+    cell: ({ row }) => {
+      const plannedFor = row.getValue("plannedFor") as string;
+      return <span>{formatDateTime(plannedFor)}</span>;
     }
+
   },
   {
     id: "actions",
