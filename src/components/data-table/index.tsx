@@ -12,7 +12,7 @@ import { type JSX } from "react"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
-  contentForm: JSX.Element,
+  contentForm?: JSX.Element,
   searchValues?: string,
   filters?: {
     column: string;

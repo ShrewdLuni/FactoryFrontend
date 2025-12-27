@@ -5,13 +5,18 @@ export type Batch = {
   assignedMasterId: number;
   size: number;
   progressStatus:
-    | "Inactive"
-    | "Knitting Workshop"
-    | "Sewing Workshop"
-    | "Molding Workshop"
-    | "Labeling Workshop"
-    | "Turning-Out"
-    | "Finished";
+    | 'Inactive'
+    | 'Knitting Workshop(Processing)'
+    | 'Knitting Workshop(Finished)'
+    | 'Sewing Workshop(Processing)'
+    | 'Sewing Workshop(Finished)'
+    | 'Molding Workshop(Processing)'
+    | 'Molding Workshop(Finished)'
+    | 'Labeling Workshop(Processing)'
+    | 'Labeling Workshop(Finished)'
+    | 'Packaging Workshop(Processing)'
+    | 'Packaging Workshop(Finished)'
+    | 'Completed'
   plannedFor: string;
   updatedAt: string;
   createdAt: string;
