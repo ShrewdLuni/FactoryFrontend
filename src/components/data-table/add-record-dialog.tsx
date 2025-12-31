@@ -15,7 +15,7 @@ interface AddRecordDialogProps {
 
 export const AddRecordDialog = ({ open, onOpenChange, contentForm } : AddRecordDialogProps) => {
   return (
-    <Dialog  open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle>""</DialogTitle>

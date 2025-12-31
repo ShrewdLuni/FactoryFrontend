@@ -1,7 +1,7 @@
 import { columns} from "./colums";
 import { DataTable } from "../data-table";
 import { BatchForm } from "../forms/batch";
-import { useBatches } from "@/hooks/useBatch";
+import { useBatches } from "@/hooks/useBatches";
 import { CircleX, CircleEllipsis, CircleCheck } from "lucide-react";
 
 export const BatchPage = () => {
