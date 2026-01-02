@@ -9,9 +9,8 @@ import { MoreHorizontal } from "lucide-react";
 import type { QRCode } from "@/types/qrcode";
 import { IconCircleFilled } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
-import type { useNavigate } from "react-router-dom";
 
-export const getColumns = (navigate: ReturnType<typeof useNavigate>): ColumnDef<QRCode>[] => [
+export const getColumns = (openActivateDialog: (qr: QRCode) => void): ColumnDef<QRCode>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -88,7 +87,7 @@ export const getColumns = (navigate: ReturnType<typeof useNavigate>): ColumnDef<
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => {console.log(row.original); navigate(`/qrcodes/${row.original.id}/activate`)}}>
+            <DropdownMenuItem onClick={() => {openActivateDialog(row.original)}}>
               Activate QR-Code
             </DropdownMenuItem>
             <DropdownMenuSeparator />
