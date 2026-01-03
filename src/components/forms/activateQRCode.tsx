@@ -5,7 +5,6 @@ import type { QRCode } from "@/types/qrcode"
 import { useBatches } from "@/hooks/useBatches"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
 import { useActivateQRCode } from "@/hooks/useActivateQRCode"
-import { API_URL } from "@/config"
 
 interface QRCodeFormProps {
   qrcode: QRCode,
@@ -41,7 +40,7 @@ export const ActivateQRCodeForm = ({ qrcode, onDone}: QRCodeFormProps) => {
                 <SelectValue placeholder="Select a batch" />
               </SelectTrigger>
               <SelectContent>
-                {batches.filter((batch) => batch.progressStatus == "Inactive").map((batch) => {return <SelectItem value={`${API_URL}/batches/${String(batch.id)}`}>{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.productName} | Size: ${batch.size}`}</SelectItem>})}
+                {batches.filter((batch) => batch.progressStatus == "Inactive").map((batch) => {return <SelectItem value={`https://shrwd.dev/batch/${String(batch.id)}`}>{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.productName} | Size: ${batch.size}`}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>

@@ -10,7 +10,7 @@ import type { QRCode } from "@/types/qrcode";
 import { IconCircleFilled } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 
-export const getColumns = (openActivateDialog: (qr: QRCode) => void): ColumnDef<QRCode>[] => [
+export const getColumns = (openActivateDialog: (qr: QRCode) => void, openSeeDialog: (qr: QRCode) => void): ColumnDef<QRCode>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -89,6 +89,9 @@ export const getColumns = (openActivateDialog: (qr: QRCode) => void): ColumnDef<
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => {openActivateDialog(row.original)}}>
               Activate QR-Code
+            </DropdownMenuItem>
+           <DropdownMenuItem onClick={() => {openSeeDialog(row.original)}}>
+              See QR-Code
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Edit</DropdownMenuItem>

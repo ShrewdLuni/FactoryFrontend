@@ -3,6 +3,7 @@ export type QRCode = {
   isTaken: boolean,
   name?: string | null,
   resource?: string | null,
+  qrcodeImage?: string | null
 }
 
 export type QRCodeInitialization = {

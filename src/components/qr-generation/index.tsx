@@ -12,6 +12,7 @@ export const QrCodeGenerationPage = () => {
 
   const { qrcodes, refetch } = useQRCodes()
   const [activateOpen, setActivateOpen] = useState(false)
+  const [seeOpen, setSeeOpen] = useState(false)
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)
 
   const openActivateDialog = (qr: QRCode) => {
@@ -19,8 +20,13 @@ export const QrCodeGenerationPage = () => {
     setActivateOpen(true)
   }
 
+  const openSeeDialog = (qr: QRCode) => {
+    setActiveQRCode(qr)
+    setSeeOpen(true)
+  }
+
   const navigate = useNavigate();
-  const columns = useMemo(() => getColumns(openActivateDialog), [navigate]);
+  const columns = useMemo(() => getColumns(openActivateDialog, openSeeDialog), [navigate]);
 
   return (
     <div>
@@ -38,8 +44,18 @@ export const QrCodeGenerationPage = () => {
             )}
         </DialogContent>
       </Dialog>
+       <Dialog open={seeOpen} onOpenChange={setSeeOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>QR Code</DialogTitle>
+            </DialogHeader>
+            {(activeQRCode && activeQRCode.qrcodeImage) && (<img 
+              src={activeQRCode.qrcodeImage} 
+              alt={activeQRCode.name || `QR Code ${activeQRCode.id}`}
+              className="w-48 h-48 border-2 border-gray-300 rounded"
+            />)}
+          </DialogContent>
+        </Dialog>
     </div>
   )
-
-
 }
