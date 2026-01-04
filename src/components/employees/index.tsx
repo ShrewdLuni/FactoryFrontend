@@ -1,7 +1,7 @@
 import { useUsers } from "@/hooks/useUsers";
 import { DataTable } from "../data-table";
 import { EmployeeForm } from "../forms/employee";
-import { columns } from "./column"
+import { columns } from "./columns"
 import { Mars, Venus, CircleSmall, HardHat, UserStar, UserCog} from "lucide-react";
 
 export const EmployeesPage = () => {

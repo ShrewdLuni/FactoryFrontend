@@ -1,4 +1,4 @@
-import { columns} from "./colums";
+import { columns} from "./columns";
 import { DataTable } from "../data-table";
 import { BatchForm } from "../forms/batch";
 import { useBatches } from "@/hooks/useBatches";

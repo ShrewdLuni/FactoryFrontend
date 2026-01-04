@@ -76,7 +76,7 @@ export const columns: ColumnDef<Batch>[] = [
     accessorKey: "assignedMasterName",
     header: ({ column }) => {
       return (
-        <SortableHeader column={column} field={"Name"}/>
+        <SortableHeader column={column} field={"Master name"}/>
       )
     }
   },
