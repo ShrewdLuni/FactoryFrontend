@@ -4,28 +4,32 @@ import { Button } from "../ui/button"
 import type { QRCode } from "@/types/qrcode"
 import { useBatches } from "@/hooks/useBatches"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
-import { useActivateQRCode } from "@/hooks/useActivateQRCode"
+import { useQR } from "@/hooks/useQR"
 
 interface QRCodeFormProps {
   qrcode: QRCode,
   onDone: () => void,
 }
 
-export const ActivateQRCodeForm = ({ qrcode, onDone}: QRCodeFormProps) => {
+export const ActivateQRCodeForm = ({ qrcode, onDone }: QRCodeFormProps) => {
   const [linkedBatch, setLinkedBatch] = useState("")
-
-  const { success, activateQRCode } = useActivateQRCode()
   const { batches } = useBatches();
+
+  const { mutate: activateQRCode, isPending }= useQR.activate()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(qrcode.id, linkedBatch)
-    activateQRCode(qrcode.id, linkedBatch)
-
-    if (success) {
-      onDone()
-    }
+    activateQRCode(
+      { id: qrcode.id, resource: linkedBatch },
+      {
+        onSuccess: () => {
+          onDone()
+        },
+        onError: (error) => {
+          console.log("Failed to activate QR code:", error)
+        }
+      })
   }
 
   return (
@@ -46,8 +50,8 @@ export const ActivateQRCodeForm = ({ qrcode, onDone}: QRCodeFormProps) => {
           </Field>
         </FieldGroup>
       </FieldSet>
-      <Button type="submit">
-        Initialize
+      <Button type="submit" disabled={isPending || !linkedBatch}>
+        { isPending ? 'Activating...' : 'Initialize' }
       </Button>
     </form>
   )
