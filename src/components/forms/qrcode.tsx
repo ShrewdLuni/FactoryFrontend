@@ -3,7 +3,7 @@ import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet, } from "@/compone
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { useRandomId } from "@/hooks/useRandomId"
-import { useInitializeQRCode } from "@/hooks/useInitializeQRCode"
+import { useQR } from "@/hooks/useQR"
 
 interface QRCodeFormProps {
   onSuccess: () =>  void;
@@ -14,16 +14,24 @@ export const QRCodeForm = ({ onSuccess }: QRCodeFormProps) => {
   const [amount, setAmount] = useState(10);
   const id = useRandomId(10, 1000)
 
-  const { initializeQRCodes, error } = useInitializeQRCode();
+  const { mutate: initializeQRCodes, isPending } = useQR.initialize();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("click")
     e.preventDefault();
-    await initializeQRCodes({name: name, amount: amount});
 
-    if (!error) {
-      onSuccess()
-    }
+    initializeQRCodes(
+      { name: name, amount: amount },
+      {
+        onSuccess: () => {
+          onSuccess()
+          setName("")
+          setAmount(10)
+        },
+        onError: (error) => {
+          console.log('Failed to initialize QR codes:', error)
+        }
+      }
+    )
   }
 
   return (
@@ -41,8 +49,8 @@ export const QRCodeForm = ({ onSuccess }: QRCodeFormProps) => {
           </Field>
         </FieldGroup>
       </FieldSet>
-      <Button type="submit">
-        Initialize
+      <Button type="submit" disabled={isPending || !name || amount < 1}>
+        {isPending ? 'Initializing...' : 'Initialize'}
       </Button>
     </form>
   )
