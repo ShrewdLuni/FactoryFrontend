@@ -1,4 +1,3 @@
-import { useQRCodes } from "@/hooks/useQRCodes"
 import { DataTable } from "../data-table"
 import { QRCodeForm } from "../forms/qrcode"
 import { useMemo, useState } from "react"
@@ -7,10 +6,11 @@ import { getColumns } from "./columns"
 import { Dialog, DialogHeader, DialogTitle, DialogContent } from "../ui/dialog"
 import type { QRCode } from "@/types/qrcode"
 import { ActivateQRCodeForm } from "../forms/activateQRCode"
+import { useQR } from "@/hooks/useQR"
 
 export const QrCodeGenerationPage = () => {
 
-  const { qrcodes, refetch } = useQRCodes()
+  const {data: qrcodes, isLoading, refetch} = useQR.getAll()
   const [activateOpen, setActivateOpen] = useState(false)
   const [seeOpen, setSeeOpen] = useState(false)
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)
@@ -28,9 +28,13 @@ export const QrCodeGenerationPage = () => {
   const navigate = useNavigate();
   const columns = useMemo(() => getColumns(openActivateDialog, openSeeDialog), [navigate]);
 
+  if (isLoading) {
+    <div>Loading</div>
+  }
+
   return (
     <div>
-      <DataTable columns={columns} data={qrcodes} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
+      <DataTable columns={columns} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
       <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
