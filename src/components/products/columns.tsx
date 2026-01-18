@@ -45,18 +45,27 @@ export const columns: ColumnDef<Product>[] = [
     }
   },
   {
-    accessorKey: "category",
-    header: ({ column }) => {
-      return (
-        <SortableHeader column={column} field={"Category"}/>
-      )
-    }
-  },
-  {
     accessorKey: "name",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Name"}/>
+      )
+    }
+  },
+  {
+    accessorKey: "isActive",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Is Active"}/>
+      )
+    }
+  },
+
+  {
+    accessorKey: "category",
+    header: ({ column }) => {
+      return (
+        <SortableHeader column={column} field={"Category"}/>
       )
     }
   },

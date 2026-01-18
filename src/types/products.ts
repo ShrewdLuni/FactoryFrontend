@@ -4,4 +4,5 @@ export type Product = {
   category: string;
   name: string;
   measureUnit: string;
+  isActive: boolean;
 };

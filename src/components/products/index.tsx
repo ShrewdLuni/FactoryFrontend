@@ -8,6 +8,6 @@ export const ProductsPage = () => {
   const { products } = useProducts()
 
   return (
-    <DataTable columns={columns} data={products} contentForm={<BatchForm/>}/>
+    <DataTable columns={columns} data={products} contentForm={<BatchForm onSuccess={() => console.log("true")}/>}/>
   )
 }
