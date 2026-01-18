@@ -2,7 +2,7 @@ import { columns} from "./columns";
 import { DataTable } from "../data-table";
 import { BatchForm } from "../forms/batch";
 import { useBatches } from "@/hooks/useBatches";
-import { CircleX, CircleEllipsis, CircleCheck } from "lucide-react";
+import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, ArchiveIcon } from "lucide-react";
 
 export const BatchPage = () => {
 
@@ -17,9 +17,31 @@ export const BatchPage = () => {
       icon: CircleX,
     },
     {
-      label: "In-Progress",
-      value: "In-Progress",
-      icon: CircleEllipsis,
+      label: "Knitting Workshop",
+      value: "Knitting Workshop",
+      icon: Scissors,
+    },
+    {
+      label: "Sewing Workshop",
+      value: "Sewing Workshop",
+      icon: Spool,
+    },
+    {
+      label: "Molding Workshop",
+      value: "Molding Workshop",
+      icon: Layers,
+    },
+
+    {
+      label: "Labeling Workshop",
+      value: "Labeling Workshop",
+      icon: Tag,
+    },
+
+    {
+      label: "Packaging Workshop",
+      value: "Packaging Workshop",
+      icon: ArchiveIcon,
     },
     {
       label: "Completed",
