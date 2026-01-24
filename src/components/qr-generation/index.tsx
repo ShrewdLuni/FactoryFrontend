@@ -36,7 +36,7 @@ export const QrCodeGenerationPage = () => {
     <div>
       <DataTable columns={columns} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
       <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Activate QR Code</DialogTitle>
           </DialogHeader>
@@ -49,14 +49,14 @@ export const QrCodeGenerationPage = () => {
         </DialogContent>
       </Dialog>
        <Dialog open={seeOpen} onOpenChange={setSeeOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>QR Code</DialogTitle>
             </DialogHeader>
             {(activeQRCode && activeQRCode.qrcodeImage) && (<img 
               src={activeQRCode.qrcodeImage} 
               alt={activeQRCode.name || `QR Code ${activeQRCode.id}`}
-              className="w-48 h-48 border-2 border-gray-300 rounded"
+              className="w-full h-full border-2 border-gray-300 rounded"
             />)}
           </DialogContent>
         </Dialog>

@@ -24,7 +24,7 @@ export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filter
 
   return (
     <div className="flex items-center py-4 gap-4">
-      {searchBarValue && (<Input 
+      {searchBarValue != null && (<Input 
         placeholder="Search..."
         value={(table.getColumn(searchBarValue)?.getFilterValue() as string) ?? ""} 
         onChange={(event) => {

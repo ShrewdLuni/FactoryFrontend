@@ -1,6 +1,6 @@
 "use client"
 
-import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel } from "@tanstack/react-table"
+import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel, type TableState } from "@tanstack/react-table"
 import { useState } from "react"
 
 import { TablePagination } from "./pagination"
@@ -23,12 +23,12 @@ interface DataTableProps<TData, TValue> {
       icon?: React.ComponentType<{ className?: string }>;
     }[];
   }[];
-
+  initialState?: Partial<TableState> 
 }
 
-export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters } : DataTableProps<TData, TValues>){
+export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState } : DataTableProps<TData, TValues>){
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialState?.columnFilters || [])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
@@ -50,7 +50,7 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
       columnFilters,
       columnVisibility,
       rowSelection,
-    }
+    },
   })
 
   return (
