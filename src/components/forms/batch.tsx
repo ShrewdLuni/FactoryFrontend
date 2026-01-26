@@ -11,7 +11,7 @@ import { useInitializeBatch } from "@/hooks/useInitializeBatch"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { CalendarIcon, ChevronDownIcon } from "lucide-react"
 import { Calendar } from "../ui/calendar"
-import { useUsers } from "@/hooks/useUsers"
+import { useUsers } from "@/hooks/useUser"
 
 interface BatchFormProps {
   onSuccess: () =>  void;
@@ -19,7 +19,7 @@ interface BatchFormProps {
 
 export const BatchForm = ({ onSuccess }: BatchFormProps) => {
   const { products } = useProducts()
-  const { users } = useUsers()
+  const { data: users } = useUsers.getAll()
 
   const [activeProductId, setActiveProductId] = useState<string | undefined>(undefined);
   const [activeMasterId, setActiveMasterId] = useState<string | undefined>(undefined);
@@ -57,7 +57,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                 <SelectValue placeholder="Select a batch" />
               </SelectTrigger>
               <SelectContent>
-                {products.map((product) => {return <SelectItem value={String(product.id)}>{product.name}</SelectItem>})}
+                {products.filter((product) => product.isActive).map((product) => {return <SelectItem value={String(product.id)}>{product.name}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>
@@ -68,7 +68,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                 <SelectValue placeholder="Assign a master" />
               </SelectTrigger>
               <SelectContent>
-                {users.filter((user) => user.role == "Master").map((user) => {return <SelectItem value={String(user.id)}>{user.fullName}</SelectItem>})}
+                {users ? users.filter((user) => user.role == "Master").map((user) => {return <SelectItem value={String(user.id)}>{user.fullName}</SelectItem>}) : ""}
               </SelectContent>
             </Select>
           </Field>
