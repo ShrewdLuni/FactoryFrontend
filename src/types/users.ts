@@ -4,20 +4,25 @@ export type UserRole =
   | "Manager"
   | "Observer"
   | "Superuser";
+
 export type UserGender = "Male" | "Female" | "Other";
 
+export type UserDepartment = "Knitting" | "Sewing" | "Molding" | "Labeling" | "Packaging"
+
 export type User = {
-  id: string;
-  code: number;
-  username: string;
+  id: number;
+  guid?: string | null | undefined;
+  code?: string | null | undefined;
+  taxCode?: string | null | undefined;
+  username?: string | null | undefined;
   firstName: string;
   lastName: string;
-  patronymic: string;
+  patronymic?: string | null | undefined;
   fullName: string;
-  dateOfBirth: string;
-  email: string;
-  phone: string;
-  gender: UserGender;
-  department: string;
-  role: UserRole;
-};
+  dateOfBirth?: string | null | undefined;
+  email?: string | null | undefined
+  phone?: string | null | undefined
+  gender?: UserGender
+  department?: UserDepartment
+  role?: UserRole
+}
