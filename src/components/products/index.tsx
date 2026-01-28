@@ -1,7 +1,7 @@
 import { DataTable } from "../data-table"
 import { getProductColumns } from "./columns"
 import { BatchForm } from "../forms/batch"
-import { useProducts } from "@/hooks/useProduct"
+import { useProducts } from "@/hooks/useProducts"
 import { CircleCheck, CircleX } from "lucide-react"
 
 export const ProductsPage = () => {

@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
-import { useProducts } from "@/hooks/useProducts"
 import { Separator } from "../ui/separator"
 import { useRandomId } from "@/hooks/useRandomId"
 import { useInitializeBatch } from "@/hooks/useInitializeBatch"
@@ -12,13 +11,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { CalendarIcon, ChevronDownIcon } from "lucide-react"
 import { Calendar } from "../ui/calendar"
 import { useUsers } from "@/hooks/useUsers"
+import { useProducts } from "@/hooks/useProducts"
 
 interface BatchFormProps {
   onSuccess: () =>  void;
 }
 
 export const BatchForm = ({ onSuccess }: BatchFormProps) => {
-  const { products } = useProducts()
+  const { data: products } = useProducts.getAll()
   const { data: users } = useUsers.getAll()
 
   const [activeProductId, setActiveProductId] = useState<string | undefined>(undefined);
@@ -57,7 +57,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                 <SelectValue placeholder="Select a batch" />
               </SelectTrigger>
               <SelectContent>
-                {products.filter((product) => product.isActive).map((product) => {return <SelectItem value={String(product.id)}>{product.name}</SelectItem>})}
+                {products && products.filter((product) => product.isActive).map((product) => {return <SelectItem value={String(product.id)}>{product.name}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>
@@ -68,7 +68,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                 <SelectValue placeholder="Assign a master" />
               </SelectTrigger>
               <SelectContent>
-                {users ? users.filter((user) => user.role == "Master").map((user) => {return <SelectItem value={String(user.id)}>{user.fullName}</SelectItem>}) : ""}
+                {users && users.filter((user) => user.role == "Master").map((user) => {return <SelectItem value={String(user.id)}>{user.fullName}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>
