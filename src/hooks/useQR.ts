@@ -12,6 +12,12 @@ const fetchQRCodes = async (): Promise<QRCode[]> => {
   return response.json();
 }
 
+const fetchQRCode = async (id: number): Promise<QRCode> => {
+  const response = await fetch(`${BASE_URL}/${id}`);
+  if (!response.ok) throw new Error('Failed to fetch qrcodes');
+  return response.json();
+}
+
 const initializeQRCodes = async (qrcodeData: QRCodeInitialization): Promise<QRCode> => {
   const response = await fetch(`${API_URL}/qrcodes`, {
     method: "POST",
@@ -39,6 +45,12 @@ export const useQR = {
     return useQuery<QRCode[]>({
       queryKey: QUERY_KEY,
       queryFn: fetchQRCodes,
+    });
+  },
+  get: (id: number) => {
+    return useQuery<QRCode>({
+      queryKey: QUERY_KEY,
+      queryFn: () => fetchQRCode(id),
     });
   },
   initialize: () => {

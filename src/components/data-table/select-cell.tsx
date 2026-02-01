@@ -16,7 +16,7 @@ export const SelectCell = ({ row, data, placeholder, onChange, defaultValue }: S
   return (
     <div className="w-full flex justify-center">
       <Select defaultValue={defaultValue} value={value} onValueChange={(value) => {console.log(value, row.original);setValue(value);onChange?.(value, row)}}>
-        <SelectTrigger className="min-w-38 w-38 max-w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncatj " size="sm">
+        <SelectTrigger className="w-full min-w-full **:data-[slot=select-value]:block **:data-[slot=select-value]:truncatj " size="sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent align="end">

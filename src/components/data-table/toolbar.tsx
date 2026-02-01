@@ -4,6 +4,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Button } from "@/components/ui/button"
 import { ChevronDown, CirclePlus } from "lucide-react"
 import { DataTableFacetedFilter } from "./filter"
+import { JSX } from "react"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>,
@@ -18,9 +19,11 @@ interface TableToolbarProps<TData> {
     }[];
   }[];
   onAddRecord: () => void,
+  toolbarExtras?: JSX.Element,
+  isAddSection?: boolean,
 }
 
-export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filters }: TableToolbarProps<TData>) {
+export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filters, toolbarExtras, isAddSection }: TableToolbarProps<TData>) {
 
   return (
     <div className="flex items-center py-4 gap-4">
@@ -42,6 +45,7 @@ export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filter
           />
         )
       })}
+      {toolbarExtras}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant={"outline"} className="ml-auto">
@@ -64,7 +68,7 @@ export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filter
           })}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button variant={"outline"} onClick={onAddRecord}>Add section <CirclePlus/> </Button>
+      {isAddSection && <Button variant={"outline"} onClick={onAddRecord}>Add section <CirclePlus/> </Button>}
     </div>
   )
 }

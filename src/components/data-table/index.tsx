@@ -23,10 +23,12 @@ interface DataTableProps<TData, TValue> {
       icon?: React.ComponentType<{ className?: string }>;
     }[];
   }[];
-  initialState?: Partial<TableState> 
+  initialState?: Partial<TableState>; 
+  toolbarExtras?: JSX.Element;
+  isAddSection?: boolean;
 }
 
-export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState } : DataTableProps<TData, TValues>){
+export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState, toolbarExtras, isAddSection = true } : DataTableProps<TData, TValues>){
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialState?.columnFilters || [])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -55,7 +57,7 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
 
   return (
     <div className="flex flex-col w-full text-center">
-      <TableToolbar table={table} searchBarValue={searchValues} onAddRecord={() => setIsAddFormOpen(true)} filters={filters}/>
+      <TableToolbar table={table} searchBarValue={searchValues} onAddRecord={() => setIsAddFormOpen(true)} filters={filters} toolbarExtras={toolbarExtras} isAddSection={isAddSection}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
       <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={contentForm}/>
