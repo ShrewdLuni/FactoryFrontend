@@ -13,7 +13,7 @@ export const ProtectedRoute = ({roles} : ProtectedRouteProps) => {
     return <Navigate to="/auth" replace />
   }
 
-  if (!roles.includes(user.role) && !roles.includes("*")) {
+  if (!roles.includes(user.role || "") && !roles.includes("*")) {
     return <Navigate to="/" replace />
   }
 

@@ -9,14 +9,6 @@ export function AppRoutes() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          user
-            ? <Navigate to="/employees" replace />
-            : <Navigate to="/auth" replace />
-        }
-      />
 
       <Route
         path="/auth"
@@ -33,9 +25,10 @@ export function AppRoutes() {
               key={route.path}
               path={route.path}
               element={
-                route.layout
+                user ? route.layout
                   ? <Layout>{route.element}</Layout>
                   : route.element
+                : <Navigate to="/auth" replace/>
               }
             />
           ))}
