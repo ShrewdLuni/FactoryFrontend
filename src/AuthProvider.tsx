@@ -11,7 +11,7 @@ import type { User } from "./types/users";
 
 interface AuthContextType {
   user: User | null;
-  login: (identity: string, password: string) => void;
+  login: (identity: string, password: string, isCode?: boolean) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -44,12 +44,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     fetchMe();
   }, []);
 
-  const login = useCallback(async (identity: string, password: string) => {
+  const login = useCallback(async (identity: string, password: string, isCode: boolean = false) => {
+    const loginData = isCode ? { code: identity, password }: { username: identity, password };
     const res = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: identity, password }),
+      body: JSON.stringify(loginData),
     });
 
     if (!res.ok) {

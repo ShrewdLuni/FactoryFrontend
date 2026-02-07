@@ -9,9 +9,12 @@ import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import { TabsContent } from "../ui/tabs"
 import { useAuth } from "@/AuthProvider"
 import { useState } from "react"
+import { useUsers } from "@/hooks/useUsers"
 
 export const AuthenticationPage = () => {
   const { login } = useAuth();
+
+  const { data: users } = useUsers.getAll()
 
   const [identity, setIdentity] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -33,9 +36,24 @@ export const AuthenticationPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={(e) => {e.preventDefault(); login(identity, password)}}>
+                <form onSubmit={(e) => {
+                  e.preventDefault(); 
+                  if (!users) return;
+
+                  const matchedUser = users.find(
+                    (u) => u.code === identity || u.username === identity
+                  );
+
+                  if (!matchedUser) {
+                    console.log("User not found");
+                    return;
+                  }
+
+                  const isCode = matchedUser.code === identity;
+                  login(identity, password, isCode)}
+                }>
                   <FieldGroup>
-                    <TabsContent value="select"><AuthSelect value={identity} onChange={setIdentity}/></TabsContent>
+                    <TabsContent value="select"><AuthSelect value={identity} onChange={setIdentity} users={users ?? []}/></TabsContent>
                     <TabsContent value="input"><AuthInput value={identity} onChange={setIdentity}/></TabsContent>
                     <Field>
                       <div className="flex items-center">
