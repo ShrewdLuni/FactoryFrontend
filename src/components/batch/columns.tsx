@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { formatDateTime } from "@/helpers/formatTime";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 export const columns: ColumnDef<Batch>[] = [
   {
@@ -16,7 +17,7 @@ export const columns: ColumnDef<Batch>[] = [
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+            (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -36,7 +37,7 @@ export const columns: ColumnDef<Batch>[] = [
     accessorKey: "id",
     header: ({ column }) => {
       return (
-          <SortableHeader column={column} field={"ID"}/>
+        <SortableHeader column={column} field={"ID"}/>
       )
     }
   },
@@ -65,7 +66,7 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
-    accessorKey: "productName",
+    accessorKey: "productId",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Product"}/>
@@ -73,10 +74,27 @@ export const columns: ColumnDef<Batch>[] = [
     }
   },
   {
-    accessorKey: "assignedMasterName",
+    accessorKey: "masters",
     header: ({ column }) => {
       return (
         <SortableHeader column={column} field={"Master name"}/>
+      )
+    },
+    cell: ({ row }) => {
+      return (
+        <HoverCard openDelay={10} closeDelay={100}>
+          <HoverCardTrigger asChild>
+            <Button variant="link">Hover here</Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="flex w-64 flex-col gap-0.5">
+            <div className="font-semibold">Masters</div>
+            <div>Knitting: {row.original.masters.knitting}</div>
+            <div>Sewing: {row.original.masters.sewing}</div>
+            <div>Molding: {row.original.masters.molding}</div>
+            <div>Labeling: {row.original.masters.labeling}</div>
+            <div>Packaging: {row.original.masters.packaging}</div>
+          </HoverCardContent>
+        </HoverCard>
       )
     }
   },
@@ -108,19 +126,18 @@ export const columns: ColumnDef<Batch>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
- 
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
+              <span className="sr-only">Open menu {row.original.name}</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
+            <DropdownMenuItem>
               Generate QR Code
             </DropdownMenuItem>
             <DropdownMenuSeparator />

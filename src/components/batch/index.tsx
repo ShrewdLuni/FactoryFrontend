@@ -1,14 +1,14 @@
 import { columns} from "./columns";
 import { DataTable } from "../data-table";
 import { BatchForm } from "../forms/batch";
-import { useBatches } from "@/hooks/useBatches";
 import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, ArchiveIcon } from "lucide-react";
+import { useBatches } from "@/hooks/useBatch";
 
 export const BatchPage = () => {
 
-  const { batches, refetch} = useBatches()
+  const { data: rawBatches, refetch } = useBatches.getAll();
 
-  console.log(batches);
+  const batches = rawBatches?.filter(batch => batch.isPlanned === false) || []
 
   const status = [
     {

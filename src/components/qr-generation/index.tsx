@@ -34,7 +34,7 @@ export const QrCodeGenerationPage = () => {
 
   return (
     <div>
-      <DataTable columns={columns} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
+      <DataTable columns={columns} searchValues={"name"} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
       <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>

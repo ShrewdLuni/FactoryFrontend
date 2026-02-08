@@ -23,8 +23,6 @@ export const ProductsPage = () => {
     <div>Loading...</div>
   }
 
-  console.log(products)
-
   const isActiveFilter = {
     column: "isActive", 
     title: "Is active", 
@@ -49,6 +47,7 @@ export const ProductsPage = () => {
       columns={getProductColumns({onCellUpdate: handleCellUpdate})} 
       data={products ? products : []} 
       contentForm={<BatchForm onSuccess={() => console.log("true")}/>} 
+      isAddSection={false}
       searchValues="name" 
       filters={filters}
       initialState={{

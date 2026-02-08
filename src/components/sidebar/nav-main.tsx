@@ -7,10 +7,9 @@ import { useAuth } from "@/AuthProvider";
 export function NavMain({}) {
   const { user } = useAuth()
 
-
   const allowedSidebar = sidebarElements.flatMap(element => {
     if ("group" in element) {
-      const allowedItems = element.items.filter(item => item.roles.includes(user!.role))
+      const allowedItems = element.items.filter(item => item.roles.includes(user!.role || ""))
       if (allowedItems.length === 0) 
         return []
       if (allowedItems.length === 1)
@@ -20,7 +19,7 @@ export function NavMain({}) {
         items: allowedItems
       }
     }
-    if (element.roles.includes(user!.role)) {
+    if (element.roles.includes(user!.role || "")) {
       return element
     }
     return []

@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Button } from "@/components/ui/button"
 import { ChevronDown, CirclePlus } from "lucide-react"
 import { DataTableFacetedFilter } from "./filter"
-import { JSX } from "react"
+import type { JSX } from "react"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>,

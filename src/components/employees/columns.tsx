@@ -1,6 +1,4 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { IconCircleFilled } from "@tabler/icons-react"
 import { SortableHeader } from "../data-table/sortable-header";
 import { Checkbox } from "../ui/checkbox";
 import type { User } from "@/types/users";
@@ -61,7 +59,7 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
       },
       cell: ({ row }) => {
         return (
-          <SelectCell row={row} defaultValue={row.original.role} data={roleSelect} placeholder="Assign role" onChange={(value) => onCellUpdate("role", value, row)}/>
+          <SelectCell row={row} defaultValue={row.original.role || ""} data={roleSelect} placeholder="Assign role" onChange={(value) => onCellUpdate("role", value, row)}/>
         )
       },
     },
@@ -74,7 +72,7 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
       },
       cell: ({ row }) => {
         return (
-          <SelectCell row={row} defaultValue={row.original.department} data={departmentsSelect} placeholder="Assign department" onChange={(value) => onCellUpdate("department", value, row)}/>
+          <SelectCell row={row} defaultValue={row.original.department || ""} data={departmentsSelect} placeholder="Assign department" onChange={(value) => onCellUpdate("department", value, row)}/>
         )
       },
     },
@@ -112,7 +110,7 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
         )
       },
       cell: ({ row }) => (
-          <SelectCell row={row} defaultValue={row.original.gender} data={genderSelect} placeholder="Assign gender" onChange={(value) => onCellUpdate("gender", value, row)}/>
+          <SelectCell row={row} defaultValue={row.original.gender || ""} data={genderSelect} placeholder="Assign gender" onChange={(value) => onCellUpdate("gender", value, row)}/>
         // <Badge variant="outline" className="text-muted-foreground px-1.5">
         //   {row.original.gender === "Male" ? (
         //     <IconCircleFilled className="fill-blue-700 dark:fill-blue-600" />

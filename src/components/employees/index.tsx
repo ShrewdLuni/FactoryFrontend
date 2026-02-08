@@ -6,7 +6,6 @@ import { useUsers } from "@/hooks/useUsers";
 
 export const EmployeesPage = () => {
 
-
   const { data: users, isLoading } = useUsers.getAll()
   const { mutate: updateUser } = useUsers.update()
 
@@ -81,7 +80,8 @@ export const EmployeesPage = () => {
 
   const filters = [
     {column: "role", title: "Role", options: roles,},
-    {column: "gender", title: "Gender", options: gender,}
+    {column: "gender", title: "Gender", options: gender,},
+    {column: "department", title: "Department", options: departments,}
   ]
 
   if (isLoading) {
@@ -98,6 +98,7 @@ export const EmployeesPage = () => {
           onCellUpdate: handleCellUpdate,
         })
       } 
+      isAddSection={false}
       data={users ? users : []} 
       contentForm={<EmployeeForm/>} 
       filters={filters} 

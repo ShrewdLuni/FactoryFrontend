@@ -1,26 +1,27 @@
 export type Batch = {
-  id: string;
+  id: number;
   name: string;
-  productId: number;
-  assignedMasterId: number;
   size: number;
-  progressStatus:
-    | 'Inactive'
-    | 'Knitting Workshop(Processing)'
-    | 'Knitting Workshop(Finished)'
-    | 'Sewing Workshop(Processing)'
-    | 'Sewing Workshop(Finished)'
-    | 'Molding Workshop(Processing)'
-    | 'Molding Workshop(Finished)'
-    | 'Labeling Workshop(Processing)'
-    | 'Labeling Workshop(Finished)'
-    | 'Packaging Workshop(Processing)'
-    | 'Packaging Workshop(Finished)'
-    | 'Completed'
+  productId: number;
+  workstationId: number;
+  progressStatus: 'Inactive'
+  | 'Knitting Workshop'
+  | 'Sewing Workshop'
+  | 'Molding Workshop'
+  | 'Labeling Workshop'
+  | 'Packaging Workshop'
+  | 'Completed';
+  masters: {
+    knitting: number,
+    sewing: number,
+    molding: number,
+    labeling: number,
+    packaging: number,
+  };
+  isPlanned: boolean
   plannedFor: string;
   updatedAt: string;
   createdAt: string;
-  productName?: string;
 };
 
 export type BatchInitialization = {
@@ -32,4 +33,4 @@ export type BatchInitialization = {
   amount: number,
 }
 
-  
+

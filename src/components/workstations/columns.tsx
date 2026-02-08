@@ -3,7 +3,7 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { SortableHeader } from "../data-table/sortable-header"
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontal, Trash } from "lucide-react";
 import type { Workstation } from "@/types/workstation"

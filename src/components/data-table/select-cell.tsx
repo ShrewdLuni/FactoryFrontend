@@ -16,12 +16,12 @@ export const SelectCell = ({ row, data, placeholder, onChange, defaultValue }: S
   return (
     <div className="w-full flex justify-center">
       <Select defaultValue={defaultValue} value={value} onValueChange={(value) => {console.log(value, row.original);setValue(value);onChange?.(value, row)}}>
-        <SelectTrigger className="w-full min-w-full **:data-[slot=select-value]:block **:data-[slot=select-value]:truncatj " size="sm">
+        <SelectTrigger className="w-full min-w-full **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate" size="sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent align="end">
           {data.map((option) => {
-              return <SelectItem value={option.value}>{option.label}</SelectItem>
+            return <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
           })}
         </SelectContent>
       </Select>
