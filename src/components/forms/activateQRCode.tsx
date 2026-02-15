@@ -5,6 +5,7 @@ import type { QRCode } from "@/types/qrcode"
 import { useBatches } from "@/hooks/useBatches"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select"
 import { useQR } from "@/hooks/useQR"
+import { BASE_URL } from "@/config"
 
 interface QRCodeFormProps {
   qrcode: QRCode,
@@ -15,7 +16,7 @@ export const ActivateQRCodeForm = ({ qrcode, onDone }: QRCodeFormProps) => {
   const [linkedBatch, setLinkedBatch] = useState("")
   const { batches } = useBatches();
 
-  const { mutate: activateQRCode, isPending }= useQR.activate()
+  const { mutate: activateQRCode, isPending } = useQR.activate()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,6 +33,7 @@ export const ActivateQRCodeForm = ({ qrcode, onDone }: QRCodeFormProps) => {
       })
   }
 
+
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       <FieldSet>
@@ -44,7 +46,7 @@ export const ActivateQRCodeForm = ({ qrcode, onDone }: QRCodeFormProps) => {
                 <SelectValue placeholder="Select a batch" />
               </SelectTrigger>
               <SelectContent>
-                {batches.filter((batch) => batch.progressStatus == "Inactive").map((batch) => {return <SelectItem value={`https://shrwd.dev/batch/${String(batch.id)}`}>{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.productName} | Size: ${batch.size}`}</SelectItem>})}
+                {batches.filter((batch) => batch.progressStatus === "Inactive").map((batch) => {return <SelectItem key={batch.name} value={`${BASE_URL}/batch/${String(batch.id)}`}>{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.productId} | Size: ${batch.size}`}</SelectItem>})}
               </SelectContent>
             </Select>
           </Field>
