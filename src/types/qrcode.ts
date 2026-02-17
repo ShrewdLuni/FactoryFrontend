@@ -1,14 +1,10 @@
 export type QRCode = {
-  id: number,
-  isTaken: boolean,
-  name?: string | null,
-  resource?: string | null,
-  qrcodeImage?: string | null
-}
+	id: number;
+	isTaken: boolean;
+	name?: string | null;
+	resource?: string | null;
+};
 
-export type QRCodeInitialization = {
-  isTaken?: boolean,
-  name?: string | null,
-  resource?: string | null,
-  amount: number,
-}
+export type InsertQRCode = Omit<QRCode, "id" | "isTaken">;
+
+export type InsertQRCodeBulk = InsertQRCode & { amount: number };

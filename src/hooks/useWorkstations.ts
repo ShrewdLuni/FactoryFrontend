@@ -1,105 +1,68 @@
-import { API_URL } from "@/config";
-import type { Workstation } from "@/types/workstation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import type { InsertWorkstation, Workstation } from "@/types/workstation";
+import { workstationService as service } from "@/services/workstations";
 
-const QUERY_KEY = ["workstations"] as const;
-
-const BASE_URL = `${API_URL}/workstations`;
-
-const fetchWorkstations = async (): Promise<Workstation[]> => {
-  const response = await fetch(BASE_URL);
-  if (!response.ok) throw new Error("Failed to fetch workstations");
-  return response.json();
+export const workstationKeys = {
+  all: () => ["workstations"] as const,
+  lists: () => [...workstationKeys.all(), "list"] as const,
+  detail: (id: number) => [...workstationKeys.all(), "detail", id] as const,
 };
 
-const fetchWorkstation = async (id: number): Promise<Workstation> => {
-  const response = await fetch(`${BASE_URL}/${id}`);
-  if (!response) throw new Error("Failed to fetch workstation");
-  return response.json();
-};
+const STALE_TIME = 1000 * 60 * 5;
 
-const createWorkstation = async ({name, qrCode}: {name: string, qrCode: number}): Promise<Workstation> => {
-  const response = await fetch(`${BASE_URL}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({name, qrCode}),
+export const useGetAllWorkstations = () => {
+  return useQuery({
+    queryKey: workstationKeys.lists(),
+    queryFn: service.getAll,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
   });
-  if (!response) throw new Error("Failed to create workstation");
-  return response.json();
 };
 
-const updateWorkstation = async ({
-  id,
-  data,
-}: {
-  id: number;
-  data: Omit<Workstation, "id">;
-}): Promise<Workstation> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const useGetWorkstation = (id: number) => {
+  return useQuery({
+    queryKey: workstationKeys.detail(id),
+    queryFn: () => service.get(id),
+    staleTime: STALE_TIME,
   });
-  if (!response) throw new Error("Failed to update workstation");
-  return response.json();
 };
 
-const deleteWorkstation = async (id: number): Promise<Workstation> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "DELETE",
+export const useCreateWorkstation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Workstation, Error, InsertWorkstation>({
+    mutationFn: (data) => service.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+    },
   });
-  if (!response) throw new Error("Failed to fetch workstation");
-  return response.json();
+};
+
+export const useUpdateWorkstation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Workstation, Error, { id: number; data: InsertWorkstation }>({
+    mutationFn: (data) => service.update(data),
+    onSettled: (_data, _err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: workstationKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+    },
+  });
+};
+
+export const useDeleteWorkstation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Workstation, Error, number>({
+    mutationFn: (id) => service.delete(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: workstationKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+    },
+  });
 };
 
 export const useWorkstations = {
-  getAll: () => {
-    return useQuery<Workstation[]>({
-      queryKey: QUERY_KEY,
-      queryFn: fetchWorkstations,
-    });
-  },
-  get: (id: number) => {
-    return useQuery<Workstation>({
-      queryKey: QUERY_KEY,
-      queryFn: () => fetchWorkstation(id),
-    });
-  },
-  create: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Workstation, Error, {name: string, qrCode: number}>({
-      mutationFn: createWorkstation,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  update: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<
-      Workstation,
-      Error,
-      { id: number; data: Omit<Workstation, "id"> }
-    >({
-      mutationFn: updateWorkstation,
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEY, variables.id],
-        });
-      },
-    });
-  },
-  delete: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Workstation, Error, number>({
-      mutationFn: deleteWorkstation,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
+  getAll: useGetAllWorkstations,
+  get: useGetWorkstation,
+  create: useCreateWorkstation,
+  update: useUpdateWorkstation,
+  delete: useDeleteWorkstation,
 };

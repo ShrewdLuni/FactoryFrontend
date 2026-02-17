@@ -1,76 +1,103 @@
-import { API_URL } from "@/config";
-import type { QRCode, QRCodeInitialization } from "@/types/qrcode";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { qrcodeService as service } from "@/services/qrcodes";
+import type { InsertQRCode, InsertQRCodeBulk, QRCode } from "@/types/qrcode";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
-const QUERY_KEY = ['qrcode'] as const;
+const STALE_TIME = 1000 * 60 * 5;
 
-const BASE_URL = `${API_URL}/qrcodes`
+export const qrcodeKeys = {
+  all: () => ["qrcodes"] as const,
+  lists: () => [...qrcodeKeys.all(), "list"] as const,
+  detail: (id: number) => [...qrcodeKeys.all(), "detail", id] as const,
+};
 
-const fetchQRCodes = async (): Promise<QRCode[]> => {
-  const response = await fetch(BASE_URL);
-  if (!response.ok) throw new Error('Failed to fetch qrcodes');
-  return response.json();
-}
+export const useGetAllQRCodes = () => {
+  return useQuery({
+    queryKey: qrcodeKeys.lists(),
+    queryFn: service.getAll,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
+  });
+};
 
-const fetchQRCode = async (id: number): Promise<QRCode> => {
-  const response = await fetch(`${BASE_URL}/${id}`);
-  if (!response.ok) throw new Error('Failed to fetch qrcodes');
-  return response.json();
-}
+export const useGetQRCode = (id: number) => {
+  return useQuery({
+    queryKey: qrcodeKeys.detail(id),
+    queryFn: () => service.get(id),
+    staleTime: STALE_TIME,
+  });
+};
 
-const initializeQRCodes = async (qrcodeData: QRCodeInitialization): Promise<QRCode> => {
-  const response = await fetch(`${API_URL}/qrcodes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(qrcodeData)
-  })
-  if (!response.ok) throw new Error("Failed to initialize qrcode(s)");
-  return response.json();
-}
+export const useCreateQRCode = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode, Error, InsertQRCode>({
+    mutationFn: (data) => service.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
 
-const activateQRCode = async ({ id, resource }: {id: number, resource: string}): Promise<QRCode> => {
-  const response = await fetch(`${API_URL}/qrcodes/${id}/activate`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resource }),
-    }
-  );
-  if (!response.ok) throw new Error("Failed to activate QR code");
-  return response.json();
-}
+export const useCreateQRCodes = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode[], Error, InsertQRCodeBulk>({
+    mutationFn: (data) => service.createMultiple(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
 
-export const useQR = {
-  getAll: () => {
-    return useQuery<QRCode[]>({
-      queryKey: QUERY_KEY,
-      queryFn: fetchQRCodes,
-    });
-  },
-  get: (id: number) => {
-    return useQuery<QRCode>({
-      queryKey: QUERY_KEY,
-      queryFn: () => fetchQRCode(id),
-    });
-  },
-  initialize: () => {
-    const queryClient = useQueryClient();
+export const useUpdateQRCode = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode, Error, { id: number; data: InsertQRCode }>({
+    mutationFn: (data) => service.update(data),
+    onSettled: (_data, _err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
 
-    return useMutation<QRCode, Error, QRCodeInitialization>({
-      mutationFn: initializeQRCodes, 
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  activate: () => {
-    const queryClient = useQueryClient();
+export const useDeleteQRCode = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode, Error, number>({
+    mutationFn: (id) => service.delete(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
 
-    return useMutation<QRCode, Error, { id: number, resource: string }>({
-      mutationFn: activateQRCode, 
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  }
-}
+export const useActivateQRCode = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode, Error, number>({
+    mutationFn: (id) => service.activate(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
+
+export const useScanQRCode = () => {
+  const queryClient = useQueryClient();
+  return useMutation<QRCode, Error, number>({
+    mutationFn: (id) => service.scan(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
+    },
+  });
+};
+
+export const useQRCodes = {
+  getAll: useGetAllQRCodes,
+  get: useGetQRCode,
+  create: useCreateQRCode,
+  createMultiple: useCreateQRCodes,
+  update: useUpdateQRCode,
+  delete: useDeleteQRCode,
+  activate: useActivateQRCode,
+  scan: useScanQRCode,
+};

@@ -1,143 +1,116 @@
-import { API_URL } from "@/config";
-import type { Batch } from "@/types/batches";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Batch, InsertBatch, InsertBatchBulk } from "@/types/batches";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { batchService as service } from "@/services/batches";
 
-const QUERY_KEY = ["batches"] as const;
-
-const BASE_URL = `${API_URL}/batches`;
-
-const fetchBatches = async (): Promise<Batch[]> => {
-  const response = await fetch(BASE_URL);
-  if (!response.ok) throw new Error("Failed to fetch batches");
-  return response.json();
+export const batchKeys = {
+  all: () => ["batches"] as const,
+  lists: () => [...batchKeys.all(), "list"] as const,
+  detail: (id: number) => [...batchKeys.all(), "detail", id] as const,
 };
 
-const fetchBatch = async (id: number): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}`);
-  if (!response) throw new Error("Failed to fetch batch");
-  return response.json();
-};
+const STALE_TIME = 1000 * 60 * 5;
 
-const createBatch = async (data: Omit<Batch, "id">): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const useGetAllBatches = () => {
+  return useQuery({
+    queryKey: batchKeys.lists(),
+    queryFn: service.getAll,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
   });
-  if (!response) throw new Error("Failed to create batch");
-  return response.json();
 };
 
-const updateBatch = async ({ id, data,}: { id: number; data: Omit<Batch, "id">; }): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const useGetBatch = (id: number) => {
+  return useQuery({
+    queryKey: batchKeys.detail(id),
+    queryFn: () => service.get(id),
+    staleTime: STALE_TIME,
   });
-  if (!response) throw new Error("Failed to update batch");
-  return response.json();
 };
 
-const deleteBatch = async (id: number): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "DELETE",
+export const useCreateBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, InsertBatch>({
+    mutationFn: (data) => service.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
   });
-  if (!response) throw new Error("Failed to delete batch");
-  return response.json();
 };
 
-const scanBatch = async (id: number): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}/scan`, { credentials: "include" });
-  if (!response) throw new Error("Failed to scan batch");
-  return response.json()
-}
-
-const initializePlannedBatches = async (): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/planned/initialize`, { method: "POST" });
-  if (!response.ok) throw new Error("Failed to initialize planned batches");
+export const useCreateBatches = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch[], Error, InsertBatchBulk>({
+    mutationFn: (data) => service.createMultiple(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
 };
 
-const executePlannedBatches = async (): Promise<void> => {
-  const response = await fetch(`${BASE_URL}/planned/execute`, { method: "POST" });
-  if (!response.ok) throw new Error("Failed to execute planned batches");
+export const useUpdateBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, { id: number; data: InsertBatch }>({
+    mutationFn: (data) => service.update(data),
+    onSettled: (_data, _err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
+};
+
+export const useDeleteBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, number>({
+    mutationFn: (id) => service.delete(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
+};
+
+export const useScanBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, number>({
+    mutationFn: (id) => service.scan(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
+};
+
+export const useInitializePlannedBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, void>({
+    mutationFn: service.planned.initialize,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
+};
+
+export const useExecutePlannedBatch = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Batch, Error, void>({
+    mutationFn: service.planned.execute,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
+    },
+  });
 };
 
 export const useBatches = {
-  getAll: () => {
-    return useQuery<Batch[]>({
-      queryKey: QUERY_KEY,
-      queryFn: fetchBatches
-    });
-  },
-  get: (id: number) => {
-    return useQuery<Batch>({
-      queryKey: QUERY_KEY,
-      queryFn: () => fetchBatch(id),
-    });
-  },
-  create: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Batch, Error, Omit<Batch, "id">>({
-      mutationFn: createBatch,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  update: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Batch,Error,{ id: number; data: Omit<Batch, "id"> }>({
-      mutationFn: updateBatch,
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEY, variables.id],
-        });
-      },
-    });
-  },
-  delete: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Batch, Error, number>({
-      mutationFn: deleteBatch,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  initialize: () => {
-    const queryClient = useQueryClient();
-    return useMutation<void, Error>({
-      mutationFn: initializePlannedBatches,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  execute: () => {
-    const queryClient = useQueryClient();
-    return useMutation<void, Error>({
-      mutationFn: executePlannedBatches,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  scan: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<Batch, Error, number>({
-      mutationFn: (id: number) => scanBatch(id),
-      onSuccess: (_, id) => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEY, id],
-        });
-      },
-    });
-  },
+  getAll: useGetAllBatches,
+  get: useGetBatch,
+  create: useCreateBatch,
+  createMultiple: useCreateBatches,
+  update: useUpdateBatch,
+  delete: useDeleteBatch,
+  scan: useScanBatch,
 };
 
+export const usePlannedBatches = {
+  initialize: useInitializePlannedBatch,
+  execute: useExecutePlannedBatch,
+};

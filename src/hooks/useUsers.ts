@@ -1,96 +1,37 @@
-import { API_URL } from "@/config";
-import type { User } from "@/types/users";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { InsertUser, User } from "@/types/users";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { userService as service } from "@/services/users";
 
-const QUERY_KEY = ["users"] as const;
-
-const BASE_URL = `${API_URL}/users`;
-
-const fetchUsers = async (): Promise<User[]> => {
-  const response = await fetch(BASE_URL);
-  if (!response.ok) throw new Error("Failed to fetch users");
-  return response.json();
+export const userKeys = {
+  all: () => ["users"] as const,
+  lists: () => [...userKeys.all(), "list"] as const,
+  detail: (id: number) => [...userKeys.all(), "detail", id] as const,
 };
 
-const fetchUser = async (id: number): Promise<User> => {
-  const response = await fetch(`${BASE_URL}/${id}`);
-  if (!response) throw new Error("Failed to fetch user");
-  return response.json();
-};
+const STALE_TIME = 1000 * 60 * 5;
 
-const createUser = async (data: Omit<User, "id" | "fullname">): Promise<User> => {
-  const response = await fetch(`${BASE_URL}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+export const useGetAllUsers = () => {
+  return useQuery({
+    queryKey: userKeys.lists(),
+    queryFn: service.getAll,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
   });
-  if (!response) throw new Error("Failed to create user");
-  return response.json();
 };
 
-const updateUser = async ({ id, data }: {  id: number; data: Omit<User, "id" | "fullName">;}): Promise<User> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!response) throw new Error("Failed to update user");
-  return response.json();
-};
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
 
-const deleteUser = async (id: number): Promise<User> => {
-  const response = await fetch(`${BASE_URL}/${id}`, {
-    method: "DELETE",
+  return useMutation<User, Error, { id: number; data: InsertUser }>({
+    mutationFn: (data) => service.update(data),
+    onSettled: (_data, _err, { id }) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    },
   });
-  if (!response) throw new Error("Failed to fetch user");
-  return response.json();
 };
 
 export const useUsers = {
-  getAll: () => {
-    return useQuery<User[]>({
-      queryKey: QUERY_KEY,
-      queryFn: fetchUsers,
-    });
-  },
-  get: (id: number) => {
-    return useQuery<User>({
-      queryKey: QUERY_KEY,
-      queryFn: () => fetchUser(id),
-    });
-  },
-  create: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<User, Error, User>({
-      mutationFn: createUser,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
-  update: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<User, Error,{ id: number; data: Omit<User, "id"> }>({
-      mutationFn: updateUser,
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-        queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEY, variables.id],
-        });
-      },
-    });
-  },
-  delete: () => {
-    const queryClient = useQueryClient();
-
-    return useMutation<User, Error, number>({
-      mutationFn: deleteUser,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      },
-    });
-  },
+  getAll: useGetAllUsers,
+  update: useUpdateUser,
 };
-

@@ -6,3 +6,5 @@ export type Product = {
   measureUnit: string;
   isActive: boolean;
 };
+
+export type InsertProduct = Omit<Product, "id">

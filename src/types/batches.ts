@@ -24,13 +24,8 @@ export type Batch = {
   createdAt: string;
 };
 
-export type BatchInitialization = {
-  name: string,
-  productId: number,
-  assignedMasterId: number,
-  plannedFor?: Date,
-  size: number,
-  amount: number,
-}
+export type InsertBatch = Omit<Batch, "id"  | "progressStatus" | "updatedAt" | "createdAt">
+
+export type InsertBatchBulk = InsertBatch & { amount: number };
 
 

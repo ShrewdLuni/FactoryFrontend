@@ -26,3 +26,5 @@ export type User = {
   department?: UserDepartment
   role?: UserRole
 }
+
+export type InsertUser = Omit<User, "id">
