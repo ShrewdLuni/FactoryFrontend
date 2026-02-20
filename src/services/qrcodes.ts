@@ -54,14 +54,19 @@ export const deleteQRCode = async (id: number): Promise<QRCode> => {
   return response.json();
 };
 
-export const activateQRCode = async (id: number): Promise<QRCode> => {
-  const response = await fetch(`${BASE_URL}/${id}/activate`, { method: "PATCH", credentials: "include" });
+export const activateQRCode = async (id: number, resource: string): Promise<QRCode> => {
+  const response = await fetch(`${BASE_URL}/${id}/activate`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({resource}),
+  });
   if (!response.ok) throw new Error("Failed to activate qrcode");
   return response.json();
 };
 
 export const scanQRCode = async (id: number): Promise<QRCode> => {
-  const response = await fetch(`${BASE_URL}/${id}/scan`, { method: "POST", credentials: "include" });
+  const response = await fetch(`${BASE_URL}/${id}/scan`);
   if (!response.ok) throw new Error("Failed to scan qrcode");
   return response.json();
 };

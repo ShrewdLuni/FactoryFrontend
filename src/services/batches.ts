@@ -55,7 +55,7 @@ export const deleteBatch = async (id: number): Promise<Batch> => {
 };
 
 export const scanBatch = async (id: number): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}`, { method: "PATCH", credentials: "include" });
+  const response = await fetch(`${BASE_URL}/${id}/scan`, { method: "PATCH", credentials: "include" });
   if (!response.ok) throw new Error("Failed to scan batches");
   return response.json();
 };

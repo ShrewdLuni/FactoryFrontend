@@ -71,10 +71,10 @@ export const useDeleteQRCode = () => {
 
 export const useActivateQRCode = () => {
   const queryClient = useQueryClient();
-  return useMutation<QRCode, Error, number>({
-    mutationFn: (id) => service.activate(id),
-    onSuccess: (_data, id) => {
-      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(id) });
+  return useMutation<QRCode, Error, { id: number; resource: string }>({
+    mutationFn: (data) => service.activate(data.id, data.resource),
+    onSuccess: (_data, data) => {
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
     },
   });
@@ -91,7 +91,7 @@ export const useScanQRCode = () => {
   });
 };
 
-export const useQRCodes = {
+export const useQR = {
   getAll: useGetAllQRCodes,
   get: useGetQRCode,
   create: useCreateQRCode,

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import type { InsertWorkstation, Workstation } from "@/types/workstation";
 import { workstationService as service } from "@/services/workstations";
+import { qrcodeKeys } from "./useQR";
 
 export const workstationKeys = {
   all: () => ["workstations"] as const,
@@ -33,17 +34,30 @@ export const useCreateWorkstation = () => {
     mutationFn: (data) => service.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
     },
   });
 };
 
 export const useUpdateWorkstation = () => {
   const queryClient = useQueryClient();
-  return useMutation<Workstation, Error, { id: number; data: InsertWorkstation }>({
+  return useMutation<Workstation, Error, { id: number; data: InsertWorkstation }, { previousWorkstations: Workstation[] | undefined}>({
     mutationFn: (data) => service.update(data),
+    onMutate: async ({id, data}) => {
+      await queryClient.cancelQueries({ queryKey: workstationKeys.lists() });
+      const previousWorkstations = queryClient.getQueryData<Workstation[]>(workstationKeys.lists());
+      queryClient.setQueryData<Workstation[]>(workstationKeys.lists(), (old) => old?.map((workstation) => (workstation.id === id ? { ...workstation, ...data } : workstation)) ?? []);
+      return { previousWorkstations };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousWorkstations) {
+        queryClient.setQueryData(workstationKeys.lists(), context.previousWorkstations);
+      }
+    },
     onSettled: (_data, _err, { id }) => {
       queryClient.invalidateQueries({ queryKey: workstationKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
     },
   });
 };
@@ -55,6 +69,7 @@ export const useDeleteWorkstation = () => {
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: workstationKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: workstationKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: qrcodeKeys.lists() });
     },
   });
 };

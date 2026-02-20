@@ -4,7 +4,13 @@ import type { User, InsertUser } from "@/types/users";
 const BASE_URL = `${API_URL}/users`;
 
 export const getAllUsers = async (): Promise<User[]> => {
-  const response = await fetch(BASE_URL, { credentials: "include" });
+  const response = await fetch(BASE_URL);
+  if (!response.ok) throw new Error("Failed to fetch users");
+  return response.json();
+};
+
+export const getUser = async (id: number): Promise<User> => {
+  const response = await fetch(`${BASE_URL}/${id}`);
   if (!response.ok) throw new Error("Failed to fetch users");
   return response.json();
 };
@@ -22,5 +28,6 @@ export const updateUsers = async ({ id, data }: { id: number; data: InsertUser }
 
 export const userService = {
   getAll: getAllUsers,
+  get: getUser,
   update: updateUsers,
 }
