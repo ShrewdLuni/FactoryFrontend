@@ -1,13 +1,8 @@
-export type UserRole =
-  | "Worker"
-  | "Master"
-  | "Manager"
-  | "Observer"
-  | "Superuser";
+export type UserRole = "Worker" | "Master" | "Manager" | "Observer" | "Superuser";
 
 export type UserGender = "Male" | "Female" | "Other";
 
-export type UserDepartment = "Knitting" | "Sewing" | "Molding" | "Labeling" | "Packaging"
+export type UserDepartment = "Knitting" | "Sewing" | "Molding" | "Labeling" | "Packaging";
 
 export type User = {
   id: number;
@@ -20,11 +15,11 @@ export type User = {
   patronymic?: string | null | undefined;
   fullName: string;
   dateOfBirth?: string | null | undefined;
-  email?: string | null | undefined
-  phone?: string | null | undefined
-  gender?: UserGender
-  department?: UserDepartment
-  role?: UserRole
-}
+  email?: string | null | undefined;
+  phone?: string | null | undefined;
+  gender?: UserGender;
+  departments?: UserDepartment[];
+  role?: UserRole;
+};
 
-export type InsertUser = Omit<User, "id">
+export type InsertUser = Omit<User, "id">;
