@@ -1,6 +1,6 @@
 import type { Column } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { ArrowDownAZ, ArrowUpAZ } from "lucide-react"
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react"
 
 interface SortableHeaderProps {
   column: Column<any, any> 
@@ -12,7 +12,7 @@ export const SortableHeader = ({column, field}: SortableHeaderProps) => {
   return (
     <Button className="w-full" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
       {field} 
-      {column.getIsSorted() === false ? <></> : column.getIsSorted() == "asc" ? <ArrowUpAZ/> : <ArrowDownAZ/>} 
+      {column.getIsSorted() === false ? <ChevronsUpDown/> : column.getIsSorted() == "asc" ? <ArrowUp/> : <ArrowDown/>} 
     </Button>
   )
 }

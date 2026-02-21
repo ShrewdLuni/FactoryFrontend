@@ -46,12 +46,12 @@ export const SidebarGroupItem = ({
           <SidebarMenuSub>
             {items.map((item) => (
               <SidebarSingleItem
+                key={item.path}
                 name={item.name}
                 path={item.path}
-                element={item.element}
-                roles={item.roles}
                 icon={item.icon}
                 isSub={true}
+                location={item.path}
               />
             ))}
           </SidebarMenuSub>

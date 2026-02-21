@@ -2,9 +2,9 @@ import type { Table } from "@tanstack/react-table"
 import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, CirclePlus } from "lucide-react"
+import { ChevronDown, CirclePlus, type LucideIcon } from "lucide-react"
 import { DataTableFacetedFilter } from "./filter"
-import type { JSX } from "react"
+import type { JSX, ReactNode } from "react"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>,
@@ -15,7 +15,7 @@ interface TableToolbarProps<TData> {
     options: {
       label: string;
       value: string;
-      icon?: React.ComponentType<{ className?: string }>;
+      icon?: LucideIcon | ReactNode
     }[];
   }[];
   onAddRecord: () => void,
@@ -26,14 +26,14 @@ interface TableToolbarProps<TData> {
 export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filters, toolbarExtras, isAddSection }: TableToolbarProps<TData>) {
 
   return (
-    <div className="flex items-center py-4 gap-4">
+    <div className="flex items-center py-4 gap-2">
       {searchBarValue != null && (<Input 
         placeholder="Search..."
         value={(table.getColumn(searchBarValue)?.getFilterValue() as string) ?? ""} 
         onChange={(event) => {
           table.getColumn(searchBarValue)?.setFilterValue(event.target.value)
         }}
-        className="max-w-sm"
+        className="max-w-sm h-8"
       />)}
       {filters && filters.map((filter) => {
         return table.getColumn(filter.column) && (
@@ -47,7 +47,7 @@ export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filter
       })}
       {toolbarExtras}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild className="h-8">
           <Button variant={"outline"} className="ml-auto">
             Columns <ChevronDown/>
           </Button>
@@ -68,7 +68,7 @@ export function TableToolbar<TData>({ table, searchBarValue, onAddRecord, filter
           })}
         </DropdownMenuContent>
       </DropdownMenu>
-      {isAddSection && <Button variant={"outline"} onClick={onAddRecord}>Add section <CirclePlus/> </Button>}
+      {isAddSection && <Button className="h-8" variant={"outline"} onClick={onAddRecord}>Add section <CirclePlus/> </Button>}
     </div>
   )
 }

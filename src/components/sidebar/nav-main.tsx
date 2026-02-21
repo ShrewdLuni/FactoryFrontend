@@ -3,8 +3,9 @@ import { sidebarElements } from "@/routes";
 import { SidebarGroupItem } from "./group-item";
 import { SidebarSingleItem } from "./single-item";
 import { useAuth } from "@/AuthProvider";
+import { useLocation } from "react-router-dom";
 
-export function NavMain({}) {
+export function NavMain() {
   const { user } = useAuth()
 
   const allowedSidebar = sidebarElements.flatMap(element => {
@@ -25,13 +26,15 @@ export function NavMain({}) {
     return []
   })
 
+  const location = useLocation()
+
   return (
     <SidebarMenu>
       {allowedSidebar.map((element, _) => 
         ("group" in element) ? (
-          <SidebarGroupItem key={_} {...element}/>
+          <SidebarGroupItem key={element.group} {...element}/>
         ) : (
-          <SidebarSingleItem key={_} {...element}/>
+          <SidebarSingleItem key={element.path} {...element} location={location.pathname}/>
         )
       )}
     </SidebarMenu>

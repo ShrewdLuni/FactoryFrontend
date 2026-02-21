@@ -18,7 +18,7 @@ export const AppSidebar = () =>  {
           WMS 
         </span>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="w-[90%] px-2">
         <NavMain/>
       </SidebarContent>
       <SidebarFooter className="border-t-2 pb-4"> 
