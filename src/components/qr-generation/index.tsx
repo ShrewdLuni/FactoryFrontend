@@ -6,11 +6,13 @@ import { getColumns } from "./columns"
 import { Dialog, DialogHeader, DialogTitle, DialogContent } from "../ui/dialog"
 import type { QRCode } from "@/types/qrcode"
 import { ActivateQRCodeForm } from "../forms/activateQRCode"
-import { useQR } from "@/hooks/useQR"
+import { useGetAllQRCodes } from "@/hooks/useQR"
+import { QRCodeCanvas } from 'qrcode.react';
+import { BASE_URL } from "@/config"
 
 export const QrCodeGenerationPage = () => {
 
-  const {data: qrcodes, isLoading, refetch} = useQR.getAll()
+  const {data: qrcodes, isLoading, refetch} = useGetAllQRCodes()
   const [activateOpen, setActivateOpen] = useState(false)
   const [seeOpen, setSeeOpen] = useState(false)
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)
@@ -32,9 +34,11 @@ export const QrCodeGenerationPage = () => {
     <div>Loading</div>
   }
 
+  console.log(activeQRCode)
+
   return (
     <div>
-      <DataTable columns={columns} searchValues={"name"} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={refetch}/>}/>
+      <DataTable columns={columns} searchValues={"name"} data={qrcodes ? qrcodes : []} contentForm={<QRCodeForm onSuccess={() => {refetch}}/>}/>
       <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -53,11 +57,8 @@ export const QrCodeGenerationPage = () => {
             <DialogHeader>
               <DialogTitle>QR Code</DialogTitle>
             </DialogHeader>
-            {(activeQRCode && activeQRCode.qrcodeImage) && (<img 
-              src={activeQRCode.qrcodeImage} 
-              alt={activeQRCode.name || `QR Code ${activeQRCode.id}`}
-              className="w-full h-full border-2 border-gray-300 rounded"
-            />)}
+            {activeQRCode && 
+            (<QRCodeCanvas style={{ width: '100%', height: '100%' }} className="border-4 rounded-xl p-8 bg-white" value={activeQRCode.resource || `${BASE_URL}/qrcodes/${activeQRCode.id}`} size={300} level="M" />)}
           </DialogContent>
         </Dialog>
     </div>

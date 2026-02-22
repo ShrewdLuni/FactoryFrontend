@@ -1,23 +1,26 @@
-import { useParams } from "react-router-dom"; 
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../ui/card";
 import { useBatches } from "@/hooks/useBatch";
 import { useNavigate } from "react-router-dom";
+import { useGetProduct } from "@/hooks/useProducts";
 
 export const BatchPreviewPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  if (!id) return;
-  const { data: batch } = useBatches.get(Number(id))
+  const { data: batch } = useBatches.get(Number(id));
   const { mutate: scan } = useBatches.scan();
+  const { data: product } = useGetProduct(batch?.productId || 0);
+
+  if (!id) return null;
 
   const handleScan = async (e: any) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!id) return;
     scan(Number(id));
     navigate("/");
-  }
+  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -31,14 +34,14 @@ export const BatchPreviewPage = () => {
                   <div className="border p-4 rounded-md shadow-sm space-y-2">
                     <p>Имя партии: {batch.name}</p>
                     <p>Статус: {batch.progressStatus}</p>
-                    <p>Продукт: {batch.productId}</p>
+                    <p>Продукт: {product?.name}</p>
                     <p>Размер: {batch.size}</p>
                   </div>
                 )}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button  className="mt-4 w-full" onClick={handleScan} disabled={!id}>
+              <Button className="mt-4 w-full" onClick={handleScan} disabled={!id}>
                 {"Сканировать"}
               </Button>
             </CardContent>
@@ -48,4 +51,3 @@ export const BatchPreviewPage = () => {
     </div>
   );
 };
-

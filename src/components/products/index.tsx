@@ -53,7 +53,8 @@ export const ProductsPage = () => {
       initialState={{
         columnFilters: [
           { id: "isActive", value: ["true"] }
-        ]
+        ],
+        columnVisibility: { code: false, measureUnit: false, category: false } 
       }}
     />
   )

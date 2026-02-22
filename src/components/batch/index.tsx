@@ -1,14 +1,13 @@
-import { columns} from "./columns";
+import { columns } from "./columns";
 import { DataTable } from "../data-table";
 import { BatchForm } from "../forms/batch";
 import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, ArchiveIcon } from "lucide-react";
 import { useBatches } from "@/hooks/useBatch";
 
 export const BatchPage = () => {
-
   const { data: rawBatches, refetch } = useBatches.getAll();
 
-  const batches = rawBatches?.filter(batch => batch.isPlanned === false) || []
+  const batches = rawBatches?.filter((batch) => batch.isPlanned === false) || [];
 
   const status = [
     {
@@ -48,11 +47,18 @@ export const BatchPage = () => {
       value: "Completed",
       icon: CircleCheck,
     },
-  ]
+  ];
 
-  const filters = [{column: "progressStatus", title: "Status", options: status,}]
+  const filters = [{ column: "progressStatus", title: "Status", options: status }];
 
   return (
-    <DataTable columns={columns} data={batches} contentForm={<BatchForm onSuccess={refetch}/>}  filters={filters}/>
+    <DataTable
+      columns={columns}
+      data={batches}
+      contentForm={<BatchForm onSuccess={refetch} />}
+      filters={filters}
+      searchValues={"name"}
+      initialState={{ columnVisibility: { plannedFor: false, updatedAt: false } }}
+    />
   );
 };

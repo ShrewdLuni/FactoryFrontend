@@ -1,23 +1,30 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { AuthInput } from "./auth-input"
-import { AuthSelect } from "./auth-select"
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
-import { TabsContent } from "../ui/tabs"
-import { useAuth } from "@/AuthProvider"
-import { useState } from "react"
-import { useUsers } from "@/hooks/useUsers"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { AuthInput } from "./auth-input";
+import { AuthSelect } from "./auth-select";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import { TabsContent } from "../ui/tabs";
+import { useAuth } from "@/AuthProvider";
+import { useState } from "react";
+import { useUsers } from "@/hooks/useUsers";
 
 export const AuthenticationPage = () => {
   const { login } = useAuth();
 
-  const { data: users } = useUsers.getAll()
+  const { data: users } = useUsers.getAll();
 
   const [identity, setIdentity] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+
+  const [hasError, setHasError] = useState(false);
+
+  const triggerError = () => {
+    setHasError(true);
+    setTimeout(() => setHasError(false), 1000); 
+  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -31,38 +38,50 @@ export const AuthenticationPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Login to your account</CardTitle>
-                <CardDescription>
-                  Enter your Identificator below to login to your account
-                </CardDescription>
+                <CardDescription>Enter your Identificator below to login to your account</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={(e) => {
-                  e.preventDefault(); 
-                  if (!users) return;
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!users) return;
 
-                  const matchedUser = users.find(
-                    (u) => u.code === identity || u.username === identity
-                  );
+                    const matchedUser = users.find((u) => u.code === identity || u.username === identity);
 
-                  if (!matchedUser) {
-                    console.log("User not found");
-                    return;
-                  }
+                    if (!matchedUser) {
+                      triggerError()
+                      return;
+                    }
 
-                  const isCode = matchedUser.code === identity;
-                  login(identity, password, isCode)}
-                }>
+                    const isCode = matchedUser.code === identity;
+                    login(identity, password, isCode).catch((e: Error) => {
+                      console.log(e)
+                      triggerError()
+                    });
+                  }}
+                >
                   <FieldGroup>
-                    <TabsContent value="select"><AuthSelect value={identity} onChange={setIdentity} users={users ?? []}/></TabsContent>
-                    <TabsContent value="input"><AuthInput value={identity} onChange={setIdentity}/></TabsContent>
+                    <TabsContent value="select">
+                      <AuthSelect value={identity} onChange={setIdentity} users={users ?? []} />
+                    </TabsContent>
+                    <TabsContent value="input">
+                      <AuthInput value={identity} onChange={setIdentity} />
+                    </TabsContent>
                     <Field>
                       <div className="flex items-center">
                         <FieldLabel htmlFor="password">Password</FieldLabel>
                       </div>
-                      <Input id="password" type="password" onChange={(e) => {setPassword(e.target.value)}} required/>
+                      <Input
+                        id="password"
+                        type="password"
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                        }}
+                        required
+                      />
                     </Field>
                     <Field>
-                      <Button type="submit">Login</Button>
+                      <Button variant={hasError ? "destructive" : "default"} className="transition-all duration-300" type="submit">{hasError ? "Invalid" : "Submit"}</Button>
                     </Field>
                   </FieldGroup>
                 </form>
@@ -72,5 +91,5 @@ export const AuthenticationPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

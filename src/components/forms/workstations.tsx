@@ -3,9 +3,9 @@ import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/componen
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useRandomId } from "@/hooks/useRandomId";
-import { useQR } from "@/hooks/useQR";
 import { useWorkstations } from "@/hooks/useWorkstations";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
+import { useGetAllQRCodes } from "@/hooks/useQR";
 
 interface WorkstationsFormProps {
   onSuccess: () => void;
@@ -13,20 +13,20 @@ interface WorkstationsFormProps {
 
 export const WorkstationsForm = ({ onSuccess }: WorkstationsFormProps) => {
   const [name, setName] = useState("");
-  const [activeQRCodeID, setActiveQRCodeID] = useState("");
+  const [activeQRCodeID, setActiveQRCodeID] = useState("generate");
 
   const id = useRandomId(10, 1000);
 
   const { mutate: createWorkstation, error: createError } = useWorkstations.create();
 
-  const { data: qrcodes, isLoading: isQRLoading } = useQR.getAll();
+  const { data: qrcodes, isLoading: isQRLoading } = useGetAllQRCodes();
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(name, activeQRCodeID)
 
-    createWorkstation({ name: name, qrCode: parseInt(activeQRCodeID),});
+    createWorkstation({ name: name, qrCode: activeQRCodeID === "generate" ? null : parseInt(activeQRCodeID),});
 
     if (!createError) {
       onSuccess();
@@ -48,14 +48,15 @@ export const WorkstationsForm = ({ onSuccess }: WorkstationsFormProps) => {
           </Field>
           <Field>
             <FieldLabel>QR-Code</FieldLabel>
-            <Select value={activeQRCodeID} onValueChange={setActiveQRCodeID}>
+            <Select defaultValue={"generate"} value={activeQRCodeID} onValueChange={setActiveQRCodeID}>
               <SelectTrigger>
                 <SelectValue placeholder="Select QR code" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="generate">Auto-generate</SelectItem>
                 {qrcodes?.filter((qr) => !qr.isTaken).map((qr: any) => (
                   <SelectItem key={qr.id} value={String(qr.id)}>
-                    {qr.name ? qr.name != '' ? qr.name : `QR-${qr.id}` : `QR-${qr.id}` }
+                    {qr.name || `QR-${qr.id}`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -63,7 +64,7 @@ export const WorkstationsForm = ({ onSuccess }: WorkstationsFormProps) => {
           </Field>
         </FieldGroup>
       </FieldSet>
-      <Button type="submit" disabled={ isQRLoading}>
+      <Button type="submit" disabled={isQRLoading || !name}>
         Initialize
       </Button>
     </form>
