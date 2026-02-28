@@ -2,7 +2,7 @@ export type UserRole = "Worker" | "Master" | "Manager" | "Observer" | "Superuser
 
 export type UserGender = "Male" | "Female" | "Other";
 
-export type UserDepartment = "Knitting" | "Sewing" | "Molding" | "Labeling" | "Packaging";
+export type UserDepartment = "Knitting" | "Sewing" | "Turning" | "Molding" | "Labeling" | "Packaging";
 
 export type User = {
   id: number;
