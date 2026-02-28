@@ -1,6 +1,6 @@
 import { DataTable } from "../data-table";
 import { getUserColumns } from "./columns";
-import { Mars, Venus, CircleSmall, HardHat, UserStar, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon } from "lucide-react";
+import { Mars, Venus, CircleSmall, HardHat, UserStar, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";
 import { useCallback, useMemo } from "react";
 
@@ -13,12 +13,12 @@ const gender = [
   {
     label: "Female",
     value: "Female",
-    icon: Venus
+    icon: Venus,
   },
   {
     label: "Other",
     value: "Other",
-    icon: CircleSmall 
+    icon: CircleSmall,
   },
 ];
 
@@ -36,7 +36,7 @@ const roles = [
   {
     label: "Manager",
     value: "Manager",
-    icon: UserStar
+    icon: UserStar,
   },
 ];
 
@@ -49,8 +49,12 @@ const departments = [
   {
     label: "Sewing",
     value: "Sewing",
-
     icon: Spool,
+  },
+  {
+    label: "Turning",
+    value: "Turning",
+    icon: Cone,
   },
   {
     label: "Molding",
@@ -103,5 +107,14 @@ export const EmployeesPage = () => {
     [handleCellUpdate],
   );
 
-  return <DataTable columns={columns} isAddSection={false} data={users ? users : []} filters={filters} searchValues={"fullName"} initialState={{columnVisibility: { code: false, email: false, phone: false }}} />;
+  return (
+    <DataTable
+      columns={columns}
+      isAddSection={false}
+      data={users ? users : []}
+      filters={filters}
+      searchValues={"fullName"}
+      initialState={{ columnVisibility: { code: false, email: false, phone: false } }}
+    />
+  );
 };

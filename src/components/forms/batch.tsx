@@ -29,6 +29,7 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
 
   const [knittingWorkerId, setKnittingWorkerId] = useState<string | undefined>(undefined);
   const [sewingWorkerId, setSewingWorkerId] = useState<string | undefined>(undefined);
+  const [turningWorkerId, setTurningWorkerId] = useState<string | undefined>(undefined);
   const [moldingWorkerId, setMoldingWorkerId] = useState<string | undefined>(undefined);
   const [labelingWorkerId, setLabelingWorkerId] = useState<string | undefined>(undefined);
   const [packagingWorkerId, setPackagingWorkerId] = useState<string | undefined>(undefined);
@@ -45,26 +46,28 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
   const workers = [
     { label: "Knitting", workerId: knittingWorkerId, onChange: setKnittingWorkerId },
     { label: "Sewing", workerId: sewingWorkerId, onChange: setSewingWorkerId },
+    { label: "Turning", workerId: turningWorkerId, onChange: setTurningWorkerId },
     { label: "Molding", workerId: moldingWorkerId, onChange: setMoldingWorkerId },
     { label: "Labeling", workerId: labelingWorkerId, onChange: setLabelingWorkerId },
     { label: "Packaging", workerId: packagingWorkerId, onChange: setPackagingWorkerId },
   ];
 
   const handleSubmit = (e: any) => {
-    e.preventDefault()
+    e.preventDefault();
     createBatches({
       name: batchName,
       size: batchSize,
+      actualSize: batchSize,
       productId: Number(activeProductId),
       workstationId: Number(activeWorkstationId),
       masters: {
         knitting: Number(knittingWorkerId),
         sewing: Number(sewingWorkerId),
+        turning: Number(turningWorkerId),
         molding: Number(moldingWorkerId),
         labeling: Number(labelingWorkerId),
         packaging: Number(packagingWorkerId),
       },
-      isPlanned: false,
       plannedFor: String(date),
       amount,
     });
@@ -130,10 +133,14 @@ export const BatchForm = ({ onSuccess }: BatchFormProps) => {
                     </SelectTrigger>
                     <SelectContent>
                       {users
-                          ?.filter((user) => user.role === "Worker" && user.departments?.includes(worker.label as UserDepartment))
-                          .map((user) => {
-                            return <SelectItem key={user.id} value={String(user.id)}>{user.fullName}</SelectItem>;
-                          })}
+                        ?.filter((user) => user.role === "Worker" && user.departments?.includes(worker.label as UserDepartment))
+                        .map((user) => {
+                          return (
+                            <SelectItem key={user.id} value={String(user.id)}>
+                              {user.fullName}
+                            </SelectItem>
+                          );
+                        })}
                     </SelectContent>
                   </Select>
                 </Field>
