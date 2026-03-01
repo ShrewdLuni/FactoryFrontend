@@ -49,8 +49,20 @@ export const useCreateBatches = () => {
 
 export const useUpdateBatch = () => {
   const queryClient = useQueryClient();
-  return useMutation<Batch, Error, { id: number; data: InsertBatch }>({
+  return useMutation<Batch, Error, { id: number; data: InsertBatch }, { previousBatches: Batch[] | undefined}>({
     mutationFn: (data) => service.update(data),
+    onMutate: async ({id, data}) => {
+      await queryClient.cancelQueries({ queryKey: batchKeys.lists() });
+      const previousBatches = queryClient.getQueryData<Batch[]>(batchKeys.lists());
+      queryClient.setQueryData<Batch[]>(batchKeys.lists(), (old) => old?.map((product) => (product.id === id ? { ...product, ...data } : product)) ?? []);
+      return { previousBatches: previousBatches };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousBatches) {
+        queryClient.setQueryData(batchKeys.lists(), context.previousBatches);
+      }
+    },
+
     onSettled: (_data, _err, { id }) => {
       queryClient.invalidateQueries({ queryKey: batchKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: batchKeys.lists() });

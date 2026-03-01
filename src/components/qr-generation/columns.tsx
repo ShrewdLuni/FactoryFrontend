@@ -17,11 +17,11 @@ import { IconCircleFilled } from "@tabler/icons-react";
 import { Badge } from "../ui/badge";
 import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
 import QRCodeLib from "qrcode";
+import { API_URL } from "@/config";
 
 const printQRCode = async (qr: QRCode) => {
-  if (!qr.resource) return;
 
-  const dataUrl = await QRCodeLib.toDataURL(qr.resource, {
+  const dataUrl = await QRCodeLib.toDataURL(qr.resource || `${API_URL}/qrcodes/${qr.id}/scan`, {
     width: 240,
     margin: 2,
   });
@@ -56,14 +56,30 @@ const printQRCode = async (qr: QRCode) => {
             max-width: 280px;
           }
           @media print {
-            body { justify-content: flex-start; padding-top: 48px; }
+            @page {
+              size: 100mm 100mm;
+              margin: 0;
+            }
+            body {
+              width: 100mm;
+              height: 100mm;
+              justify-content: center;
+              padding: 4mm;
+              overflow: hidden;
+            }
+            h2 { font-size: 10pt; }
+            img {
+              width: 72mm;
+              height: 72mm;
+            }
+            p { font-size: 7pt; max-width: 92mm; }
           }
         </style>
       </head>
       <body>
         <h2>${qr.name ?? `QR #${qr.id}`}</h2>
         <img src="${dataUrl}" alt="QR Code" />
-        <p>${qr.resource}</p>
+        <p>${qr.resource || `${API_URL}/qrcodes/${qr.id}`}</p>
         <script>
           window.onload = () => {
             window.print();
@@ -121,7 +137,6 @@ export const getColumns = (openActivateDialog: (qr: QRCode) => void, openSeeDial
                 See QR-Code
               </DropdownMenuItem>
               <DropdownMenuItem
-                disabled={!row.original.resource}
                 onClick={() => printQRCode(row.original)}
               >
                 Print QR-Code

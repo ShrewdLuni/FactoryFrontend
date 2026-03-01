@@ -9,14 +9,12 @@ export function AppRoutes() {
 
   return (
     <Routes>
-
       <Route
         path="/auth"
         element={
           user ? <Navigate to="/" replace /> : routes.find(r => r.path === "/auth")!.element
         }
       />
-
       <Route element={<ProtectedRoute roles={["*"]} />}>
         {routes
           .filter(r => r.path !== "/auth")

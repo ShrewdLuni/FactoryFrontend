@@ -23,7 +23,6 @@ export const SelectCell = ({ row, data, placeholder, onChange, defaultValue }: S
             return (
               <SelectItem key={option.value} value={option.value}>
                 <div className="flex items-center gap-2">
-                  {/* {Icon && <Icon className="h-4 w-4 shrink-0 text" />} */}
                   {renderIcon(option.icon)}
                   {option.label}
                 </div>

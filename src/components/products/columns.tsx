@@ -58,7 +58,7 @@ export const getProductColumns = ({ onCellUpdate }: ProductColumnsProps) => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <MoreHorizontal className="h-4 w-4" />
-                  <span>{row.original.id}</span>
+                  <span className="sr-only">{row.original.id}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
