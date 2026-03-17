@@ -1,9 +1,8 @@
 export type Product = {
   id: number;
   code: string;
-  category: string;
   name: string;
-  measureUnit: string;
+  measureUnitId: number;
   isActive: boolean;
 };
 

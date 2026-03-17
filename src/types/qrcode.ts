@@ -1,8 +1,9 @@
 export type QRCode = {
 	id: number;
+  name?: string | null;
+  resource?: string | null;
 	isTaken: boolean;
-	name?: string | null;
-	resource?: string | null;
+	isActive: boolean;
 };
 
 export type InsertQRCode = Omit<QRCode, "id" | "isTaken">;

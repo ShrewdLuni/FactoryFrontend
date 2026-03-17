@@ -1,7 +1,8 @@
 export type Workstation = {
   id: number,
   name: string, 
-  qrCode: number | null,
+  qrCodeId: number | null,
+  isActive: boolean
 }
 
 export type InsertWorkstation = Omit<Workstation, "id">
