@@ -13,13 +13,14 @@ export const WorkstationsPage = () => {
       columns={columns}
       data={workstations!}
       searchValues={"name"}
-      contentForm={
-        <WorkstationsForm
-          onSuccess={() => {
-            console.log("success");
-          }}
-        />
-      }
+      isAddSection={false}
+      // contentForm={
+      //   <WorkstationsForm
+      //     onSuccess={() => {
+      //       console.log("success");
+      //     }}
+      //   />
+      // }
     />
   );
 };

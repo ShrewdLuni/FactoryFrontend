@@ -1,20 +1,13 @@
 "use client";
 
-import { Button } from "../ui/button";
+import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
-import { SortableHeader } from "../data-table/sortable-header";
 import type { Product } from "@/types/products";
 import { CheckBoxCell } from "../data-table/checkbox-cell";
 import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-
+import { SortableHeader } from "../data-table/sortable-header";
+import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
 
 interface ProductColumnsProps {
   onCellUpdate: (field: string, value: string | boolean, row: any) => void;
@@ -40,15 +33,18 @@ export const getProductColumns = ({ onCellUpdate }: ProductColumnsProps) => {
         return <SortableHeader column={column} field={"Is Active"} />;
       },
       cell: ({ row }) => {
-        return <div className="w-full flex justify-center"><CheckBoxCell row={row} field="isActive" defaultValue={row.original.isActive} onChange={onCellUpdate} /></div>;
+        return (
+          <div className="w-full flex justify-center">
+            <CheckBoxCell row={row} field="isActive" defaultValue={row.original.isActive} onChange={onCellUpdate} />
+          </div>
+        );
       },
       filterFn: (row, id, value) => {
         const cellValue = String(row.getValue(id));
         return value.includes(cellValue);
       },
     },
-    createColumn<Product>("category", "Category"),
-    createColumn<Product>("measureUnit", "Unit"),
+    createColumn<Product>("measureUnitId", "Unit"),
     {
       id: "actions",
       cell: ({ row }) => {

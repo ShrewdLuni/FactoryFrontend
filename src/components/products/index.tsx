@@ -1,11 +1,9 @@
 import { DataTable } from "../data-table"
 import { getProductColumns } from "./columns"
-import { BatchForm } from "../forms/batch"
 import { useProducts } from "@/hooks/useProducts"
 import { CircleCheck, CircleX } from "lucide-react"
 
 export const ProductsPage = () => {
-
   const { data: products, isLoading } = useProducts.getAll() 
   const { mutate: updateProduct } = useProducts.update()
 
@@ -46,7 +44,6 @@ export const ProductsPage = () => {
     <DataTable 
       columns={getProductColumns({onCellUpdate: handleCellUpdate})} 
       data={products ? products : []} 
-      contentForm={<BatchForm onSuccess={() => console.log("true")}/>} 
       isAddSection={false}
       searchValues="name" 
       filters={filters}

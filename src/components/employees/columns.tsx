@@ -50,7 +50,7 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
         return (
           <SelectCell
             row={row}
-            defaultValue={row.original.role || ""}
+            defaultValue={row.original.role?.label || ""}
             data={roleSelect}
             placeholder="Assign role"
             onChange={(value) => onCellUpdate("role", value, row)}
@@ -67,7 +67,7 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
         return (
           <MultipleSelectCell
             row={row}
-            defaultValue={row.original.departments}
+            defaultValue={row.original.departments?.map((d) => d.label) ?? []}
             data={departmentsSelect}
             onChange={(value) => onCellUpdate("departments", value, row)}
           />

@@ -12,7 +12,7 @@ export const columns: ColumnDef<Workstation>[] = [
   createSelectColumn<Workstation>(),
   createIdColumn<Workstation>(),
   createColumn<Workstation>("name", "Name"),
-  createColumn<Workstation>("qrCode", "QR Code"),
+  createColumn<Workstation>("qrCodeId", "QR Code"),
   {
     id: "actions",
     cell: ({ row }) => {

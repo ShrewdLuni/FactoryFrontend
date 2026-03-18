@@ -11,6 +11,7 @@ export type User = {
   gender: "Male" | "Female" | "Other" | null;
   dateOfBirth?: Date | null | undefined;
   email?: string | null | undefined;
+  phone?: string | null | undefined;
   isActive: boolean;
   departments: {
     isActive: boolean;
@@ -25,4 +26,19 @@ export type User = {
   } | null | undefined;
 }
 
-export type InsertUser = Omit<User, "id" | "fullName">;
+export type InsertUser = {
+    firstName: string;
+    lastName: string;
+    gender: UserGender,
+    departmentIds: number[] | null;
+    code?: string | null | undefined;
+    isActive?: boolean | undefined;
+    email?: string | null | undefined;
+    username?: string | null | undefined;
+    patronymic?: string | null | undefined;
+    phone?: string | null | undefined;
+    dateOfBirth?: Date | null | undefined;
+    roleId?: number | null | undefined;
+}
+
+// export type InsertUser = Omit<User, "id" | "fullName">;

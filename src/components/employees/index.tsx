@@ -1,8 +1,10 @@
 import { DataTable } from "../data-table";
 import { getUserColumns } from "./columns";
-import { Mars, Venus, CircleSmall, HardHat, UserStar, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
+import { Mars, Venus, CircleSmall, HardHat, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";
 import { useCallback, useMemo } from "react";
+import type { User, UserGender, UserInsert } from "@/types/users";
+import type { Row } from "@tanstack/react-table";
 
 const gender = [
   {
@@ -13,64 +15,27 @@ const gender = [
   {
     label: "Female",
     value: "Female",
-    icon: Venus,
+    icon: Venus
   },
   {
     label: "Other",
     value: "Other",
-    icon: CircleSmall,
+    icon: CircleSmall 
   },
 ];
 
 const roles = [
-  {
-    label: "Worker",
-    value: "Worker",
-    icon: HardHat,
-  },
-  {
-    label: "Master",
-    value: "Master",
-    icon: UserCog,
-  },
-  {
-    label: "Manager",
-    value: "Manager",
-    icon: UserStar,
-  },
+  { id: 1, label: "Worker", value: "Worker", icon: HardHat },
+  { id: 2, label: "Master", value: "Master", icon: UserCog },
 ];
 
 const departments = [
-  {
-    label: "Knitting",
-    value: "Knitting",
-    icon: Scissors,
-  },
-  {
-    label: "Sewing",
-    value: "Sewing",
-    icon: Spool,
-  },
-  {
-    label: "Turning",
-    value: "Turning",
-    icon: Cone,
-  },
-  {
-    label: "Molding",
-    value: "Molding",
-    icon: Layers,
-  },
-  {
-    label: "Labeling",
-    value: "Labeling",
-    icon: Tag,
-  },
-  {
-    label: "Packaging",
-    value: "Packaging",
-    icon: ArchiveIcon,
-  },
+  { id: 1, label: "Knitting", value: "Knitting", icon: Scissors },
+  { id: 2, label: "Sewing", value: "Sewing", icon: Spool },
+  { id: 3, label: "Turning", value: "Turning", icon: Cone },
+  { id: 4, label: "Molding", value: "Molding", icon: Layers },
+  { id: 5, label: "Labeling", value: "Labeling", icon: Tag },
+  { id: 6, label: "Packaging", value: "Packaging", icon: ArchiveIcon },
 ];
 
 const filters = [
@@ -79,19 +44,48 @@ const filters = [
   { column: "departments", title: "Departments", options: departments },
 ];
 
+export function userToInsert(user: User): UserInsert {
+  return {
+    code: user.code,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    patronymic: user.patronymic,
+    email: user.email,
+    phone: user.phone,
+    gender: user.gender ?? "Other",
+    dateOfBirth: user.dateOfBirth,
+    isActive: user.isActive,
+    roleId: user.role?.id ?? null,
+    departmentIds: user.departments?.map((d) => d.id) ?? [],
+  };
+}
+
 export const EmployeesPage = () => {
   const { data: users } = useUsers.getAll();
   const { mutate: updateUser } = useUsers.update();
 
+  console.log(users)
+
   const handleCellUpdate = useCallback(
-    (field: string, value: string, row: any) => {
-      updateUser({
-        id: row.original.id,
-        data: {
-          ...row.original,
-          [field]: value,
-        },
-      });
+    (field: string, value: unknown, row: Row<User>) => {
+      const base = userToInsert(row.original);
+
+      let patch: Partial<UserInsert> = {};
+
+      if (field === "role") {
+        const match = roles.find((r) => r.value === value);
+        patch = { roleId: match?.id ?? null };
+      } else if (field === "departments") {
+        const ids = (value as string[])
+        .map((v) => departments.find((d) => d.value === v)?.id)
+        .filter((id): id is number => id !== undefined);
+        patch = { departmentIds: ids };
+      } else if (field === "gender") {
+        patch = { gender: value as UserGender };
+      }
+
+      updateUser({ id: row.original.id, data: { ...base, ...patch } });
     },
     [updateUser],
   );
@@ -107,14 +101,5 @@ export const EmployeesPage = () => {
     [handleCellUpdate],
   );
 
-  return (
-    <DataTable
-      columns={columns}
-      isAddSection={false}
-      data={users ? users : []}
-      filters={filters}
-      searchValues={"fullName"}
-      initialState={{ columnVisibility: { code: false, email: false, phone: false } }}
-    />
-  );
+  return <DataTable columns={columns} isAddSection={false} data={users ? users : []} filters={filters} searchValues={"fullName"} initialState={{columnVisibility: { code: false, email: false, phone: false }}} />;
 };
