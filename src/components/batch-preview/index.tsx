@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../ui/card";
 import { useBatches } from "@/hooks/useBatch";
-import { useGetProduct } from "@/hooks/useProducts";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
-import { API_URL } from "@/config";
 
 const SECOND_GRADE = [
   { id: 1, label: "Не відповідність лінійним розмірам" },
@@ -29,60 +27,45 @@ export const BatchPreviewPage = () => {
   const navigate = useNavigate();
 
   const { data: batch } = useBatches.get(Number(id));
-  const { mutate: scan } = useBatches.scan();
-  const { mutate: updateBatch } = useBatches.update();
-  const { data: product } = useGetProduct(batch?.productId || 0);
+  const { mutate: advance } = useBatches.advance()
 
   const [defects, setDefects] = useState<Record<number, number>>({});
-
-  const [actualSize, setActualSize] = useState<number>(0)
+  const [sizeOverride, setSizeOverride] = useState<number>(0);
 
   useEffect(() => {
     if (batch?.actualSize) {
-      setActualSize(batch.actualSize);
+      setSizeOverride(batch.actualSize);
     }
   }, [batch?.actualSize]);
 
-  const questioneer = String(batch?.progressStatus).includes("In-Progress");
-
-  const actualSizeQuestion = String(batch?.progressStatus) === "Knitting Workshop (In-Progress)";
-
-  if (!id) return null;
+  const showQuestionnaire = batch?.status.allowsDefectReporting;
+  const showSizeOverride = String(batch?.status.label) === "Activated";
 
   const handleChange = (id: number, value: string) => {
     setDefects((prev) => ({ ...prev, [id]: Math.max(0, parseInt(value) || 0) }));
   };
 
-  const handleScan = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if(!batch) {
-      return
-    }
-
-    const total = Object.values(defects).reduce((sum, count) => sum + count, 0);
-    if (total > (batch?.size ?? 0)) return;
+  const handleAdvance = () => {
+    if (!batch || !id) return;
 
     const defectsPayload = Object.entries(defects)
-      .filter(([, count]) => count > 0)
-      .map(([typeId, count]) => ({ typeId: Number(typeId), count }));
+      .filter(([, quantity]) => quantity > 0)
+      .map(([defect_type_id, quantity]) => ({
+        defect_type_id: Number(defect_type_id),
+        quantity,
+      }));
 
-    await fetch(`${API_URL}/batches/${id}/spoilage`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ defects: defectsPayload }),
-    });
-
-    const updatedBatch = {
-      ...batch,
-      actualSize: ((actualSize ?? batch?.actualSize ?? batch?.size ?? 100) - total),
-    };
-
-    updateBatch({ id: Number(id), data: updatedBatch });
-    scan(Number(id));
-    navigate("/");
+    advance(
+      {
+        id: Number(id),
+        defects: defectsPayload,
+        sizeOverride: showSizeOverride ? sizeOverride : batch.actualSize ? batch.actualSize : undefined,
+      },
+      { onSuccess: () => navigate("/") },
+    );
   };
 
+  console.log(showQuestionnaire, showSizeOverride)
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-4 md:p-6">
       <div className="w-full max-w-md">
@@ -93,20 +76,28 @@ export const BatchPreviewPage = () => {
               <CardDescription>
                 {batch && (
                   <div className="border p-4 text-white font-semibold rounded-md shadow-sm space-y-2">
-                    <p>{product?.name}</p>
+                    <p>{batch.product.name}</p>
                     <p>Розмір: {batch.size}</p>
                     <p>Актуальний Розмір: {batch.actualSize}</p>
-                    <p>Статус: {batch.progressStatus}</p>
+                    <p>Статус: {batch.status.label}</p>
                     <p>Назва партії: {batch.name}</p>
                   </div>
                 )}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {questioneer && 
-              <ScrollArea className="h-[40vh] px-4">
-                <form className="flex flex-col gap-4" onSubmit={handleScan}>
+              {showQuestionnaire && (
+                <ScrollArea className="h-[40vh] px-4">
                   <FieldSet className="flex gap-4">
+                    {showSizeOverride && (
+                      <Field className="flex flex-row font-normal">
+                        <FieldLabel>Актуальна Кількість</FieldLabel>
+                        <Input
+                          value={sizeOverride}
+                          onChange={(e) => setSizeOverride(Number(e.target.value))}
+                        />
+                      </Field>
+                    )}
                     <FieldLegend>Другий сорт</FieldLegend>
                     <FieldGroup className="gap-2">
                       {SECOND_GRADE.map((type) => (
@@ -131,17 +122,10 @@ export const BatchPreviewPage = () => {
                         </Field>
                       ))}
                     </FieldGroup>
-                      {actualSizeQuestion &&  <Field className="flex flex-row font-normal">
-                        <FieldLabel>Актуальное Количество</FieldLabel>
-                        <Input
-                          value={actualSize}
-                          onChange={(e) => setActualSize(Number(e.target.value))}
-                        />
-                      </Field>}
                   </FieldSet>
-                </form>
-              </ScrollArea>}
-              <Button className="mt-4 w-full" onClick={handleScan} disabled={!id}>
+                </ScrollArea>
+              )}
+              <Button className="mt-4 w-full" onClick={handleAdvance} disabled={!id}>
                 Сканувати
               </Button>
             </CardContent>

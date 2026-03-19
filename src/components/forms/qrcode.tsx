@@ -20,7 +20,7 @@ export const QRCodeForm = ({ onSuccess }: QRCodeFormProps) => {
     e.preventDefault();
 
     initializeQRCodes(
-      { name: name === "" ? "Empty" : name, amount: amount },
+      { name: name === "" ? "Empty" : name, amount: amount, isActive: true },
       {
         onSuccess: () => {
           onSuccess();

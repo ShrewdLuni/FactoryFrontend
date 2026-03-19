@@ -55,7 +55,7 @@ export const deleteQRCode = async (id: number): Promise<QRCode> => {
 };
 
 export const activateQRCode = async (id: number, resource: string): Promise<QRCode> => {
-  const response = await fetch(`${BASE_URL}/${id}/activate`, {
+  const response = await fetch(`${BASE_URL}/${id}/link`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

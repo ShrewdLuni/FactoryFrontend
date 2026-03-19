@@ -7,12 +7,7 @@ export const WorkstationPreviewPage = () => {
 
   const { id } = useParams();
 
-  if (id == undefined || isNaN(parseInt(id))) {
-    return <div>Something went wrong</div>
-  }
-
-  const { data: workstation, isLoading  } = useWorkstations.get(parseInt(id))
-
+  const { data: workstation, isLoading  } = useWorkstations.get(parseInt(id ?? "0", 10))
 
   useEffect(() => {
     if (workstation) {
@@ -21,6 +16,11 @@ export const WorkstationPreviewPage = () => {
       console.log('Saved workstation:', workstation);
     }
   }, [workstation]);
+
+  if (id === undefined || isNaN(parseInt(id))) {
+    return <div>Something went wrong</div>
+  }
+
 
   return (
    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">

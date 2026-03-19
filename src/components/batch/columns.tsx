@@ -2,7 +2,7 @@
 
 import { SortableHeader } from "../data-table/sortable-header";
 import { type ColumnDef, type Row } from "@tanstack/react-table";
-import type { Batch } from "@/types/batches";
+import type { Batch, InsertBatch } from "@/types/batches";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,20 +15,20 @@ import { Button } from "../ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
 import { formatDate } from "date-fns";
-import { useGetUser } from "@/hooks/useUsers";
 import { useGetProduct } from "@/hooks/useProducts";
 import { InputCell } from "../data-table/input-cell";
 import { SelectCell } from "../data-table/select-cell";
 import type { Product } from "@/types/products";
-import type { User, UserDepartment } from "@/types/users";
+import type { User } from "@/types/users";
 import type { Workstation } from "@/types/workstation";
 import { useDeleteBatch } from "@/hooks/useBatch";
+import type { Department } from "@/types/departments";
 
 export const columns: ColumnDef<Batch>[] = [
   createSelectColumn<Batch>(),
   createIdColumn<Batch>(),
   createColumn<Batch>("name", "Name"),
-  createColumn<Batch>("progressStatus", "Status"),
+  createColumn<Batch>("status", "Status"),
   createColumn<Batch>("size", "Batch size"),
   {
     accessorKey: "productId",
@@ -36,62 +36,62 @@ export const columns: ColumnDef<Batch>[] = [
       return <SortableHeader column={column} field={"Product"} />;
     },
     cell: ({ row }) => {
-      const { data: product, isLoading } = useGetProduct(row.original.productId || 0);
+      const { data: product, isLoading } = useGetProduct(row.original.product.id || 0);
 
       return <div>{isLoading ? "Loading" : product ? product.name : "Not found"}</div>;
     },
   },
-  {
-    accessorKey: "masters.knitting",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Knitting"} />;
-    },
-    cell: ({ row }) => {
-      const { data: user, isLoading } = useGetUser(row.original.masters.knitting ?? 0);
-
-      return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
-    },
-  },
-  {
-    accessorKey: "masters.sewing",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Sewing"} />;
-    },
-    cell: ({ row }) => {
-      const { data: user, isLoading } = useGetUser(row.original.masters.sewing ?? 0);
-      return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
-    },
-  },
-  {
-    accessorKey: "masters.molding",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Molding"} />;
-    },
-    cell: ({ row }) => {
-      const { data: user, isLoading } = useGetUser(row.original.masters.molding ?? 0);
-      return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
-    },
-  },
-  {
-    accessorKey: "masters.labeling",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Labeling"} />;
-    },
-    cell: ({ row }) => {
-      const { data: user, isLoading } = useGetUser(row.original.masters.labeling ?? 0);
-      return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
-    },
-  },
-  {
-    accessorKey: "masters.packaging",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Packaging"} />;
-    },
-    cell: ({ row }) => {
-      const { data: user, isLoading } = useGetUser(row.original.masters.packaging ?? 0);
-      return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
-    },
-  },
+  // {
+  //   accessorKey: "masters.knitting",
+  //   header: ({ column }) => {
+  //     return <SortableHeader column={column} field={"Knitting"} />;
+  //   },
+  //   cell: ({ row }) => {
+  //     const { data: user, isLoading } = useGetUser(row.original.masters.knitting ?? 0);
+  //
+  //     return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "masters.sewing",
+  //   header: ({ column }) => {
+  //     return <SortableHeader column={column} field={"Sewing"} />;
+  //   },
+  //   cell: ({ row }) => {
+  //     const { data: user, isLoading } = useGetUser(row.original.masters.sewing ?? 0);
+  //     return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "masters.molding",
+  //   header: ({ column }) => {
+  //     return <SortableHeader column={column} field={"Molding"} />;
+  //   },
+  //   cell: ({ row }) => {
+  //     const { data: user, isLoading } = useGetUser(row.original.masters.molding ?? 0);
+  //     return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "masters.labeling",
+  //   header: ({ column }) => {
+  //     return <SortableHeader column={column} field={"Labeling"} />;
+  //   },
+  //   cell: ({ row }) => {
+  //     const { data: user, isLoading } = useGetUser(row.original.masters.labeling ?? 0);
+  //     return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "masters.packaging",
+  //   header: ({ column }) => {
+  //     return <SortableHeader column={column} field={"Packaging"} />;
+  //   },
+  //   cell: ({ row }) => {
+  //     const { data: user, isLoading } = useGetUser(row.original.masters.packaging ?? 0);
+  //     return <div>{isLoading ? "Loading" : user ? user.fullName : "Not found"}</div>;
+  //   },
+  // },
   {
     accessorKey: "plannedFor",
     header: ({ column }) => {
@@ -140,9 +140,9 @@ export const columns: ColumnDef<Batch>[] = [
   },
 ];
 
-export type updateFunction = (field: keyof Batch | keyof Batch["masters"], value: any, row: Row<Batch>) => void;
+export type UpdateFunction = (field: keyof InsertBatch, value: any, row: Row<Batch>) => void;
 
-function createSizeColumn(handleCellUpdate: updateFunction, isChangable: boolean): ColumnDef<Batch> {
+function createSizeColumn(handleCellUpdate: UpdateFunction, isChangable: boolean): ColumnDef<Batch> {
   return {
     accessorKey: "size",
     header: ({ column }) => <SortableHeader column={column} field={"Batch size"} />,
@@ -162,14 +162,14 @@ function createSizeColumn(handleCellUpdate: updateFunction, isChangable: boolean
   };
 }
 
-function createNameColumn(handleCellUpdate: updateFunction, isChangable: boolean): ColumnDef<Batch> {
+function createNameColumn(handleCellUpdate: UpdateFunction, isChangable: boolean): ColumnDef<Batch> {
   return {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} field={"Name"} />,
     cell: ({ row }) => {
       return isChangable ? (
         <InputCell
-          defaultValue={row.original.name}
+          defaultValue={row.original.name || undefined}
           onBlur={(e) => {
             e.preventDefault();
             handleCellUpdate("name", e.target.value, row);
@@ -182,16 +182,16 @@ function createNameColumn(handleCellUpdate: updateFunction, isChangable: boolean
   };
 }
 
-function createWorkstationColumn(handleCellUpdate: updateFunction, isChangable: boolean, workstations: Workstation[]): ColumnDef<Batch> {
+function createWorkstationColumn(handleCellUpdate: UpdateFunction, isChangable: boolean, workstations: Workstation[]): ColumnDef<Batch> {
   return {
     accessorKey: "workstationId",
     header: ({ column }) => <SortableHeader column={column} field={"workstations"} />,
     cell: ({ row }) => {
-      const selectedWorkstation = workstations?.find((w) => w.id === row.original.workstationId);
-      const workstationData = workstations.map((product) => {
+      const selectedWorkstation = workstations?.find((w) => w.id === row.original.workstation.id);
+      const workstationData = workstations.map((workstation) => {
         return {
-          label: product.name,
-          value: String(product.id),
+          label: workstation.name,
+          value: String(workstation.id),
         };
       });
 
@@ -206,26 +206,26 @@ function createWorkstationColumn(handleCellUpdate: updateFunction, isChangable: 
           }}
         />
       ) : (
-        <div>{`${selectedWorkstation?.name}`}</div>
+        <div>{`${row.original.workstation.name}`}</div>
       );
     },
   };
 }
 
-
-
-function createProductColumn(handleCellUpdate: updateFunction, isChangable: boolean, products: Product[]): ColumnDef<Batch> {
+function createProductColumn(handleCellUpdate: UpdateFunction, isChangable: boolean, products: Product[]): ColumnDef<Batch> {
   return {
     accessorKey: "productId",
     header: ({ column }) => <SortableHeader column={column} field={"Product"} />,
     cell: ({ row }) => {
-      const selectedProduct = products?.find((p) => p.id === row.original.productId);
-      const productsData = products?.filter((product) => product.isActive).map((product) => {
-        return {
-          label: product.name,
-          value: String(product.id),
-        };
-      });
+      const selectedProduct = products?.find((p) => p.id === row.original.product.id);
+      const productsData = products
+        ?.filter((product) => product.isActive)
+        .map((product) => {
+          return {
+            label: product.name,
+            value: String(product.id),
+          };
+        });
 
       return isChangable ? (
         <SelectCell
@@ -244,105 +244,121 @@ function createProductColumn(handleCellUpdate: updateFunction, isChangable: bool
   };
 }
 
-function createMasterColumn(
-  handleCellUpdate: updateFunction,
-  isChangable: boolean,
-  users: User[],
-  department: UserDepartment,
-): ColumnDef<Batch> {
+// function createMasterColumn(
+//   handleCellUpdate: UpdateFunction,
+//   isChangable: boolean,
+//   users: User[],
+//   department: UserDepartment,
+// ): ColumnDef<Batch> {
+//   return {
+//     accessorKey: `masters.${department}`,
+//     header: ({ column }) => <SortableHeader column={column} field={department} />,
+//     cell: ({ row }) => {
+//       const usersData =
+//         users
+//           ?.filter((user) => user.departments?.includes(department))
+//           .map((user) => ({
+//             label: user.fullName,
+//             value: String(user.id),
+//           })) ?? [];
+//
+//       const departmentKey = department.toLowerCase() as keyof Batch["masters"];
+//
+//       const selectedMasterId = row.original.masters?.[departmentKey];
+//
+//       return isChangable ? (
+//         <SelectCell
+//           row={row}
+//           defaultValue={String(selectedMasterId)}
+//           data={usersData}
+//           placeholder="Select master"
+//           onChange={(value) => handleCellUpdate(departmentKey, Number(value), row)}
+//         />
+//       ) : (
+//         <div className="text-center">{`${row.original.name}`}</div>
+//       );
+//     },
+//   };
+// }
+
+function createWorkerColumn(handleCellUpdate: UpdateFunction, users: User[], department: Department): ColumnDef<Batch> {
   return {
-    accessorKey: `masters.${department}`,
-    header: ({ column }) => <SortableHeader column={column} field={department} />,
+    accessorKey: `workers_${department.label}`,
+    header: ({ column }) => <SortableHeader column={column} field={department.label} />,
     cell: ({ row }) => {
-      const usersData =
-        users
-          ?.filter((user) => user.departments?.includes(department))
-          .map((user) => ({
-            label: user.fullName,
-            value: String(user.id),
-          })) ?? [];
+      const entry = row.original.workers?.find((w) => w.department.id === department.id);
 
-      const departmentKey = department.toLowerCase() as keyof Batch["masters"];
+      const usersData = users
+        .filter((u) => u.departments?.some((d) => d.id === department.id))
+        .map((u) => ({ label: u.fullName ?? "", value: String(u.id) }));
 
-      const selectedMasterId = row.original.masters?.[departmentKey];
-
-      return isChangable ? (
+      return (
         <SelectCell
           row={row}
-          defaultValue={String(selectedMasterId)}
+          defaultValue={entry ? String(entry.worker.id) : ""}
           data={usersData}
-          placeholder="Select master"
-          onChange={(value) => handleCellUpdate(departmentKey, Number(value), row)}
+          placeholder="Select worker"
+          onChange={(value) => handleCellUpdate("workers", { departmentId: department.id, workerId: Number(value) }, row)}
         />
-      ) : (
-        <div className="text-center">{`${row.original.name}`}</div>
       );
     },
   };
 }
 
-export const getBatchColumns = (onChange: updateFunction, products: Product[], users: User[], workstations: Workstation[]) => {
-  const { mutate: delteBatch } = useDeleteBatch()
-  const departments: UserDepartment[] = ["Knitting", "Sewing", "Turning", "Molding", "Labeling", "Packaging"];
+export const getBatchColumns = (
+  onChange: UpdateFunction,
+  products: Product[],
+  users: User[],
+  workstations: Workstation[],
+  departments: Department[],
+): ColumnDef<Batch>[] => {
+  const { mutate: deleteBatch } = useDeleteBatch();
 
-  const columns: ColumnDef<Batch>[] = [];
-
-
-  columns.push(createSelectColumn<Batch>());
-  columns.push(createIdColumn<Batch>());
-  columns.push(createColumn<Batch>("progressStatus", "Status"));
-  columns.push(createSizeColumn(onChange, true));
-  columns.push(createColumn<Batch>("actualSize", "Actual size"));
-  columns.push(createNameColumn(onChange, true));
-  columns.push(createWorkstationColumn(onChange, true, workstations));
-  columns.push(createProductColumn(onChange, true, products));
-  for (const department of departments) columns.push(createMasterColumn(onChange, true, users, department));
-  columns.push({
-    accessorKey: "plannedFor",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Planned for"} />;
+  const columns: ColumnDef<Batch>[] = [
+    createSelectColumn<Batch>(),
+    createIdColumn<Batch>(),
+    {
+      accessorKey: "status",
+      header: ({ column }) => <SortableHeader column={column} field="Status" />,
+      cell: ({ row }) => <div className="text-center">{row.original.status.label}</div>,
     },
-    cell: ({ row }) => {
-      return <div className="text-center">{formatDate(row.original.plannedFor || 0, "dd/MM/yyyy")}</div>;
+    createSizeColumn(onChange, true),
+    createColumn<Batch>("actualSize", "Actual size"),
+    createNameColumn(onChange, true),
+    createWorkstationColumn(onChange, true, workstations),
+    createProductColumn(onChange, true, products),
+    ...departments.map((dept) => createWorkerColumn(onChange, users, dept)),
+    {
+      accessorKey: "plannedFor",
+      header: ({ column }) => <SortableHeader column={column} field="Planned for" />,
+      cell: ({ row }) => <div className="text-center">{formatDate(row.original.plannedFor, "dd/MM/yyyy")}</div>,
     },
-  });
-  columns.push({
-    accessorKey: "updatedAt",
-    header: ({ column }) => {
-      return <SortableHeader column={column} field={"Last updated"} />;
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{formatDate(row.original.plannedFor || 0, "dd/MM/yyyy")}</div>;
-    },
-  });
-  columns.push({
-    id: "actions",
-    cell: ({ row }) => {
-      return (
+    {
+      id: "actions",
+      cell: ({ row }) => (
         <div className="flex justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu {row.original.name}</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem disabled={true}>Link to QR</DropdownMenuItem>
-              <DropdownMenuItem disabled={true}>See QR</DropdownMenuItem>
-              <DropdownMenuItem disabled={true}>Print</DropdownMenuItem>
+              <DropdownMenuItem disabled>Link to QR</DropdownMenuItem>
+              <DropdownMenuItem disabled>See QR</DropdownMenuItem>
+              <DropdownMenuItem disabled>Print</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem disabled={true}>Edit</DropdownMenuItem>
-              <DropdownMenuItem disabled={false} onClick={() => delteBatch(row.original.id)} variant="destructive">
+              <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onClick={() => deleteBatch(row.original.id)}>
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      );
+      ),
     },
-  });
+  ];
 
   return columns;
 };

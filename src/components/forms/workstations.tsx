@@ -26,7 +26,7 @@ export const WorkstationsForm = ({ onSuccess }: WorkstationsFormProps) => {
     e.preventDefault();
     console.log(name, activeQRCodeID)
 
-    createWorkstation({ name: name, qrCode: activeQRCodeID === "generate" ? null : parseInt(activeQRCodeID),});
+    createWorkstation({ name: name, qrCodeId: activeQRCodeID === "generate" ? null : parseInt(activeQRCodeID), isActive: true});
 
     if (!createError) {
       onSuccess();

@@ -3,7 +3,7 @@ import { getUserColumns } from "./columns";
 import { Mars, Venus, CircleSmall, HardHat, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";
 import { useCallback, useMemo } from "react";
-import type { User, UserGender, UserInsert } from "@/types/users";
+import type { User, UserGender, InsertUser } from "@/types/users";
 import type { Row } from "@tanstack/react-table";
 
 const gender = [
@@ -44,7 +44,7 @@ const filters = [
   { column: "departments", title: "Departments", options: departments },
 ];
 
-export function userToInsert(user: User): UserInsert {
+export function userToInsert(user: User): InsertUser {
   return {
     code: user.code,
     username: user.username,
@@ -71,7 +71,7 @@ export const EmployeesPage = () => {
     (field: string, value: unknown, row: Row<User>) => {
       const base = userToInsert(row.original);
 
-      let patch: Partial<UserInsert> = {};
+      let patch: Partial<InsertUser> = {};
 
       if (field === "role") {
         const match = roles.find((r) => r.value === value);

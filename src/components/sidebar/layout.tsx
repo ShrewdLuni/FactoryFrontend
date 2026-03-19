@@ -1,12 +1,11 @@
-import type { ReactNode } from "react"
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar"
 import { Outlet } from "react-router-dom"
 import { AppSidebar } from "./app-sidebar"
 
-interface LayoutProps {
-  children: ReactNode,
-}
-
+// interface LayoutProps {
+//   children: ReactNode,
+// }
+//
 // export const Layout = ({ children } : LayoutProps) => {
 //   return (
 //     <SidebarProvider className="flex">

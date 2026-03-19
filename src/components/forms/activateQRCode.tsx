@@ -47,13 +47,13 @@ export const ActivateQRCodeForm = ({ qrcode, onDone }: QRCodeFormProps) => {
               </SelectTrigger>
               <SelectContent>
                 {isLoading ? [] : (batches
-                  ?.filter((batch) => batch.progressStatus === "Inactive")
+                  ?.filter((batch) => batch.status.label === "Inactive")
                   .map((batch) => {
                     return (
                       <SelectItem
                         key={batch.name}
                         value={`${BASE_URL}/batch/${String(batch.id)}`}
-                      >{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.productId} | Size: ${batch.size}`}</SelectItem>
+                      >{`ID: ${batch.id} | Name: ${batch.name} | Product: ${batch.product.id} | Size: ${batch.size}`}</SelectItem>
                     );
                   }))}
               </SelectContent>

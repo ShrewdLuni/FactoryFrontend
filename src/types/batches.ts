@@ -34,6 +34,26 @@ export type Batch = {
   isActive: boolean;
 }
 
-export type InsertBatch = Omit<Batch, "id" | "progressStatus" | "updatedAt" | "createdAt" | "isPlanned">;
+
+export type InsertBatch = {
+  name?: string | null | undefined;
+  size?: number | undefined;
+  actualSize?: number | null | undefined;
+  productId?: number | null | undefined;
+  workstationId?: number | null | undefined;
+  statusId: number | null;
+  plannedFor: Date;
+  isActive: boolean;
+  workers?: {
+    department: {
+      id: number;
+      label?: string | null | undefined;
+    };
+    worker: {
+      id: number;
+      fullName?: string | null | undefined;
+    };
+  }[] | null | undefined;
+}
 
 export type InsertBatchBulk = InsertBatch & { amount: number };
