@@ -54,9 +54,20 @@ export const deleteBatch = async (id: number): Promise<Batch> => {
   return response.json();
 };
 
-export const scanBatch = async (id: number): Promise<Batch> => {
-  const response = await fetch(`${BASE_URL}/${id}/scan`, { method: "PATCH", credentials: "include" });
-  if (!response.ok) throw new Error("Failed to scan batches");
+export type AdvanceBatchPayload = {
+  id: number;
+  defects: { defect_type_id: number; quantity: number }[];
+  sizeOverride?: number;
+};
+
+export const advanceBatch  = async ({ id , defects, sizeOverride }: AdvanceBatchPayload): Promise<Batch> => {
+  const response = await fetch(`${BASE_URL}/${id}/advance`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ defects, sizeOverride }),
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to advance batch");
   return response.json();
 };
 
@@ -79,7 +90,7 @@ export const batchService = {
   createMultiple: createBatches,
   update: updateBatch,
   delete: deleteBatch,
-  scan: scanBatch,
+  advance: advanceBatch,
   planned: {
     initialize: initializePlannedBatches,
     execute: executePlannedBatches,

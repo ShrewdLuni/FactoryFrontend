@@ -1,6 +1,6 @@
 import type { Batch, InsertBatch, InsertBatchBulk } from "@/types/batches";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { batchService as service } from "@/services/batches";
+import { batchService as service, type AdvanceBatchPayload } from "@/services/batches";
 
 export const batchKeys = {
   all: () => ["batches"] as const,
@@ -49,13 +49,36 @@ export const useCreateBatches = () => {
 
 export const useUpdateBatch = () => {
   const queryClient = useQueryClient();
-  return useMutation<Batch, Error, { id: number; data: InsertBatch }, { previousBatches: Batch[] | undefined}>({
+  return useMutation<Batch, Error, { id: number; data: InsertBatch }, { previousBatches: Batch[] | undefined }>({
     mutationFn: (data) => service.update(data),
-    onMutate: async ({id, data}) => {
+    onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: batchKeys.lists() });
       const previousBatches = queryClient.getQueryData<Batch[]>(batchKeys.lists());
-      queryClient.setQueryData<Batch[]>(batchKeys.lists(), (old) => old?.map((product) => (product.id === id ? { ...product, ...data } : product)) ?? []);
-      return { previousBatches: previousBatches };
+
+      queryClient.setQueryData<Batch[]>(
+        batchKeys.lists(),
+        (old) =>
+          old?.map((batch) => {
+            if (batch.id !== id) return batch;
+            return {
+              ...batch,
+              name: data.name ?? batch.name,
+              size: data.size ?? batch.size,
+              actualSize: data.actualSize ?? batch.actualSize,
+              plannedFor: data.plannedFor,
+              isActive: data.isActive,
+              workers:
+                data.workers?.map((w) => ({
+                  department: w.department,
+                  worker: { id: w.worker.id, fullName: w.worker.fullName ?? null },
+                })) ?? batch.workers,
+              product: { ...batch.product, id: data.productId ?? batch.product.id },
+              workstation: { ...batch.workstation, id: data.workstationId ?? batch.workstation.id },
+              status: { ...batch.status, id: data.statusId ?? batch.status.id },
+            } satisfies Batch;
+          }) ?? [],
+      );
+      return { previousBatches };
     },
     onError: (_err, _vars, context) => {
       if (context?.previousBatches) {
@@ -81,11 +104,11 @@ export const useDeleteBatch = () => {
   });
 };
 
-export const useScanBatch = () => {
+export const useAdvanceBatch = () => {
   const queryClient = useQueryClient();
-  return useMutation<Batch, Error, number>({
-    mutationFn: (id) => service.scan(id),
-    onSuccess: (_data, id) => {
+  return useMutation<Batch, Error, AdvanceBatchPayload>({
+    mutationFn: (payload) => service.advance(payload),
+    onSuccess: (_data, { id }) => {
       queryClient.invalidateQueries({ queryKey: batchKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: batchKeys.lists() });
     },
@@ -119,7 +142,7 @@ export const useBatches = {
   createMultiple: useCreateBatches,
   update: useUpdateBatch,
   delete: useDeleteBatch,
-  scan: useScanBatch,
+  advance: useAdvanceBatch,
 };
 
 export const usePlannedBatches = {
