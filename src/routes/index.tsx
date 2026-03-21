@@ -1,8 +1,8 @@
-import { AuthenticationPage } from "@/components/authentication";
+import { AuthenticationPage } from "@/pages/auth";
 import { BatchPage } from "@/components/batch";
 import { EmployeesPage } from "@/components/employees";
 import { BatchPreviewPage } from "@/components/batch-preview";
-import { ProductsPage } from "@/components/products";
+import { ProductsPage } from "@/pages/products";
 import { QrCodeGenerationPage } from "@/components/qr-generation";
 import { WorkerPlanPage } from "@/components/worker-plan";
 import { WorkstationsPage } from "@/components/workstations";

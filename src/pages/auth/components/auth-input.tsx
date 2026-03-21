@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "../ui/field";
-import { Input } from "../ui/input";
+import { Field, FieldLabel } from "../../../components/ui/field";
+import { Input } from "../../../components/ui/input";
 import { useRandomId } from "@/hooks/useRandomId";
 
 interface AuthInputProps {
