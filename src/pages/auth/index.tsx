@@ -1,12 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AuthInput } from "./components/auth-input";
 import { AuthSelect } from "./components/auth-select";
-import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { TabsContent } from "../../components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/AuthProvider";
 import { useState } from "react";
 import { useUsers } from "@/hooks/useUsers";

@@ -1,6 +1,6 @@
 import { useWorkstations } from "@/hooks/useWorkstations";
 import { useParams } from "react-router-dom"
-import { Card, CardHeader, CardTitle, CardContent } from "../../../components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useEffect } from "react";
 
 export const WorkstationPreviewPage = () => {

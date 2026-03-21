@@ -1,18 +1,18 @@
-import { DataTable } from "../../components/data-table"
-import { QRCodeForm } from "../../components/forms/qrcode"
+import { DataTable } from "@/components/data-table"
+import { QRCodeForm } from "@/components/forms/qrcode"
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getColumns } from "./columns"
-import { Dialog, DialogHeader, DialogTitle, DialogContent } from "../../components/ui/dialog"
+import { Dialog, DialogHeader, DialogTitle, DialogContent } from "@/components/ui/dialog"
 import type { QRCode } from "@/types/qrcode"
-import { ActivateQRCodeForm } from "../../components/forms/activateQRCode"
+import { ActivateQRCodeForm } from "@/components/forms/activateQRCode"
 import { useGetAllQRCodes } from "@/hooks/useQR"
 import { QRCodeCanvas } from 'qrcode.react';
 import { BASE_URL } from "@/config"
 
 export const QrCodeGenerationPage = () => {
 
-  const {data: qrcodes, isLoading, refetch} = useGetAllQRCodes()
+  const {data: qrcodes, isLoading, refetch } = useGetAllQRCodes()
   const [activateOpen, setActivateOpen] = useState(false)
   const [seeOpen, setSeeOpen] = useState(false)
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)

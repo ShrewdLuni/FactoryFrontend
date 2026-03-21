@@ -1,14 +1,13 @@
 import { AuthenticationPage } from "@/pages/auth";
-import { BatchPage } from "@/components/batch";
-import { EmployeesPage } from "@/components/employees";
-import { BatchPreviewPage } from "@/components/batch-preview";
+import { BatchPage } from "@/pages/batches";
+import { EmployeesPage } from "@/pages/users";
+import { BatchPreviewPage } from "@/pages/batches/detail";
 import { ProductsPage } from "@/pages/products";
-import { QrCodeGenerationPage } from "@/components/qr-generation";
-import { WorkerPlanPage } from "@/components/worker-plan";
-import { WorkstationsPage } from "@/components/workstations";
-import { WorkstationPreviewPage } from "@/components/workstation-preview";
-import { QRCodePreviewPage } from "@/components/qrcode-preview";
-import { EmptyPage } from "@/components/empty";
+import { QrCodeGenerationPage } from "@/pages/qrcodes";
+import { WorkerPlanPage } from "@/pages/worker-plan";
+import { WorkstationsPage } from "@/pages/workstations";
+import { WorkstationPreviewPage } from "@/pages/workstations/detail";
+import { QRCodePreviewPage } from "@/pages/qrcodes/detail";
 import type { ForwardRefExoticComponent, JSX, RefAttributes } from "react";
 import {
   Bolt,
@@ -36,7 +35,7 @@ export interface Route {
 const emptyRoute = {
   name: "empty",
   path: "/",
-  element: <EmptyPage />,
+  element: <div></div>,
   roles: ["*"],
   icon: Bolt,
   layout: true,
@@ -149,7 +148,7 @@ const singularWorkstationRoute = {
 const actionsRoute = {
   name: "Actions",
   path: "/actions",
-  element: <EmptyPage/>,
+  element: <div></div>,
   roles: ["Master"],
   icon: ScanEye,
   layout: true,

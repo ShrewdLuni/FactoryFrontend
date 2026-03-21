@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardContent } from "../../../components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useBatches } from "@/hooks/useBatch";
 import { useAuth } from "@/AuthProvider";
 import { BASE_URL } from "@/config";

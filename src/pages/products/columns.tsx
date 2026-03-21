@@ -3,11 +3,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import type { Product } from "@/types/products";
-import { CheckBoxCell } from "../../components/data-table/checkbox-cell";
-import { createColumn, createIdColumn, createSelectColumn } from "../../components/data-table/common-columns";
-import { SortableHeader } from "../../components/data-table/sortable-header";
-import { Button } from "../../components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
+import { CheckBoxCell } from "@/components/data-table/checkbox-cell";
+import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { SortableHeader } from "@/components/data-table/sortable-header";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface ProductColumnsProps {
   onCellUpdate: (field: string, value: string | boolean, row: any) => void;

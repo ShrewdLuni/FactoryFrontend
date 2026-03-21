@@ -4,7 +4,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog"
 import type { ReactNode } from "react"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { DialogTitle } from "@radix-ui/react-dialog"
 
 interface AddRecordDialogProps {

@@ -1,7 +1,7 @@
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
-import { SortableHeader } from "../../components/data-table/sortable-header";
+import { SortableHeader } from "@/components/data-table/sortable-header";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
-import { Button } from "../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { QRCode } from "@/types/qrcode";
 import { IconCircleFilled } from "@tabler/icons-react";
-import { Badge } from "../../components/ui/badge";
-import { createColumn, createIdColumn, createSelectColumn } from "../../components/data-table/common-columns";
+import { Badge } from "@/components/ui/badge";
+import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import QRCodeLib from "qrcode";
 import { API_URL } from "@/config";
 

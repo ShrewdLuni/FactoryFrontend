@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "../../../components/ui/field"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
+import { Field, FieldLabel } from "@/components/ui/field"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { User } from "@/types/users";
 // import { fuzzySearch } from "@/helpers/fuzzyfind";
 // import { useEffect, useState } from "react";

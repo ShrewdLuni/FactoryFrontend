@@ -1,8 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { ProtectedRoute } from "./routes/ProtectedRoute";
-import { routes } from "./routes/index";
-import { useAuth } from "./AuthProvider";
-import { Layout } from "./components/sidebar/layout";
+import { ProtectedRoute } from "@/routes/ProtectedRoute";
+import { routes } from "@/routes/index";
+import { useAuth } from "@/AuthProvider";
+import { Layout } from "@/components/sidebar/layout";
 
 export function AppRoutes() {
   const { user } = useAuth();

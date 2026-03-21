@@ -1,4 +1,4 @@
-import { DataTable } from "../../components/data-table"
+import { DataTable } from "@/components/data-table"
 import { getProductColumns } from "./columns"
 import { useProducts } from "@/hooks/useProducts"
 import { CircleCheck, CircleX } from "lucide-react"

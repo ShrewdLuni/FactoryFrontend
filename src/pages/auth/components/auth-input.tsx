@@ -1,5 +1,5 @@
-import { Field, FieldLabel } from "../../../components/ui/field";
-import { Input } from "../../../components/ui/input";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { useRandomId } from "@/hooks/useRandomId";
 
 interface AuthInputProps {
@@ -9,8 +9,8 @@ interface AuthInputProps {
 
 export const AuthInput = ({ value, onChange }: AuthInputProps) => {
   const passwordLength = 8;
-  const example = useRandomId(100, 1000000)
-  
+  const example = useRandomId(100, 1000000);
+
   return (
     <Field>
       <FieldLabel htmlFor="userId">Id</FieldLabel>
@@ -18,11 +18,10 @@ export const AuthInput = ({ value, onChange }: AuthInputProps) => {
         id="userId"
         type="text"
         placeholder={example.padStart(passwordLength, "0")}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         value={value}
         required
       />
     </Field>
   );
 };
-
