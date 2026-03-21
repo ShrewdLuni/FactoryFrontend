@@ -1,5 +1,5 @@
 import { getBatchColumns } from "./columns";
-import { DataTable } from "../data-table";
+import { DataTable } from "../../components/data-table";
 // import { BatchForm } from "../forms/batch";
 import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useBatches, useCreateBatch, useUpdateBatch } from "@/hooks/useBatch";
@@ -8,7 +8,7 @@ import { useGetAllUsers } from "@/hooks/useUsers";
 import type { Batch, InsertBatch } from "@/types/batches";
 import type { Row } from "@tanstack/react-table";
 import { useGetAllWorkstations } from "@/hooks/useWorkstations";
-import { Button } from "../ui/button";
+import { Button } from "../../components/ui/button";
 import type { Department } from "@/types/departments";
 
 export const BatchPage = () => {

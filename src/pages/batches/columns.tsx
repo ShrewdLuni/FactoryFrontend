@@ -1,6 +1,6 @@
 "use client";
 
-import { SortableHeader } from "../data-table/sortable-header";
+import { SortableHeader } from "../../components/data-table/sortable-header";
 import { type ColumnDef, type Row } from "@tanstack/react-table";
 import type { Batch, InsertBatch } from "@/types/batches";
 import {
@@ -10,14 +10,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from "../../components/ui/dropdown-menu";
+import { Button } from "../../components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
+import { createColumn, createIdColumn, createSelectColumn } from "../../components/data-table/common-columns";
 import { formatDate } from "date-fns";
 import { useGetProduct } from "@/hooks/useProducts";
-import { InputCell } from "../data-table/input-cell";
-import { SelectCell } from "../data-table/select-cell";
+import { InputCell } from "../../components/data-table/input-cell";
+import { SelectCell } from "../../components/data-table/select-cell";
 import type { Product } from "@/types/products";
 import type { User } from "@/types/users";
 import type { Workstation } from "@/types/workstation";

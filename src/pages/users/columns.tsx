@@ -1,9 +1,9 @@
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { SortableHeader } from "../data-table/sortable-header";
+import { SortableHeader } from "@/components/data-table/sortable-header";
 import type { User } from "@/types/users";
-import { SelectCell } from "../data-table/select-cell";
+import { SelectCell } from "@/components/data-table/select-cell";
 import { formatDate } from "date-fns";
 import {
   DropdownMenu,
@@ -11,9 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
-import { MultipleSelectCell } from "../data-table/multiple-select-cell";
+} from "@/components/ui/dropdown-menu";
+import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { MultipleSelectCell } from "@/components/data-table/multiple-select-cell";
 
 type SelectCellOptions = {
   label: string;

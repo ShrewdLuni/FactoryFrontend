@@ -1,12 +1,12 @@
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "../../components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Trash } from "lucide-react";
 import type { Workstation } from "@/types/workstation";
 import { useWorkstations } from "@/hooks/useWorkstations";
-import { createColumn, createIdColumn, createSelectColumn } from "../data-table/common-columns";
+import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 
 export const columns: ColumnDef<Workstation>[] = [
   createSelectColumn<Workstation>(),

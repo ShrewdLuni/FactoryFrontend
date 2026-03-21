@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../../../components/ui/card";
 import { useBatches } from "@/hooks/useBatch";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
-import { Input } from "../ui/input";
-import { ScrollArea } from "../ui/scroll-area";
+import { Input } from "../../../components/ui/input";
+import { ScrollArea } from "../../../components/ui/scroll-area";
 
 const SECOND_GRADE = [
   { id: 1, label: "Не відповідність лінійним розмірам" },

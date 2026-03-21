@@ -1,4 +1,4 @@
-import { DataTable } from "../data-table";
+import { DataTable } from "@/components/data-table";
 import { getUserColumns } from "./columns";
 import { Mars, Venus, CircleSmall, HardHat, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";

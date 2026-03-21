@@ -1,5 +1,5 @@
 import { useWorkstations } from "@/hooks/useWorkstations";
-import { DataTable } from "../data-table";
+import { DataTable } from "../../components/data-table";
 import { columns } from "./columns";
 
 export const WorkstationsPage = () => {
