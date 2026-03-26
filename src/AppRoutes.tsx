@@ -3,20 +3,22 @@ import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { routes } from "@/routes/index";
 import { useAuth } from "@/AuthProvider";
 import { Layout } from "@/components/sidebar/layout";
+import { useMemo } from "react";
 
 export function AppRoutes() {
   const { user } = useAuth();
 
-  const authRoute = routes.find(r => r.path === "/auth");
-  const protectedRoutes = routes.filter(r => r.path !== "/auth");
-  const layoutRoutes = protectedRoutes.filter(r => r.layout);
-  const plainRoutes = protectedRoutes.filter(r => !r.layout);
+  const authRoute = useMemo(() => routes.find(r => r.path === "/auth"), []);
+  const layoutRoutes = useMemo(() => routes.filter(r => r.path !== "/auth" && r.layout), []);
+  const plainRoutes = useMemo(() => routes.filter(r => r.path !== "/auth" && !r.layout), []);
+
+  if (!authRoute) throw new Error('Missing /auth route in routes config');
 
   return (
     <Routes>
       <Route
         path="/auth"
-        element={user ? <Navigate to="/" replace /> : authRoute!.element}
+        element={user ? <Navigate to="/" replace /> : authRoute.element}
       />
       <Route element={<ProtectedRoute roles={["*"]} />}>
         <Route element={<Layout/>}>
