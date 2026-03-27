@@ -56,10 +56,10 @@ export function DataTableFacetedFilter<TData, TValue>({ column, title, options }
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent className="w-auto min-w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command>
           <CommandInput placeholder={title} />
-          <CommandList>
+          <CommandList className="scrollbar-pretty">
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
