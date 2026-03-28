@@ -43,10 +43,18 @@ export const deleteProduct = async (id: number): Promise<Product> => {
   return response.json();
 };
 
+export const findQuantities = async (): Promise<any> => {
+  const response = await fetch(`${BASE_URL}/quantities`, { credentials: "include" });
+  if (!response.ok) throw new Error("Failed to fetch product quantities");
+  return response.json();
+}
+
+
 export const productService = {
   getAll: getAllProducts,
   get: getProduct,
   create: createProduct,
   update: updateProduct,
   delete: deleteProduct,
+  findQuantities,
 };
