@@ -318,7 +318,8 @@ export const getBatchColumns = (
     createSelectColumn<Batch>(),
     createIdColumn<Batch>(),
     {
-      accessorKey: "status",
+      id: "status",
+      accessorFn: (row) => row.status?.label ?? "",
       header: ({ column }) => <SortableHeader column={column} field="Status" />,
       cell: ({ row }) => <div className="text-center">{row.original.status.label}</div>,
     },
