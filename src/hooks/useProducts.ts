@@ -6,6 +6,7 @@ export const productKeys = {
   all: () => ["prudcts"] as const,
   lists: () => [...productKeys.all(), "list"] as const,
   detail: (id: number) => [...productKeys.all(), "detail", id] as const,
+  quantities: () => [...productKeys.all(), "quantities"] as const
 };
 
 const STALE_TIME = 1000 * 60 * 5;
@@ -71,10 +72,20 @@ export const useDeleteProducts = () => {
   });
 };
 
+export const useFindQuantities = () => {
+  return useQuery({
+    queryKey: productKeys.quantities(),
+    queryFn: service.findQuantities,
+    staleTime: STALE_TIME,
+    placeholderData: keepPreviousData,
+  });
+};
+
 export const useProducts = {
   getAll: useGetAllProducts,
   get: useGetProduct,
   create: useCreateProducts,
   update: useUpdateProducts,
   delete: useDeleteProducts,
+  findQuantities: useFindQuantities
 };
