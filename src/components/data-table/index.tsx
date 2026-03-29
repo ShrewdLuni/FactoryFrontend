@@ -1,6 +1,6 @@
 "use client"
 
-import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel, type TableState, type PaginationState } from "@tanstack/react-table"
+import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel, type TableState, type PaginationState, getFacetedRowModel, getFacetedUniqueValues } from "@tanstack/react-table"
 import { useState, type ReactNode } from "react"
 
 import { TablePagination } from "./pagination"
@@ -51,6 +51,29 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: (table, columnId) => {
+      const defaultFaceted = getFacetedUniqueValues()(table, columnId);
+
+      return () => {
+        const rows = table.getPreFilteredRowModel().rows;
+
+        if (rows.length === 0) return defaultFaceted();
+
+        const firstValue = rows[0]?.getValue(columnId);
+
+        if (Array.isArray(firstValue)) {
+          const map = new Map<string, number>();
+          rows.forEach((row) => {
+            const values = row.getValue<string[]>(columnId);
+            values?.forEach((v) => { map.set(v, (map.get(v) ?? 0) + 1); });
+          });
+          return map;
+        }
+
+        return defaultFaceted();
+      };
+    },
     autoResetPageIndex: false,
     state: {
       sorting,
