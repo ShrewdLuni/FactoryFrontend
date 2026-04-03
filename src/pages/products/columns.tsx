@@ -28,22 +28,17 @@ export const getProductColumns = ({ onCellUpdate }: ProductColumnsProps) => {
       },
     },
     {
-      accessorKey: "isActive",
-      header: ({ column }) => {
-        return <SortableHeader column={column} field={"Is Active"} />;
-      },
-      cell: ({ row }) => {
-        return (
-          <div className="w-full flex justify-center">
-            <CheckBoxCell row={row} field="isActive" defaultValue={row.original.isActive} onChange={onCellUpdate} />
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        const cellValue = String(row.getValue(id));
-        return value.includes(cellValue);
-      },
-    },
+      id: "isActive",
+      accessorFn: (row) => String(row.isActive),
+      header: ({ column }) => <SortableHeader column={column} field="Is Active" />,
+      cell: ({ row }) => (
+        <div className="w-full flex justify-center">
+          <CheckBoxCell row={row} field="isActive" defaultValue={row.original.isActive} onChange={onCellUpdate} />
+        </div>
+      ),
+      filterFn: (row, columnId, selectedValues: string[]) =>
+        selectedValues.includes(row.getValue(columnId)),
+    },    
     createColumn<Product>("measureUnitId", "Unit"),
     {
       id: "actions",
