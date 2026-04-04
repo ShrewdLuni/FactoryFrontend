@@ -75,7 +75,7 @@ export const BatchPreviewPage = () => {
               <CardTitle>Інформація про партію</CardTitle>
               <CardDescription>
                 {batch && (
-                  <div className="border p-4 text-white font-semibold rounded-md shadow-sm space-y-2">
+                  <div className="border p-4 text-black dark:text-white font-semibold rounded-md shadow-sm space-y-2">
                     <p>{batch.product.name}</p>
                     <p>Розмір: {batch.size}</p>
                     <p>Актуальний Розмір: {batch.actualSize}</p>
