@@ -12,6 +12,7 @@ import type { ForwardRefExoticComponent, JSX, RefAttributes } from "react";
 import {
   Bolt,
   Boxes,
+  Calculator,
   ClipboardList,
   // LandPlot,
   Package,
@@ -22,6 +23,7 @@ import {
   Users,
   type LucideProps,
 } from "lucide-react";
+import { StoragePage } from "@/pages/storage";
 
 export interface Route {
   name: string;
@@ -93,6 +95,15 @@ const singularBatchRoute = {
   icon: PackageCheck,
 };
 
+const storageRoute = {
+  name: "Storage",
+  path: "/storage",
+  element: <StoragePage />,
+  roles: ["Master"],
+  icon: Calculator,
+  layout: true,
+};
+
 const qrcodeRoute = {
   name: "Generate QR",
   path: "/qrcodes",
@@ -162,6 +173,7 @@ export const routes: Route[] = [
   inProgressBatchesRoute,
   doneBatchesRoute,
   qrcodeRoute,
+  storageRoute,
   singularQRCodeRoute,
   singularBatchRoute,
   workerPlanRoute,
@@ -201,6 +213,7 @@ export const sidebarElements: (
   //   items: [inProgressBatchesRoute, doneBatchesRoute],
   // },
   doneBatchesRoute,
+  storageRoute,
   qrcodeRoute,
   // actionsRoute,
   emptyRoute,
