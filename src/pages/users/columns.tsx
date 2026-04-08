@@ -42,38 +42,36 @@ export const getUserColumns = ({ roleSelect, genderSelect, departmentsSelect, on
       },
     },
     {
-      accessorKey: "role",
-      header: ({ column }) => {
-        return <SortableHeader column={column} field={"Role"} />;
-      },
-      cell: ({ row }) => {
-        return (
-          <SelectCell
-            row={row}
-            defaultValue={row.original.role?.label || ""}
-            data={roleSelect}
-            placeholder="Assign role"
-            onChange={(value) => onCellUpdate("role", value, row)}
-          />
-        );
-      },
+      id: "role",
+      accessorFn: (row) => row.role?.label ?? "",
+      header: ({ column }) => <SortableHeader column={column} field="Role" />,
+      cell: ({ row }) => (
+        <SelectCell
+          row={row}
+          defaultValue={row.original.role?.label || ""}
+          data={roleSelect}
+          placeholder="Assign role"
+          onChange={(value) => onCellUpdate("role", value, row)}
+        />
+      ),
     },
     {
-      accessorKey: "departments",
-      header: ({ column }) => {
-        return <SortableHeader column={column} field={"Departments"} />;
+      id: "departments",
+      accessorFn: (row) => row.departments?.map((d) => d.label) ?? [],
+      filterFn: (row, columnId, selectedValues: string[]) => {
+        const rowDepts = row.getValue<string[]>(columnId);
+        return selectedValues.some((v) => rowDepts.includes(v));
       },
-      cell: ({ row }) => {
-        return (
-          <MultipleSelectCell
-            row={row}
-            defaultValue={row.original.departments?.map((d) => d.label) ?? []}
-            data={departmentsSelect}
-            onChange={(value) => onCellUpdate("departments", value, row)}
-          />
-        );
-      }
-    },
+      header: ({ column }) => <SortableHeader column={column} field="Departments" />,
+      cell: ({ row }) => (
+        <MultipleSelectCell
+          row={row}
+          defaultValue={row.original.departments?.map((d) => d.label) ?? []}
+          data={departmentsSelect}
+          onChange={(value) => onCellUpdate("departments", value, row)}
+        />
+      ),
+    },    
     createColumn<User>("email", "Email"),
     createColumn<User>("phone", "Phone"),
     {
