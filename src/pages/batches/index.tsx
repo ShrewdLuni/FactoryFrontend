@@ -1,7 +1,7 @@
 import { getBatchColumns } from "./columns";
 import { DataTable } from "@/components/data-table";
 // import { BatchForm } from "../forms/batch";
-import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
+import { CircleX, CircleCheck, Spool, Scissors, Layers, Tag, Cone, Archive } from "lucide-react";
 import { useBatches, useCreateBatch, useUpdateBatch } from "@/hooks/useBatch";
 import { useGetAllProducts } from "@/hooks/useProducts";
 import { useGetAllUsers } from "@/hooks/useUsers";
@@ -19,52 +19,26 @@ export const BatchPage = () => {
   const { mutate: updateBatch } = useUpdateBatch();
   const { mutate: createBatch } = useCreateBatch();
 
+
   const status = [
-    {
-      label: "Inactive",
-      value: "Inactive",
-      icon: CircleX,
-    },
-    {
-      label: "Knitting Workshop",
-      value: "Knitting Workshop",
-      icon: Scissors,
-    },
-    {
-      label: "Sewing Workshop",
-      value: "Sewing Workshop",
-      icon: Spool,
-    },
-    {
-      label: "Turning Workshop",
-      value: "Turning Workshop",
-      icon: Cone,
-    },
-    {
-      label: "Molding Workshop",
-      value: "Molding Workshop",
-      icon: Layers,
-    },
-
-    {
-      label: "Labeling Workshop",
-      value: "Labeling Workshop",
-      icon: Tag,
-    },
-
-    {
-      label: "Packaging Workshop",
-      value: "Packaging Workshop",
-      icon: ArchiveIcon,
-    },
-    {
-      label: "Completed",
-      value: "Completed",
-      icon: CircleCheck,
-    },
+    { label: "Inactive", value: "Inactive", icon: CircleX },
+    { label: "Activated", value: "Activated", icon: Scissors },
+    { label: "Knitting Workshop (Waiting for confirmation)", value: "Knitting Workshop (Waiting for confirmation)", icon: Scissors },
+    { label: "Knitting Workshop (Confirmed)", value: "Knitting Workshop (Confirmed)", icon: Scissors },
+    { label: "Sewing Workshop (In-Progress)", value: "Sewing Workshop (In-Progress)", icon: Spool },
+    { label: "Sewing Workshop (Finished)", value: "Sewing Workshop (Finished)", icon: Spool },
+    { label: "Turning Workshop (In-Progress)", value: "Turning Workshop (In-Progress)", icon: Cone },
+    { label: "Turning Workshop (Finished)", value: "Turning Workshop (Finished)", icon: Cone },
+    { label: "Molding Workshop (In-Progress)", value: "Molding Workshop (In-Progress)", icon: Layers },
+    { label: "Molding Workshop (Finished)", value: "Molding Workshop (Finished)", icon: Layers },
+    { label: "Labeling Workshop (In-Progress)", value: "Labeling Workshop (In-Progress)", icon: Tag },
+    { label: "Labeling Workshop (Finished)", value: "Labeling Workshop (Finished)", icon: Tag },
+    { label: "Packaging Workshop (In-Progress)", value: "Packaging Workshop (In-Progress)", icon: Archive },
+    { label: "Completed", value: "Completed", icon: CircleCheck },
   ];
 
-  const filters = [{ column: "progressStatus", title: "Status", options: status }];
+
+  const filters = [{ column: "status", title: "Status", options: status }];
 
 
 const toInsertBatch = (batch: Batch): InsertBatch => ({
@@ -80,6 +54,7 @@ const toInsertBatch = (batch: Batch): InsertBatch => ({
   });
 
   type UpdateFunction = (field: keyof InsertBatch, value: any, row: Row<Batch>) => void;
+
 
   const handleCellUpdate: UpdateFunction = (field, value, row) => {
     const current = toInsertBatch(row.original);
@@ -102,15 +77,15 @@ const toInsertBatch = (batch: Batch): InsertBatch => ({
 
   const handleRowClick = () => {
     createBatch({
-      name:          null,
-      size:          100,
-      actualSize:    100,
-      productId:     undefined,
-      workstationId: undefined,
-      statusId:      null,
-      plannedFor:    new Date(),
-      workers:       [],
-      isActive:      true,
+      name: null,
+      size: 150,
+      actualSize: 150,
+      productId: undefined,
+      workstationId:undefined,
+      statusId: null,
+      plannedFor: new Date(),
+      workers: [],
+      isActive: true,
     });
   };
 
