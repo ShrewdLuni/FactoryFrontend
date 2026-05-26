@@ -1,48 +1,14 @@
-import { DataTable } from "@/components/data-table";
 import { getUserColumns } from "./columns";
-import { Mars, Venus, CircleSmall, HardHat, UserCog, Spool, Scissors, Layers, Tag, ArchiveIcon, Cone } from "lucide-react";
 import { useUsers } from "@/hooks/useUsers";
 import { useCallback, useMemo } from "react";
 import type { User, UserGender, InsertUser } from "@/types/users";
 import type { Row } from "@tanstack/react-table";
+import { useGetAllUsers } from "@/api/generated/user/user";
+import { useRoleOptions } from "@/hooks/useRoleOptions";
+import { useDepartmentOptions } from "@/hooks/useDepartmentOptions";
+import { useGenderOptions } from "@/hooks/useGenderOptions";
+import { DataTable } from "@/components/data-table";
 
-const gender = [
-  {
-    label: "Male",
-    value: "Male",
-    icon: Mars,
-  },
-  {
-    label: "Female",
-    value: "Female",
-    icon: Venus
-  },
-  {
-    label: "Other",
-    value: "Other",
-    icon: CircleSmall 
-  },
-];
-
-const roles = [
-  { id: 1, label: "Worker", value: "Worker", icon: HardHat },
-  { id: 2, label: "Master", value: "Master", icon: UserCog },
-];
-
-const departments = [
-  { id: 1, label: "Knitting", value: "Knitting", icon: Scissors },
-  { id: 2, label: "Sewing", value: "Sewing", icon: Spool },
-  { id: 3, label: "Turning", value: "Turning", icon: Cone },
-  { id: 4, label: "Molding", value: "Molding", icon: Layers },
-  { id: 5, label: "Labeling", value: "Labeling", icon: Tag },
-  { id: 6, label: "Packaging", value: "Packaging", icon: ArchiveIcon },
-];
-
-const filters = [
-  { column: "role", title: "Role", options: roles },
-  { column: "gender", title: "Gender", options: gender },
-  { column: "departments", title: "Departments", options: departments },
-];
 
 export function userToInsert(user: User): InsertUser {
   return {
@@ -62,10 +28,18 @@ export function userToInsert(user: User): InsertUser {
 }
 
 export const EmployeesPage = () => {
-  const { data: users } = useUsers.getAll();
-  const { mutate: updateUser } = useUsers.update();
+  const { data: roles, isLoading } = useRoleOptions();
+  const { data: departments } = useDepartmentOptions();
+  const { data: gender } = useGenderOptions();
 
-  console.log(users)
+  const filters = [
+    { column: "role", title: "Role", options: roles },
+    { column: "gender", title: "Gender", options: gender },
+    { column: "departments", title: "Departments", options: departments },
+  ];
+
+  const { data: users } = useGetAllUsers();
+  const { mutate: updateUser } = useUsers.update();
 
   const handleCellUpdate = useCallback(
     (field: string, value: unknown, row: Row<User>) => {
@@ -98,8 +72,11 @@ export const EmployeesPage = () => {
         departmentsSelect: departments,
         onCellUpdate: handleCellUpdate,
       }),
-    [handleCellUpdate],
+    [handleCellUpdate, roles, departments, gender],
   );
+
+  if (isLoading)
+    return <div>Loading</div>
 
   return <DataTable columns={columns} isAddSection={false} data={users ? users : []} filters={filters} searchValues={"fullName"} initialState={{columnVisibility: { code: false, email: false, phone: false }}} />;
 };
