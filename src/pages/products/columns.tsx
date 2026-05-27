@@ -2,13 +2,12 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import type { Product } from "@/types/products";
 import { CheckBoxCell } from "@/components/data-table/checkbox-cell";
 import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import type { PackedStock } from "@/types/batches";
+import type { PackedStock, Product } from "@/api/generated/models";
 
 interface ProductColumnsProps {
   onCellUpdate: (field: string, value: string | boolean, row: any) => void;
@@ -36,7 +35,7 @@ export const getProductColumns = ({ onCellUpdate, packedStock }: ProductColumnsP
       },
       cell: ({ row }) => {
         const normalized = packedStock ?? []
-        const stock = normalized.find((s) => s.product_id === row.original.id);
+        const stock = normalized.find((s) => s.product.id === row.original.id);
         return <div className="text-center">{stock?.quantity ?? 0}</div>;
       },
     },
@@ -52,7 +51,12 @@ export const getProductColumns = ({ onCellUpdate, packedStock }: ProductColumnsP
       filterFn: (row, columnId, selectedValues: string[]) =>
         selectedValues.includes(row.getValue(columnId)),
     },    
-    createColumn<Product>("measureUnitId", "Unit"),
+    {
+      id: "MeasureUnit",
+      accessorFn: (row) => String(row.isActive),
+      header: ({ column }) => <SortableHeader column={column} field="MeasureUnit" />,
+      cell: ({ row }) => { return <div className="text-center">{`${row.original.measureUnit.label || row.original.measureUnit.id }`}</div>; },
+    },    
     {
       id: "actions",
       cell: ({ row }) => {

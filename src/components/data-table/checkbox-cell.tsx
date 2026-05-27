@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Checkbox } from "../ui/checkbox"
-import type { Product } from "@/types/products";
 import type { Row } from "@tanstack/react-table";
+import type { Product } from "@/api/generated/models";
 
 interface CheckBoxCellProps {
   row: Row<Product> 

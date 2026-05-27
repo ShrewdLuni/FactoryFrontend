@@ -1,13 +1,13 @@
 import { DataTable } from "@/components/data-table"
 import { getProductColumns } from "./columns"
-import { useProducts } from "@/hooks/useProducts"
 import { CircleCheck, CircleX } from "lucide-react"
-import { useBatches } from "@/hooks/useBatch"
+import { useGetAllProducts, useUpdateProduct } from "@/api/generated/product/product"
+import { useGetAllPackedStock } from "@/api/generated/packed-stock/packed-stock"
 
 export const ProductsPage = () => {
-  const { data: products, isLoading } = useProducts.getAll() 
-  const { mutate: updateProduct } = useProducts.update()
-  const { data: packedStock } = useBatches.getPackedStock();
+  const { data: products, isLoading } =  useGetAllProducts()
+  const { mutate: updateProduct } = useUpdateProduct()
+  const { data: packedStock } = useGetAllPackedStock();
 
   const handleCellUpdate = (field: string, value: string | boolean, row: any) => {
     updateProduct({
