@@ -1,16 +1,20 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import type { Table } from "@tanstack/react-table";
+
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TablePaginationProps<TData> {
   table: Table<TData>;
+  pageSizeOptions?: number[];
 }
 
-export function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
+export function TablePagination<TData>({ table, pageSizeOptions = [10, 20, 50, 100] }: TablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-between space-x-2 px-4 py-4">
-      <div className="text-muted-foreground justify-end text-sm">
+    <div className="flex items-center justify-between space-x-2 px-1 py-4">
+      <div className="text-muted-foreground flex-1 text-sm">
         {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className="flex w-full items-center gap-8 lg:w-fit">
@@ -18,17 +22,12 @@ export function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
           <Label htmlFor="rows-per-page" className="text-sm font-medium">
             Rows per page
           </Label>
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-          >
+          <Select value={`${table.getState().pagination.pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
             <SelectTrigger size="sm" className="w-20" id="rows-per-page">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 50, 100].map((pageSize) => (
+              {pageSizeOptions.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
@@ -37,7 +36,7 @@ export function TablePagination<TData>({ table }: TablePaginationProps<TData>) {
           </Select>
         </div>
         <div className="flex w-fit items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
         </div>
         <div className="space-x-2">
           <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
