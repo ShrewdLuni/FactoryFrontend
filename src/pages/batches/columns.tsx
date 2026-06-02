@@ -15,13 +15,20 @@ import { MoreHorizontal } from "lucide-react";
 import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { InputCell } from "@/components/data-table/input-cell";
 import { SelectCell } from "@/components/data-table/select-cell";
-import type { Batch, BatchInsert, BatchStatus, Department, Product, User, Workstation } from "@/api/generated/models";
+import type { UseMutateFunction } from "@tanstack/react-query";
+import type { Batch, BatchInsert, BatchPatch, BatchStatus, Department, Product, User, Workstation } from "@/api/generated/models";
 
-// export type UpdateFunction = (field: keyof BatchInsert, value: any, row: Row<Batch>) => void;
-export type UpdateFunction = any;
+type patchBatch = UseMutateFunction<
+  Batch,
+  unknown,
+  {
+    id: string;
+    data?: BatchPatch;
+  },
+  unknown
+>;
 
-
-function createNameColumn(handleCellUpdate: UpdateFunction, isChangable: boolean): ColumnDef<Batch> {
+function createNameColumn(patch: patchBatch, isChangable: boolean): ColumnDef<Batch> {
   return {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} field={"Назва"} />,
@@ -31,7 +38,7 @@ function createNameColumn(handleCellUpdate: UpdateFunction, isChangable: boolean
           defaultValue={row.original.name || undefined}
           onBlur={(e) => {
             e.preventDefault();
-            // handleCellUpdate("name", e.target.value, row);
+            patch({ id: String(row.original.id), data: { name: String(e.target.value) } });
           }}
         />
       ) : (
@@ -41,9 +48,9 @@ function createNameColumn(handleCellUpdate: UpdateFunction, isChangable: boolean
   };
 }
 
-function createWorkstationColumn(handleCellUpdate: UpdateFunction, isChangable: boolean, workstations: Workstation[]): ColumnDef<Batch> {
+function createWorkstationColumn(patch: patchBatch, isChangable: boolean, workstations: Workstation[]): ColumnDef<Batch> {
   return {
-    accessorKey: "workstationId",
+    accessorKey: "workstation",
     header: ({ column }) => <SortableHeader column={column} field={"Машина"} />,
     cell: ({ row }) => {
       const selectedWorkstation = workstations?.find((w) => w.id === row.original.workstation.id);
@@ -61,7 +68,7 @@ function createWorkstationColumn(handleCellUpdate: UpdateFunction, isChangable: 
           data={workstationData ? workstationData : []}
           placeholder="Select workstation"
           onChange={(value) => {
-            // handleCellUpdate("workstationId", Number(value), row);
+            patch({ id: String(row.original.id), data: { workstation: { id: Number(value) } } });
           }}
         />
       ) : (
@@ -71,7 +78,7 @@ function createWorkstationColumn(handleCellUpdate: UpdateFunction, isChangable: 
   };
 }
 
-function createProductColumn(handleCellUpdate: UpdateFunction, isChangable: boolean, products: Product[]): ColumnDef<Batch> {
+function createProductColumn(patch: patchBatch, isChangable: boolean, products: Product[]): ColumnDef<Batch> {
   return {
     accessorKey: "productId",
     header: ({ column }) => <SortableHeader column={column} field={"Продукт"} />,
@@ -93,7 +100,7 @@ function createProductColumn(handleCellUpdate: UpdateFunction, isChangable: bool
           data={productsData ? productsData : []}
           placeholder="Select product"
           onChange={(value) => {
-            // handleCellUpdate("productId", Number(value), row);
+            patch({ id: String(row.original.id), data: { product: { id: Number(value) } } });
           }}
         />
       ) : (
@@ -115,6 +122,12 @@ function createWorkerColumn(handleCellUpdate: UpdateFunction, users: User[], dep
         .map((u) => ({ label: u.fullName ?? "", value: String(u.id) }));
 
       return (
+        // <div className="flex flex-col justify-center gap-2">
+        //   <p className="font-semibold">Кобля Альона Станіславівна</p>
+        //   <p className="font-semibold">Фактичний розмір: 120</p>
+        //   <p className="font-semibold">Час: 03:12</p>
+        //   <p className="font-semibold">Дата: 22.08.2027</p>
+        // </div>
         <SelectCell
           row={row}
           defaultValue={entry ? String(entry.worker.id) : ""}
@@ -143,7 +156,7 @@ function createActualSizeColumn(handleCellUpdate: UpdateFunction): ColumnDef<Bat
   };
 }
 
-function createStatusColumn(handleCellUpdate: UpdateFunction, statuses: BatchStatus[]): ColumnDef<Batch> {
+function createStatusColumn(patch: patchBatch, statuses: BatchStatus[]): ColumnDef<Batch> {
   return {
     id: "status",
     accessorFn: (row) => row.status?.label ?? "",
@@ -161,7 +174,7 @@ function createStatusColumn(handleCellUpdate: UpdateFunction, statuses: BatchSta
           data={statusData}
           placeholder="Select status"
           onChange={(value) => {
-            // handleCellUpdate("statusId", Number(value), row);
+            patch({ id: String(row.original.id), data: { status: { id: Number(value) } } });
           }}
         />
       );
@@ -176,15 +189,16 @@ export const getBatchColumns = (
   workstations: Workstation[],
   departments: Department[],
   statuses: BatchStatus[],
+  patch: patchBatch,
 ): ColumnDef<Batch>[] => {
   const columns: ColumnDef<Batch>[] = [
     createSelectColumn<Batch>(),
     createIdColumn<Batch>(),
-    createStatusColumn(onChange, statuses),
+    createStatusColumn(patch, statuses),
     createActualSizeColumn(onChange),
-    createNameColumn(onChange, true),
-    createWorkstationColumn(onChange, true, workstations),
-    createProductColumn(onChange, true, products),
+    createNameColumn(patch, true),
+    createWorkstationColumn(patch, true, workstations),
+    createProductColumn(patch, true, products),
     ...departments.map((dept) => createWorkerColumn(onChange, users, dept)),
     {
       id: "actions",
