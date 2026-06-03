@@ -13,7 +13,7 @@ import type { LucideIcon } from "lucide-react"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[],
   data: TData[]
-  contentForm?: JSX.Element,
+  contentForm?: (props: { onClose: () => void }) => ReactNode,
   searchValues?: string,
   filters?: {
     column: string;
@@ -28,7 +28,7 @@ interface DataTableProps<TData, TValue> {
   toolbarExtras?: JSX.Element;
   isAddSection?: boolean;
   tableRef?: Ref<Table<TData>>;
-  onRowSelectionChange?: (count: number) => void;
+  onRowSelectionChange?: (ids: string[]) => void;
 }
 
 export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState, toolbarExtras, isAddSection = true, tableRef, onRowSelectionChange } : DataTableProps<TData, TValues>){
@@ -43,7 +43,7 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
   const handleRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
     setRowSelection((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      onRowSelectionChange?.(Object.keys(next).length);
+      onRowSelectionChange?.(Object.keys(next));
       return next;
     });
   };
@@ -101,7 +101,11 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
       <TableToolbar table={table} searchBarValue={searchValues} onAddRecord={() => setIsAddFormOpen(true)} filters={filters} toolbarExtras={toolbarExtras} isAddSection={isAddSection}/>
       <TableContent table={table} columns={columns}/>
       <TablePagination table={table}/>
-      <AddRecordDialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen} contentForm={contentForm}/>
+      <AddRecordDialog
+        open={isAddFormOpen}
+        onOpenChange={setIsAddFormOpen}
+        contentForm={contentForm?.({ onClose: () => setIsAddFormOpen(false) })}
+      />
     </div>
   )
 }

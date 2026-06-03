@@ -2,7 +2,7 @@ import { getBatchColumns } from "./columns";
 import { DataTable } from "@/components/data-table";
 import type { Row } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useCreateBatch, useCreateBatches, useGetAllBatches, usePatchBatch, useUpdateBatch } from "@/api/generated/batch/batch";
 import { useGetAllProducts } from "@/api/generated/product/product";
 import { useGetAllUsers } from "@/api/generated/user/user";
@@ -32,7 +32,11 @@ export const BatchPage = () => {
     createBatches({ data: workstationIds.map((id) => ({ workstation: { id }}))})
   };
 
-  const columns = getBatchColumns("", products ?? [], users ?? [], workstations ?? [], departments ?? [], statuses, patchBatch);
+  // const columns = getBatchColumns("", products ?? [], users ?? [], workstations ?? [], departments ?? [], statuses, patchBatch);
+  const columns = useMemo(
+    () => getBatchColumns("", products ?? [], users ?? [], workstations ?? [], departments ?? [], statuses, patchBatch),
+    [products, users, workstations, departments, statuses, patchBatch]
+  );
 
   const [showArchive, setShowArchive] = useState(false);
 
@@ -46,14 +50,14 @@ export const BatchPage = () => {
       toolbarExtras={
         <div className="flex justify-between w-full">
           <Button className="h-8" variant="outline" onClick={() => setShowArchive(!showArchive)}>
-            {!showArchive ? "Показать архив" : "Скрыть архив"}
+            {!showArchive ? "Показати архів" : "Приховати архів"}
           </Button>
           <div className="flex flex-row gap-2">
             <Button className="h-8" variant="outline" onClick={() => handleRowClick()} disabled={isCreateBatchPending}>
-              {isCreateBatchPending ? "Adding..." : "Add row"}
+              {isCreateBatchPending ? "Додавання..." : "Додати рядок"}
             </Button>
             <Button className="h-8" variant="outline" onClick={() => handleAdd36()} disabled={isCreateBatchesPending}>
-              {isCreateBatchesPending ? "Adding..." : "Add 36"}
+              {isCreateBatchesPending ? "Додавання..." : "Додати 36"}
             </Button>
           </div>
         </div>

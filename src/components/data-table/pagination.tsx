@@ -15,12 +15,12 @@ export function TablePagination<TData>({ table, pageSizeOptions = [10, 20, 50, 1
   return (
     <div className="flex items-center justify-between space-x-2 px-1 py-4">
       <div className="text-muted-foreground flex-1 text-sm">
-        {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+        {table.getFilteredSelectedRowModel().rows.length} з {table.getFilteredRowModel().rows.length} рядків вибрано.
       </div>
       <div className="flex w-full items-center gap-8 lg:w-fit">
         <div className="hidden items-center gap-2 lg:flex">
           <Label htmlFor="rows-per-page" className="text-sm font-medium">
-            Rows per page
+            Рядків на сторінці
           </Label>
           <Select value={`${table.getState().pagination.pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
             <SelectTrigger size="sm" className="w-20" id="rows-per-page">
@@ -36,14 +36,14 @@ export function TablePagination<TData>({ table, pageSizeOptions = [10, 20, 50, 1
           </Select>
         </div>
         <div className="flex w-fit items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
+          Сторінка {table.getState().pagination.pageIndex + 1} of {Math.max(table.getPageCount(), 1)}
         </div>
         <div className="space-x-2">
           <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-            Previous
+            Попередня
           </Button>
           <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-            Next
+            Наступна
           </Button>
         </div>
       </div>

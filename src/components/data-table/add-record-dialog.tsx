@@ -18,7 +18,7 @@ export const AddRecordDialog = ({ open, onOpenChange, contentForm } : AddRecordD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="">
         <DialogHeader>
-          <DialogTitle>""</DialogTitle>
+          <DialogTitle className="font-semibold">Додати запис</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[calc(80vh-4rem)] px-4 py-2" onWheel={(e) => {e.currentTarget.scrollBy({ top: e.deltaY * 0.5, left: 0,}); e.preventDefault();}}>
           {contentForm}

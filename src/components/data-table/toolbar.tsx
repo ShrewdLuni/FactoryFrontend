@@ -42,7 +42,7 @@ export function TableToolbar<TData>({
     <div className="flex items-center py-4 gap-2">
       {searchBarValue != null && (
         <Input
-          placeholder="Search..."
+          placeholder="Пошук..."
           value={(table.getColumn(searchBarValue)?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
             table.getColumn(searchBarValue)?.setFilterValue(event.target.value);
@@ -50,18 +50,15 @@ export function TableToolbar<TData>({
           className="max-w-sm h-8"
         />
       )}
-
       {filters?.map((filter) => {
         const column = table.getColumn(filter.column);
         return column && <DataTableFacetedFilter key={filter.column} column={column} title={filter.title} options={filter.options} />;
       })}
-
       {toolbarExtras}
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="h-8">
           <Button variant="outline" className="ml-auto">
-            Columns <ChevronDown />
+            Колонки <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -84,7 +81,7 @@ export function TableToolbar<TData>({
 
       {isAddSection && (
         <Button className="h-8" variant="outline" onClick={onAddRecord}>
-          Add section <CirclePlus />
+          Додати<CirclePlus />
         </Button>
       )}
     </div>
