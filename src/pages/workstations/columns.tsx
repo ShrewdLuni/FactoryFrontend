@@ -29,7 +29,10 @@ export const getWorkstationColumns = ({ handlePatch, handleDelete }: Workstation
             defaultValue={row.original.name || undefined}
             onBlur={(e) => {
               e.preventDefault();
-              handlePatch(row.original.id, { name: String(e.target.value) })
+              const newValue = e.target.value.trim();
+              const originalValue = (row.original.name ?? "").trim();
+
+              if (newValue !== originalValue) handlePatch(row.original.id, { name: newValue });
             }}
           /></div>
         ) : (
