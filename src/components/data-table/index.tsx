@@ -31,7 +31,7 @@ interface DataTableProps<TData, TValue> {
   onRowSelectionChange?: (ids: string[]) => void;
 }
 
-export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState, toolbarExtras, isAddSection = true, tableRef, onRowSelectionChange } : DataTableProps<TData, TValues>){
+export function DataTable<TData, TValues>({ columns, searchValues, data, contentForm, filters, initialState, toolbarExtras, isAddSection = false, tableRef, onRowSelectionChange } : DataTableProps<TData, TValues>){
   const [sorting, setSorting] = useState<SortingState>([{ id: "id", desc: false }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialState?.columnFilters || [])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialState?.columnVisibility || {})

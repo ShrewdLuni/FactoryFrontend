@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { DataTableFacetedFilter } from "./filter";
+import { cn } from "@/lib/utils";
 
 export interface TableFilterConfig {
   column: string;
@@ -55,9 +56,14 @@ export function TableToolbar<TData>({
         return column && <DataTableFacetedFilter key={filter.column} column={column} title={filter.title} options={filter.options} />;
       })}
       {toolbarExtras}
+      {isAddSection && (
+        <Button className="h-8 ml-auto" variant="outline" onClick={onAddRecord}>
+          Додати<CirclePlus />
+        </Button>
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="h-8">
-          <Button variant="outline" className="ml-auto">
+          <Button variant="outline" className={cn(!isAddSection && "ml-auto")}>
             Колонки <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
@@ -78,12 +84,6 @@ export function TableToolbar<TData>({
             ))}
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {isAddSection && (
-        <Button className="h-8" variant="outline" onClick={onAddRecord}>
-          Додати<CirclePlus />
-        </Button>
-      )}
     </div>
   );
 }

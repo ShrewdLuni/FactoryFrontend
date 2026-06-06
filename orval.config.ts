@@ -9,10 +9,11 @@ export default defineConfig({
       schemas: "src/api/generated/models",
       client: "react-query",
       httpClient: "fetch",
+      clean: true,
       override: {
         mutator: { path: "src/api/fetcher.ts", name: "customFetch" },
         fetch: {
-          includeHttpResponseReturnType: false, // 👈 add this
+          includeHttpResponseReturnType: false, 
         },
       },
     },
