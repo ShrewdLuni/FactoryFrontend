@@ -19,13 +19,13 @@ export const getWorkstationColumns = ({ handlePatch, handleDelete }: Workstation
     createSelectColumn<Workstation>(),
     createIdColumn<Workstation>(),
     {
-      accessorKey: "Назва",
+      accessorKey: "name",
       header: ({ column }) => <SortableHeader column={column} field={"Назва"} />,
       cell: ({ row }) => {
         const isChangable = true
         return isChangable ? (
           <div className="flex justify-center"><InputCell
-            className="w-fit max-w-fit"
+            className="w-fit"
             defaultValue={row.original.name || undefined}
             onBlur={(e) => {
               e.preventDefault();
@@ -46,13 +46,13 @@ export const getWorkstationColumns = ({ handlePatch, handleDelete }: Workstation
       cell: ({ row }) => {
         return (
           <div className="flex items-center justify-end gap-2 text-end">
-          <Button
-            variant="ghost"
-            className="text-destructive hover:text-destructive h-8 w-8 p-0"
-            onClick={() => handleDelete(row.original.id)}>
-            <span className="sr-only">Видалити</span>
-            <Trash />
-          </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive hover:text-destructive h-8 w-8 p-0"
+              onClick={() => handleDelete(row.original.id)}>
+              <span className="sr-only">Видалити</span>
+              <Trash />
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">

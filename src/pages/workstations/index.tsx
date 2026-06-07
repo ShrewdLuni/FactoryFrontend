@@ -10,13 +10,12 @@ import {
   usePatchWorkstations,
 } from "@/api/generated/workstation/workstation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { WorkstationForm } from "./form/form";
-import type { Workstation, WorkstationInsert, WorkstationPatch } from "@/api/generated/models";
-import { Trash } from "lucide-react";
+import type { Workstation, WorkstationPatch } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger  } from "@/components/ui/alert-dialog";
+import { ConfirmDeleteMultipleDialog } from "@/components/dialogs/confirm-delete-multiple-dialog";
+import { ConfirmEditMultipleDialog } from "@/components/dialogs/confirm-edit-multiple-dialog";
 
 const getErrorMessage = (error: any, fallback: string) =>
   error?.response?.data?.message ?? error?.message ?? fallback;
@@ -120,25 +119,22 @@ export const WorkstationsPage = () => {
     }
   }
 
-  const handlePatch = (id: number, data: WorkstationPatch) => {
-    if (selectedIds.length < 2)
-      patchWorkstation({ id: String(id), data })
-    else {
-        patchWorkstations({data: { ids: selectedIds.map(Number), data }})
-    }
-  }
-
-  const handlePatchMultiple = (data: WorkstationPatch | null | undefined) => {
-    if (data == null || data === undefined) return
-    patchWorkstations({data: { ids: selectedIds.map(Number), data }})
-  }
+  const handlePatchMultiple = () => {
+    if (editData == null) return;
+    patchWorkstations(
+      { data: { ids: selectedIds.map(Number), data: editData } },
+      {
+        onSuccess: () => {
+          setIsEditRequested(false);
+          setEditData(null);
+        },
+      }
+    );
+  };
 
 
   const handleDelete = (id: number) => {
-    if (selectedIds.length < 2)
-      deleteWorkstation({ id: String(id) });
-    else
-      deleteWorkstations({ data: { ids: selectedIds.map(Number) } });
+    deleteWorkstation({ id: String(id) });
   };
 
   const handleDeleteMultiple = () => {
@@ -161,39 +157,11 @@ export const WorkstationsPage = () => {
         searchValues={"name"}
         toolbarExtras={
           selectedIds.length > 1 ? (
-            <AlertDialog>
-              <AlertDialogTrigger
-                render={
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    disabled={isDeleteWorkstationsPending}
-                  >
-                    <Trash className="h-4 w-4"/>
-                    Видалити машини 
-                  </Button>
-                }
-              />
-              <AlertDialogContent size="sm">
-                <AlertDialogHeader>
-                  <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
-                    <Trash />
-                  </AlertDialogMedia>
-                  <AlertDialogTitle>Видалити {selectedIds.length} машини?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Це назавжди видалить вибрані машини ({selectedIds.length}) та пов’язану з ними інформацію.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel variant="outline">Скасувати</AlertDialogCancel>
-                  <AlertDialogAction 
-                    variant="destructive"
-                    onClick={handleDeleteMultiple}
-                    disabled={isDeleteWorkstationsPending}
-                  >Видалити</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <ConfirmDeleteMultipleDialog
+              isPending = {isDeleteWorkstationsPending}
+              selectedIds={selectedIds}
+              handleDeleteMultiple={handleDeleteMultiple}
+            />
           ) : (
               <></>
             )
@@ -220,24 +188,13 @@ export const WorkstationsPage = () => {
           />
         )}
       />
-      <AlertDialog open={isEditRequested} onOpenChange={setIsEditRequested}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Редагувати {selectedIds.length} машини?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Ви впевнені, що хочете редагувати {selectedIds.length} машин?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Скасувати</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { 
-              handlePatchMultiple(editData)
-              setIsEditRequested(false);
-              setEditData(null);
-            }} disabled={isPatchWorkstationsPending}>Підтвердити</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmEditMultipleDialog
+        isPending={isPatchWorkstationsPending}
+        open={isEditRequested}
+        onOpenChange={setIsEditRequested}
+        selectedIds={selectedIds}
+        handlePatchMultiple={handlePatchMultiple}
+      />      
     </div>
   );
 };
