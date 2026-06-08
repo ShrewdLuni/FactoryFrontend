@@ -1,7 +1,7 @@
 "use client"
 
 import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel, type TableState, type PaginationState, getFacetedRowModel, getFacetedUniqueValues, type Table, type OnChangeFn, type RowSelectionState } from "@tanstack/react-table"
-import { useState, useImperativeHandle, type ReactNode, type Ref } from "react"
+import { useState, useImperativeHandle, type ReactNode, type Ref, useEffect } from "react"
 
 import { TablePagination } from "./pagination"
 import { TableToolbar } from "./toolbar"
@@ -47,6 +47,32 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
       return next;
     });
   };
+
+  useEffect(() => {
+    setRowSelection((prev) => {
+      const keys = Object.keys(prev);
+      if (keys.length === 0) return prev;
+
+      const validIds = new Set(data.map((row: any) => String(row.id)));
+      const next: RowSelectionState = {};
+      let changed = false;
+
+      for (const key of keys) {
+        if (validIds.has(key)) {
+          next[key] = prev[key];
+        } else {
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        onRowSelectionChange?.(Object.keys(next));
+        return next;
+      }
+      return prev;
+    });
+  }, [data, onRowSelectionChange]);
+
 
   const table = useReactTable({
     data, 

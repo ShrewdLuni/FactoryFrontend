@@ -16,88 +16,40 @@ import type { Workstation, WorkstationPatch } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmDeleteMultipleDialog } from "@/components/dialogs/confirm-delete-multiple-dialog";
 import { ConfirmEditMultipleDialog } from "@/components/dialogs/confirm-edit-multiple-dialog";
-
-const getErrorMessage = (error: any, fallback: string) =>
-  error?.response?.data?.message ?? error?.message ?? fallback;
+import { createOptimisticCrudHandlers, getErrorMessage } from "@/lib/optimistic-crud";
 
 export const WorkstationsPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isEditRequested, setIsEditRequested] = useState<boolean>(false);
   const [editData, setEditData] = useState<WorkstationPatch | null>();
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const queryKey = getGetAllWorkstationsQueryKey();
 
   const { data: workstations = [], isLoading } = useGetAllWorkstations();
 
-  const { mutate: patchWorkstation, isPending: isPatchWorkstationPending } = usePatchWorkstation({
-    mutation: {
-      onMutate: async ({ id, data }) => {
-        const previous = queryClient.getQueryData<Workstation[]>(queryKey);
-        queryClient.setQueryData<Workstation[]>(queryKey, (old = []) =>
-          old.map((w) => (String(w.id) === id ? { ...w, ...data } : w))
-        );
-        return { previous };
-      },
-      onError: (error, _vars, context) => {
-        queryClient.setQueryData(queryKey, context?.previous);
-        toast.error(getErrorMessage(error, "Failed to patch workstation"));
-      },
-      onSuccess: () => toast.success("Workstation patched"),
-    },
-  });
+  const handlers = createOptimisticCrudHandlers<Workstation>(queryClient, queryKey, "Workstation");
 
-  const { mutate: patchWorkstations, isPending: isPatchWorkstationsPending } = usePatchWorkstations({
-    mutation: {
-      onMutate: async ({ data: { ids, data } }) => {
-        const previous = queryClient.getQueryData<Workstation[]>(queryKey);
-        queryClient.setQueryData<Workstation[]>(queryKey, (old = []) =>
-          old.map((w) => (ids.includes(w.id) ? { ...w, ...data } : w))
-        );
-        return { previous };
-      },
-      onError: (error, _vars, context) => {
-        queryClient.setQueryData(queryKey, context?.previous);
-        toast.error(getErrorMessage(error, "Failed to patch workstations"));
-      },
-      onSuccess: () => toast.success("Workstations patched"),
-    },
-  });
+  const { mutate: patchWorkstation, isPending: isPatchWorkstationPending } = usePatchWorkstation({ mutation: handlers.patch });
+  const { mutate: patchWorkstations, isPending: isPatchWorkstationsPending } = usePatchWorkstations({ mutation: handlers.patchMany });
 
-  const { mutate: deleteWorkstation } = useDeleteWorkstation({
+  const { mutate: deleteWorkstation, isPending: isDeleteWorkstationPending } = useDeleteWorkstation({
     mutation: {
-      onMutate: async ({ id }) => {
-        const previous = queryClient.getQueryData<Workstation[]>(queryKey);
-        queryClient.setQueryData<Workstation[]>(queryKey, (old = []) =>
-          old.filter((w) => String(w.id) !== id)
-        );
-        return { previous };
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey });
+        toast.success("Workstation deleted");
       },
-      onError: (error, _vars, context) => {
-        queryClient.setQueryData(queryKey, context?.previous);
-        toast.error(getErrorMessage(error, "Failed to delete workstation"));
-      },
-      onSuccess: () => toast.success("Workstation deleted"),
+      onError: (error) => toast.error(getErrorMessage(error, "Failed to delete workstation")),
     },
   });
 
   const { mutate: deleteWorkstations, isPending: isDeleteWorkstationsPending } = useDeleteWorkstations({
     mutation: {
-      onMutate: async ({ data: { ids } }) => {
-        const previous = queryClient.getQueryData<Workstation[]>(queryKey);
-        queryClient.setQueryData<Workstation[]>(queryKey, (old = []) =>
-          old.filter((w) => !ids.includes(w.id))
-        );
-        return { previous };
-      },
-      onError: (error, _vars, context) => {
-        queryClient.setQueryData(queryKey, context?.previous);
-        toast.error(getErrorMessage(error, "Failed to delete workstations"));
-      },
       onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey });
         toast.success("Workstations deleted");
-        setSelectedIds([]);
       },
+      onError: (error) => toast.error(getErrorMessage(error, "Failed to delete workstations")),
     },
   });
 
@@ -109,15 +61,13 @@ export const WorkstationsPage = () => {
     },
   });
 
-
   const handlePatchWithDialog = (id: number, data: WorkstationPatch) => {
-    if (selectedIds.length < 2)
-      patchWorkstation({ id: String(id), data })
+    if (selectedIds.length < 2) patchWorkstation({ id: String(id), data });
     else {
-        setIsEditRequested(true)
-        setEditData(data)
+      setIsEditRequested(true);
+      setEditData(data);
     }
-  }
+  };
 
   const handlePatchMultiple = () => {
     if (editData == null) return;
@@ -128,17 +78,32 @@ export const WorkstationsPage = () => {
           setIsEditRequested(false);
           setEditData(null);
         },
-      }
+      },
     );
   };
 
-
   const handleDelete = (id: number) => {
-    deleteWorkstation({ id: String(id) });
+    deleteWorkstation(
+      { id: String(id) },
+      {
+        onSuccess: () => {
+          setSelectedIds([])
+          setSelectedIds((prev) => prev.filter((sid) => sid !== String(id)));
+        },
+      },
+    );
   };
 
   const handleDeleteMultiple = () => {
-    deleteWorkstations({ data: { ids: selectedIds.map((id) => Number(id)) } });
+    const idsToDelete = selectedIds;
+    deleteWorkstations(
+      { data: { ids: idsToDelete.map(Number) } },
+      {
+        onSuccess: () => {
+          setSelectedIds((prev) => prev.filter((sid) => !idsToDelete.includes(sid)));
+        },
+      },
+    );
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -158,13 +123,13 @@ export const WorkstationsPage = () => {
         toolbarExtras={
           selectedIds.length > 1 ? (
             <ConfirmDeleteMultipleDialog
-              isPending = {isDeleteWorkstationsPending}
+              isPending={isDeleteWorkstationsPending}
               selectedIds={selectedIds}
               handleDeleteMultiple={handleDeleteMultiple}
             />
           ) : (
-              <></>
-            )
+            <></>
+          )
         }
         isAddSection={true}
         onRowSelectionChange={setSelectedIds}
@@ -180,9 +145,9 @@ export const WorkstationsPage = () => {
                     onClose();
                   },
                   onError: (error) => {
-                    toast.error(getErrorMessage(error, "Failed to create workstation"));
+                    toast.error("Failed to create workstation");
                   },
-                }
+                },
               );
             }}
           />
@@ -194,7 +159,7 @@ export const WorkstationsPage = () => {
         onOpenChange={setIsEditRequested}
         selectedIds={selectedIds}
         handlePatchMultiple={handlePatchMultiple}
-      />      
+      />
     </div>
   );
 };
