@@ -11,29 +11,39 @@ import {
 } from "@/api/generated/workstation/workstation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { WorkstationForm } from "./form/form";
-import type { Workstation, WorkstationPatch } from "@/api/generated/models";
+import { WorkstationAddForm } from "./form/add";
+import { WorkstationEditForm } from "./form/edit";
+import type { Workstation, WorkstationPatch, WorkstationBulkPatch, WorkstationInsert } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmDeleteMultipleDialog } from "@/components/dialogs/confirm-delete-multiple-dialog";
 import { ConfirmEditMultipleDialog } from "@/components/dialogs/confirm-edit-multiple-dialog";
+import { EditDialog } from "@/components/dialogs/edit-dialog";
 import { createOptimisticCrudHandlers, getErrorMessage } from "@/lib/optimistic-crud";
+import { AddDialog } from "@/components/dialogs/add-dialog";
+import { CirclePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const WorkstationsPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   const [isEditRequested, setIsEditRequested] = useState<boolean>(false);
   const [editData, setEditData] = useState<WorkstationPatch | null>();
+  const [editedRecord, setEditedRecord] = useState<Workstation | null>(null)
+
+  const [addOpen, setAddOpen] = useState<boolean>(false)
+  const [editOpen, setEditOpen] = useState<boolean>(false)
 
   const queryClient = useQueryClient();
   const queryKey = getGetAllWorkstationsQueryKey();
 
   const { data: workstations = [], isLoading } = useGetAllWorkstations();
 
-  const handlers = createOptimisticCrudHandlers<Workstation>(queryClient, queryKey, "Workstation");
+  const handlers = createOptimisticCrudHandlers<Workstation, WorkstationPatch, Workstation, WorkstationBulkPatch>(queryClient, queryKey, "Workstation");
 
   const { mutate: patchWorkstation, isPending: isPatchWorkstationPending } = usePatchWorkstation({ mutation: handlers.patch });
   const { mutate: patchWorkstations, isPending: isPatchWorkstationsPending } = usePatchWorkstations({ mutation: handlers.patchMany });
 
-  const { mutate: deleteWorkstation, isPending: isDeleteWorkstationPending } = useDeleteWorkstation({
+  const { mutate: deleteWorkstation } = useDeleteWorkstation({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey });
@@ -57,13 +67,26 @@ export const WorkstationsPage = () => {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey });
+        toast.success("Workstation created");
+      },
+      onError: (error) => {
+        toast.error("Failed to create workstation");
       },
     },
   });
 
+  const handleCreate = (data: WorkstationInsert) => {
+    createWorkstation({ data });
+    setAddOpen(false);
+  }
+
   const handlePatchWithDialog = (id: number, data: WorkstationPatch) => {
-    if (selectedIds.length < 2) patchWorkstation({ id: String(id), data });
+    if (selectedIds.length < 2) {
+      patchWorkstation({ id: String(id), data })
+      setEditOpen(false);
+    }
     else {
+      setEditOpen(false);
       setIsEditRequested(true);
       setEditData(data);
     }
@@ -106,13 +129,13 @@ export const WorkstationsPage = () => {
     );
   };
 
-  if (isLoading) return <div>Loading...</div>;
-
   const columns = getWorkstationColumns({
-    // handlePatch,
     handlePatch: handlePatchWithDialog,
     handleDelete,
+    onEditDialogOpenClick: (data: Workstation) => { setEditOpen(true); setEditedRecord(data) },
   });
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div>
@@ -121,38 +144,33 @@ export const WorkstationsPage = () => {
         data={workstations}
         searchValues={"name"}
         toolbarExtras={
-          selectedIds.length > 1 ? (
-            <ConfirmDeleteMultipleDialog
-              isPending={isDeleteWorkstationsPending}
-              selectedIds={selectedIds}
-              handleDeleteMultiple={handleDeleteMultiple}
-            />
-          ) : (
-            <></>
-          )
+          <div className="flex flex-row w-full">
+            {selectedIds.length > 1 && (
+              <ConfirmDeleteMultipleDialog
+                isPending={isDeleteWorkstationsPending}
+                selectedIds={selectedIds}
+                handleDeleteMultiple={handleDeleteMultiple}
+              />
+            )}
+            <Button className="h-8 ml-auto" variant="outline" onClick={() => setAddOpen(true)}>
+              Додати<CirclePlus/>
+            </Button>
+          </div>
         }
-        isAddSection={true}
         onRowSelectionChange={setSelectedIds}
-        contentForm={({ onClose }) => (
-          <WorkstationForm
-            isPending={isCreatePending}
-            onSubmit={(name) => {
-              createWorkstation(
-                { data: { name } },
-                {
-                  onSuccess: () => {
-                    toast.success("Workstation created");
-                    onClose();
-                  },
-                  onError: (error) => {
-                    toast.error("Failed to create workstation");
-                  },
-                },
-              );
-            }}
-          />
-        )}
       />
+      <AddDialog open={addOpen} onOpenChange={setAddOpen}>
+        <WorkstationAddForm isPending={isCreatePending} onSubmit={handleCreate}/>
+      </AddDialog>
+      <EditDialog open={editOpen} onOpenChange={setEditOpen}>
+        <WorkstationEditForm 
+          previous={editedRecord} 
+          isPending={isPatchWorkstationPending} 
+          onSubmit={
+            (data) => {
+              if (editedRecord != null) handlePatchWithDialog(editedRecord.id, data)
+            }}/>
+      </EditDialog>
       <ConfirmEditMultipleDialog
         isPending={isPatchWorkstationsPending}
         open={isEditRequested}

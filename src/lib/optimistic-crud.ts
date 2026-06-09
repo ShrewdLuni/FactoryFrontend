@@ -10,8 +10,16 @@ export function createOptimisticCrudHandlers<
   T extends WithId,
   TPatch = Partial<T>,
   TUpdate = T,
+  TBulkPatch extends { ids: (string | number)[]; data?: TPatch } = {
+    ids: (string | number)[];
+    data?: TPatch;
+  },
+  TBulkUpdate extends { ids: (string | number)[]; data?: TUpdate } = {
+    ids: (string | number)[];
+    data?: TUpdate;
+  },
 >(queryClient: QueryClient, queryKey: QueryKey, entityName: string) {
-  const withOptimistic = <V>(
+  const withOptimistic = <V,>(
     updateFn: (old: T[], vars: V) => T[],
     successMsg: string,
     errorFallback: string,
@@ -34,18 +42,24 @@ export function createOptimisticCrudHandlers<
         old.map((i) => (String(i.id) === id ? { ...i, ...(data ?? {}) } : i)),
       `${entityName} змінено`, `Не вдалося змінити ${entityName}`,
     ),
-    patchMany: withOptimistic<{ data: { ids: (string | number)[]; data?: TPatch } }>(
-      (old, { data: { ids, data } }) =>
-        old.map((i) => (ids.includes(i.id) ? { ...i, ...(data ?? {}) } : i)),
+    patchMany: withOptimistic<{ data?: TBulkPatch }>(
+      (old, { data }) => {
+        if (!data) return old;
+        const { ids, data: patchData } = data;
+        return old.map((i) => (ids.includes(i.id) ? { ...i, ...(patchData ?? {}) } : i));
+      },
       `${entityName} змінено`, `Не вдалося змінити ${entityName}`,
     ),
     update: withOptimistic<{ id: string; data: TUpdate }>(
       (old, { id, data }) => old.map((i) => (String(i.id) === id ? { ...i, ...data } : i)),
       `${entityName} оновлено`, `Не вдалося оновити ${entityName}`,
     ),
-    updateMany: withOptimistic<{ data: { ids: (string | number)[]; data: TUpdate } }>(
-      (old, { data: { ids, data } }) =>
-        old.map((i) => (ids.includes(i.id) ? { ...i, ...data } : i)),
+    updateMany: withOptimistic<{ data?: TBulkUpdate }>(
+      (old, { data }) => {
+        if (!data) return old;
+        const { ids, data: updateData } = data;
+        return old.map((i) => (ids.includes(i.id) ? { ...i, ...updateData } : i));
+      },
       `${entityName} оновлено`, `Не вдалося оновити ${entityName}`,
     ),
     delete: withOptimistic<{ id: string }>(

@@ -12,9 +12,10 @@ import { InputCell } from "@/components/data-table/input-cell";
 interface WorkstationColumnsProps {
   handlePatch: (id: number, data: WorkstationPatch) => void;
   handleDelete: (id: number) => void;
+  onEditDialogOpenClick: (data: Workstation) => void;
 }
 
-export const getWorkstationColumns = ({ handlePatch, handleDelete }: WorkstationColumnsProps) => {
+export const getWorkstationColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick }: WorkstationColumnsProps) => {
   const columns: ColumnDef<Workstation>[] = [
     createSelectColumn<Workstation>(),
     createIdColumn<Workstation>(),
@@ -62,7 +63,7 @@ export const getWorkstationColumns = ({ handlePatch, handleDelete }: Workstation
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEditDialogOpenClick(row.original)}>
                   <SquarePen />
                   <p className="">Редагувати</p>
                 </DropdownMenuItem>

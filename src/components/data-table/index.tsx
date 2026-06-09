@@ -25,7 +25,7 @@ interface DataTableProps<TData, TValue> {
     }[];
   }[];
   initialState?: Partial<TableState>; 
-  toolbarExtras?: JSX.Element;
+  toolbarExtras?: ReactNode;
   isAddSection?: boolean;
   tableRef?: Ref<Table<TData>>;
   onRowSelectionChange?: (ids: string[]) => void;
