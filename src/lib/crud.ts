@@ -72,3 +72,24 @@ export function createOptimisticCrudHandlers<
     ),
   };
 }
+
+export function createInvalidateCrudHandlers<T extends WithId>(
+  queryClient: QueryClient,
+  queryKey: QueryKey,
+  entityName: string,
+) {
+  const withInvalidate = (successMsg: string, errorFallback: string) => ({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey });
+      toast.success(successMsg);
+    },
+    onError: (error: any) => toast.error(getErrorMessage(error, errorFallback)),
+  });
+
+  return {
+    create: withInvalidate(`${entityName} створено`, `Не вдалося створити ${entityName}`),
+    createMany: withInvalidate(`${entityName} створено`, `Не вдалося створити ${entityName}`),
+    delete: withInvalidate(`${entityName} видалено`, `Не вдалося видалити ${entityName}`),
+    deleteMany: withInvalidate(`${entityName} видалено`, `Не вдалося видалити ${entityName}`),
+  };
+}
