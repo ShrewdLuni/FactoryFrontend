@@ -16,11 +16,10 @@ import type { Workstation, WorkstationPatch, WorkstationBulkPatch, WorkstationIn
 import { useQueryClient } from "@tanstack/react-query";
 import { ConfirmDeleteMultipleDialog } from "@/components/dialogs/confirm-delete-multiple-dialog";
 import { ConfirmEditMultipleDialog } from "@/components/dialogs/confirm-edit-multiple-dialog";
-import { EditDialog } from "@/components/dialogs/edit-dialog";
 import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
-import { AddDialog } from "@/components/dialogs/add-dialog";
 import { CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormDialog } from "@/components/dialogs/form-dialog";
 
 export const WorkstationsPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -132,10 +131,10 @@ export const WorkstationsPage = () => {
         }
         onRowSelectionChange={setSelectedIds}
       />
-      <AddDialog open={addOpen} onOpenChange={setAddOpen}>
+      <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
         <WorkstationAddForm isPending={isCreatePending} onSubmit={handleCreate} />
-      </AddDialog>
-      <EditDialog open={editOpen} onOpenChange={setEditOpen}>
+      </FormDialog >
+      <FormDialog title={"Редагування запису"} open={editOpen} onOpenChange={setEditOpen}>
         <WorkstationEditForm
           previous={editedRecord}
           isPending={isPatchWorkstationPending}
@@ -143,7 +142,7 @@ export const WorkstationsPage = () => {
             if (editedRecord != null) handlePatchWithDialog(editedRecord.id, data);
           }}
         />
-      </EditDialog>
+      </FormDialog >
       <ConfirmEditMultipleDialog
         isPending={isPatchWorkstationsPending}
         open={isEditRequested}
