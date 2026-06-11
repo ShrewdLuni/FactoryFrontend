@@ -14,8 +14,8 @@ import { WorkstationAddForm } from "./form/add";
 import { WorkstationEditForm } from "./form/edit";
 import type { Workstation, WorkstationPatch, WorkstationBulkPatch, WorkstationInsert } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
-import { ConfirmDeleteMultipleDialog } from "@/components/dialogs/confirm-delete-multiple-dialog";
-import { ConfirmEditMultipleDialog } from "@/components/dialogs/confirm-edit-multiple-dialog";
+import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog";
+import { ConfirmEditManyDialog } from "@/components/dialogs/confirm-edit-many-dialog";
 import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
 import { CirclePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,7 @@ export const WorkstationsPage = () => {
     }
   };
 
-  const handlePatchMultiple = () => {
+  const handlePatchMany = () => {
     if (editData == null) return;
     patchWorkstations(
       { data: { ids: selectedIds.map(Number), data: editData } },
@@ -85,7 +85,7 @@ export const WorkstationsPage = () => {
     );
   };
 
-  const handleDeleteMultiple = () => {
+  const handleDeleteMany = () => {
     const idsToDelete = selectedIds;
     deleteWorkstations(
       { data: { ids: idsToDelete.map(Number) } },
@@ -114,13 +114,14 @@ export const WorkstationsPage = () => {
         columns={columns}
         data={workstations}
         searchValues={"name"}
+        onRowSelectionChange={setSelectedIds}
         toolbarExtras={
           <div className="flex flex-row w-full">
             {selectedIds.length > 1 && (
-              <ConfirmDeleteMultipleDialog
+              <ConfirmDeleteManyDialog
                 isPending={isDeleteWorkstationsPending}
                 selectedIds={selectedIds}
-                handleDeleteMultiple={handleDeleteMultiple}
+                handleDeleteMany={handleDeleteMany}
               />
             )}
             <Button className="h-8 ml-auto" variant="outline" onClick={() => setAddOpen(true)}>
@@ -129,7 +130,6 @@ export const WorkstationsPage = () => {
             </Button>
           </div>
         }
-        onRowSelectionChange={setSelectedIds}
       />
       <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
         <WorkstationAddForm isPending={isCreatePending} onSubmit={handleCreate} />
@@ -143,12 +143,12 @@ export const WorkstationsPage = () => {
           }}
         />
       </FormDialog >
-      <ConfirmEditMultipleDialog
+      <ConfirmEditManyDialog
         isPending={isPatchWorkstationsPending}
         open={isEditRequested}
         onOpenChange={setIsEditRequested}
         selectedIds={selectedIds}
-        handlePatchMultiple={handlePatchMultiple}
+        handlePatchMany={handlePatchMany}
       />
     </div>
   );

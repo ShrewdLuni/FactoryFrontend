@@ -13,10 +13,12 @@ import { SwitchCell } from "@/components/data-table/switch-cell";
 
 interface ProductColumnsProps {
   handlePatch: (id: number, data: ProductPatch) => void;
+  handleDelete: (id: number) => void;
+  onEditDialogOpenClick: (data: Product) => void;
   packedStock: PackedStock[] | undefined;
 }
 
-export const getProductColumns = ({ handlePatch, packedStock }: ProductColumnsProps) => {
+export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick, packedStock }: ProductColumnsProps) => {
   const columns: ColumnDef<Product>[] = [
     createSelectColumn<Product>(),
     createIdColumn<Product>(),
@@ -73,13 +75,12 @@ export const getProductColumns = ({ handlePatch, packedStock }: ProductColumnsPr
     {
       id: "isActive",
       accessorFn: (row) => String(row.isActive),
-      header: ({ column }) => <SortableHeader column={column} field="Активні" />,
+      header: ({ column }) => <SortableHeader column={column} field="Актуальні" />,
       cell: ({ row }) => (
         <div className="w-full flex justify-center">
           <SwitchCell
             pressed={row.original.isActive}
             onPressed={(pressed) => {
-              console.log(pressed)
               handlePatch(row.original.id, { isActive: pressed })
             }}
             />
@@ -110,7 +111,7 @@ export const getProductColumns = ({ handlePatch, packedStock }: ProductColumnsPr
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Дії</DropdownMenuLabel>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEditDialogOpenClick(row.original)}>
                   <SquarePen/>
                   <p className="">Редагувати</p>
                 </DropdownMenuItem>

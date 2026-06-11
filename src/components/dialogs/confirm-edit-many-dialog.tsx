@@ -9,15 +9,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface ConfirmDeleteMultipleDialog {
+interface ConfirmDeleteManyDialog {
   isPending: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedIds: string[];
-  handlePatchMultiple: () => void;
+  handlePatchMany: () => void;
 }
 
-export const ConfirmEditMultipleDialog = ({ isPending, open, onOpenChange, selectedIds, handlePatchMultiple }: ConfirmDeleteMultipleDialog) => {
+export const ConfirmEditManyDialog = ({ isPending, open, onOpenChange, selectedIds, handlePatchMany}: ConfirmDeleteManyDialog) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent size="sm">
@@ -29,7 +29,7 @@ export const ConfirmEditMultipleDialog = ({ isPending, open, onOpenChange, selec
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Скасувати</AlertDialogCancel>
-          <AlertDialogAction onClick={handlePatchMultiple} disabled={isPending}>Підтвердити</AlertDialogAction>
+          <AlertDialogAction onClick={handlePatchMany} disabled={isPending}>Підтвердити</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

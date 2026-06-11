@@ -1,7 +1,7 @@
 "use client"
 
 import { getCoreRowModel, useReactTable, getSortedRowModel, type ColumnDef, type SortingState, type ColumnFiltersState, getFilteredRowModel, type VisibilityState, getPaginationRowModel, type TableState, type PaginationState, getFacetedRowModel, getFacetedUniqueValues, type Table, type OnChangeFn, type RowSelectionState } from "@tanstack/react-table"
-import { useState, useImperativeHandle, type ReactNode, type Ref, useEffect } from "react"
+import { useState, useImperativeHandle, type ReactNode, type Ref, useEffect, useRef } from "react"
 
 import { TablePagination } from "./pagination"
 import { TableToolbar } from "./toolbar"
@@ -41,11 +41,7 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
   const [isAddFormOpen, setIsAddFormOpen] = useState(false)
 
   const handleRowSelectionChange: OnChangeFn<RowSelectionState> = (updater) => {
-    setRowSelection((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      onRowSelectionChange?.(Object.keys(next));
-      return next;
-    });
+    setRowSelection((prev) => (typeof updater === "function" ? updater(prev) : updater));
   };
 
   useEffect(() => {
@@ -65,14 +61,16 @@ export function DataTable<TData, TValues>({ columns, searchValues, data, content
         }
       }
 
-      if (changed) {
-        onRowSelectionChange?.(Object.keys(next));
-        return next;
-      }
-      return prev;
+      return changed ? next : prev;    
     });
   }, [data, onRowSelectionChange]);
 
+  const onRowSelectionChangeRef = useRef(onRowSelectionChange);
+  onRowSelectionChangeRef.current = onRowSelectionChange;
+
+  useEffect(() => {
+    onRowSelectionChangeRef.current?.(Object.keys(rowSelection));
+  }, [rowSelection]);
 
   const table = useReactTable({
     data, 

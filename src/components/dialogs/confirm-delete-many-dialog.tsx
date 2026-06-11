@@ -13,13 +13,13 @@ import {
 import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface ConfirmDeleteMultipleDialog {
+interface ConfirmDeleteManyDialog {
   isPending: boolean;
   selectedIds: string[];
-  handleDeleteMultiple: () => void;
+  handleDeleteMany: () => void;
 }
 
-export const ConfirmDeleteMultipleDialog = ({ isPending, selectedIds, handleDeleteMultiple }: ConfirmDeleteMultipleDialog) => {
+export const ConfirmDeleteManyDialog = ({ isPending, selectedIds, handleDeleteMany }: ConfirmDeleteManyDialog) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger
@@ -42,7 +42,7 @@ export const ConfirmDeleteMultipleDialog = ({ isPending, selectedIds, handleDele
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel variant="outline">Скасувати</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={handleDeleteMultiple} disabled={isPending}>
+          <AlertDialogAction variant="destructive" onClick={handleDeleteMany} disabled={isPending}>
             Видалити
           </AlertDialogAction>
         </AlertDialogFooter>

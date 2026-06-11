@@ -1,82 +1,191 @@
 import { DataTable } from "@/components/data-table"
 import { getProductColumns } from "./columns"
-import { CircleCheck, CircleX } from "lucide-react"
+import { CircleCheck, CirclePlus, CircleX } from "lucide-react"
 import { getGetAllProductsQueryKey, useCreateProduct, useCreateProducts, useDeleteProduct, useDeleteProducts, useGetAllProducts, usePatchProduct, usePatchProducts, useUpdateProduct } from "@/api/generated/product/product"
 import { useGetAllPackedStock } from "@/api/generated/packed-stock/packed-stock"
-import type { Product, ProductPatch } from "@/api/generated/models"
-import { toast } from "sonner"
+import type { Product, ProductBulkPatch, ProductInsert, ProductPatch } from "@/api/generated/models"
 import { useQueryClient } from "@tanstack/react-query"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
+import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud"
+import { ConfirmEditManyDialog } from "@/components/dialogs/confirm-edit-many-dialog"
+import { FormDialog } from "@/components/dialogs/form-dialog"
+import { ProductAddForm } from "./forms/add"
+import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog"
+import { Button } from "@/components/ui/button"
+import { ProductEditForm } from "./forms/edit"
+
+
+const isActiveFilter = {
+  column: "isActive", 
+  title: "Статус актуальності", 
+  options: [
+    {
+      label: "Актуальні",
+      value: "true",
+      icon: CircleCheck,
+    },
+    {
+      label: "Неактуальні",
+      value: "false",
+      icon: CircleX,
+    }
+  ],
+}
+
+const filters = [isActiveFilter]
 
 export const ProductsPage = () => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const [isEditRequested, setIsEditRequested] = useState<boolean>(false);
+  const [editData, setEditData] = useState<ProductPatch | null>();
+  const [editedRecord, setEditedRecord] = useState<Product | null>(null);
+
+  const [addOpen, setAddOpen] = useState<boolean>(false);
+  const [editOpen, setEditOpen] = useState<boolean>(false);
 
   const queryClient = useQueryClient()
   const queryKey = getGetAllProductsQueryKey();
 
+  const optimistic = createOptimisticCrudHandlers<Product, ProductPatch, Product, ProductBulkPatch>(queryClient, queryKey, "Product");
+  const invalidated = createInvalidateCrudHandlers<Product>(queryClient, queryKey, "Product")
+
   const { data: products = [], isLoading } =  useGetAllProducts()
   const { data: packedStock } = useGetAllPackedStock();
-  const { mutate: patchProduct, isPending: isPatchProductPending } = usePatchProduct({
-    mutation: {
-      onMutate: async ({ id, data }) => {
-        const previous = queryClient.getQueryData<Product[]>(queryKey);
-        queryClient.setQueryData<Product[]>(queryKey, (old = []) =>
-          old.map((w) => (String(w.id) === id ? { ...w, ...data } : w))
-        );
-        return { previous };
-      },
-      onError: (error, _vars, context) => {
-        queryClient.setQueryData(queryKey, context?.previous);
-      },
-      onSuccess: () => toast.success("Workstation patched"),
-    },
-  })
-  const { mutate: patchProducts, isPending: isPatchProductsPending } = usePatchProducts()
-  const { mutate: deleteProduct, isPending: isDeleteProdcutPending } = useDeleteProduct()
-  const { mutate: deleteProducts, isPending: isDeleteProdcutsPendings } = useDeleteProducts()
-  const { mutate: createProduct, isPending: isDeleteProdcutPendings } = useCreateProduct()
-  const { mutate: createProducts, isPending: isCreateProductPendings } = useCreateProducts()
 
-  if (isLoading) {
-    <div>Loading...</div>
-  }
+  const { mutate: patchProduct, isPending: isPatchProductPending } = usePatchProduct({ mutation: optimistic.patch });
+  const { mutate: patchProducts, isPending: isPatchProductsPending } = usePatchProducts({ mutation: optimistic.patchMany })
 
-  const isActiveFilter = {
-    column: "isActive", 
-    title: "Статус активності", 
-    options: [
-      {
-        label: "Активні",
-        value: "true",
-        icon: CircleCheck,
-      },
-      {
-        label: "Неактивні",
-        value: "false",
-        icon: CircleX,
-      }
-    ],
-  }
+  const { mutate: deleteProduct, isPending: isDeleteProdcutPending } = useDeleteProduct({ mutation: invalidated.delete })
+  const { mutate: deleteProducts, isPending: isDeleteProdcutsPendings } = useDeleteProducts({ mutation: invalidated.deleteMany })
+  const { mutate: createProduct, isPending: isCreateProdcutPendings } = useCreateProduct({ mutation: invalidated.create })
+  const { mutate: createProducts, isPending: isCreateProductsPendings } = useCreateProducts({ mutation: invalidated.createMany })
 
-  const filters = [isActiveFilter]
+  const handleCreate = (data: ProductInsert) => {
+    createProduct({ data });
+    setAddOpen(false);
+  };
 
   const handlePatch = (id: number, data: ProductPatch) => {
-    patchProduct({ id: String(id), data })
-  }
+    if (selectedIds.length < 2) {
+      patchProduct({ id: String(id), data });
+      setEditOpen(false);
+    } else {
+      setEditOpen(false);
+      setIsEditRequested(true);
+      setEditData(data);
+    }
+  };
 
-  const columns = useMemo(
-    () => getProductColumns({ handlePatch, packedStock }),
-    [packedStock]   
-  )
+  const handlePatchMany = () => {
+    if (editData == null) return;
+    patchProducts(
+      { data: { ids: selectedIds.map(Number), data: editData } },
+      {
+        onSuccess: () => {
+          setIsEditRequested(false);
+          setEditData(null);
+        },
+      },
+    );
+  };
+
+  const handleDelete = (id: number) => {
+    deleteProduct(
+      { id: String(id) },
+      {
+        onSuccess: () => {
+          setSelectedIds([]);
+          setSelectedIds((prev) => prev.filter((sid) => sid !== String(id)));
+        },
+      },
+    );
+  };
+
+  const handleDeleteMany = () => {
+    const idsToDelete = selectedIds;
+    deleteProducts(
+      { data: { ids: idsToDelete.map(Number) } },
+      {
+        onSuccess: () => {
+          setSelectedIds((prev) => prev.filter((sid) => !idsToDelete.includes(sid)));
+        },
+      },
+    );
+  };
+
+  const columns = getProductColumns(
+      { 
+        packedStock,
+        handlePatch, 
+        handleDelete, 
+        onEditDialogOpenClick: (data: Product) => {
+          console.log(data)
+          setEditOpen(true);
+          setEditedRecord(data);
+        } 
+      })
+
+  // const columns = useMemo(
+  //   () => getProductColumns(
+  //     { 
+  //       packedStock,
+  //       handlePatch, 
+  //       handleDelete, 
+  //       onEditDialogOpenClick: (data: Product) => {
+  //         console.log(data)
+  //         setEditOpen(true);
+  //         setEditedRecord(data);
+  //       } 
+  //     }),
+  //   [packedStock]   
+  // )
+
+  if (isLoading) <div>Loading...</div>
 
   return (
-    <DataTable 
-      columns={columns} 
-      data={products} 
-      searchValues="name" 
-      filters={filters}
-      initialState={{
-        columnVisibility: { code: true } 
-      }}
-    />
+    <div>
+      <DataTable 
+        columns={columns} 
+        data={products} 
+        searchValues="name" 
+        filters={filters}
+        onRowSelectionChange={setSelectedIds}
+        toolbarExtras={
+          <div className="flex flex-row w-full">
+            {selectedIds.length > 1 && (
+              <ConfirmDeleteManyDialog
+                isPending={isDeleteProdcutsPendings}
+                selectedIds={selectedIds}
+                handleDeleteMany={handleDeleteMany}
+              />
+            )}
+            <Button className="h-8 ml-auto" variant="outline" onClick={() => setAddOpen(true)}>
+              Додати
+              <CirclePlus />
+            </Button>
+          </div>
+        }
+      />
+      <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
+        <ProductAddForm isPending={isCreateProdcutPendings} onSubmit={handleCreate} />
+      </FormDialog>
+      <FormDialog open={editOpen} onOpenChange={setEditOpen}>
+        <ProductEditForm
+          previous={editedRecord}
+          isPending={isPatchProductPending}
+          onSubmit={(data) => {
+            if (editedRecord != null) handlePatch(editedRecord.id, data);
+          }}
+        />
+      </FormDialog >
+      <ConfirmEditManyDialog
+        isPending={isPatchProductsPending}
+        open={isEditRequested}
+        onOpenChange={setIsEditRequested}
+        selectedIds={selectedIds}
+        handlePatchMany={handlePatchMany}
+      />
+    </div>
   )
 }
