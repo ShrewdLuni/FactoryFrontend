@@ -36,7 +36,7 @@ export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenC
         )
       },
     },
-    createColumn<Product>("code", "Code"),
+    createColumn<Product>("code", "Код"),
     {
       accessorKey: "name",
       accessorFn: (row) => {
