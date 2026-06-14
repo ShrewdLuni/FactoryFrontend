@@ -27,7 +27,7 @@ export function createIdColumn<T extends { id: number }>(): ColumnDef<T> {
       return <SortableHeader column={column} field={"ID"} />;
     },
     cell: ({ row }) => {
-      return <div className="text-center">{`${row.original.id || 0}`.padStart(4, "0")}</div>;
+      return <div className="text-center">{`${row.original.id || 0}`.padStart(5, "0")}</div>;
     },
   };
 }

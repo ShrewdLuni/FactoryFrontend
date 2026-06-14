@@ -65,7 +65,7 @@ export const QuantityPage = () => {
   return (
     <div className="flex flex-col gap-6 p-4">
       <Input
-        placeholder="Search products..."
+        placeholder="Пошук..."
         value={globalFilter}
         onChange={(e) => setGlobalFilter(e.target.value)}
         className="max-w-sm h-8"

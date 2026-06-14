@@ -1,24 +1,28 @@
 import { DataTable } from "@/components/data-table"
-import { QRCodeForm } from "@/components/forms/qrcode"
 import { useMemo, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { getColumns, printMultipleQRCodes } from "./columns"  // import new fn
+import { getColumns } from "./columns"
 import { Dialog, DialogHeader, DialogTitle, DialogContent } from "@/components/ui/dialog"
-import type { QRCode } from "@/types/qrcode"
 import { ActivateQRCodeForm } from "@/components/forms/activateQRCode"
-import { useGetAllQRCodes } from "@/hooks/useQR"
 import { QRCodeCanvas } from 'qrcode.react';
 import { BASE_URL } from "@/config"
 import { Button } from "@/components/ui/button"
-import { Printer } from "lucide-react"
-import type { Table } from "@tanstack/react-table"
+import { CirclePlus, Printer } from "lucide-react"
+import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog"
+import type { QRCode } from "@/api/generated/models"
+import { useDeleteQRCodes, useGetAllQRCodes } from "@/api/generated/qrcode/qrcode"
 
 export const QrCodeGenerationPage = () => {
-  const { data: qrcodes, isLoading, refetch } = useGetAllQRCodes()
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   const [activateOpen, setActivateOpen] = useState(false)
   const [seeOpen, setSeeOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)
-  const tableRef = useRef<Table<QRCode>>(null)  // ref to access table instance
+
+  const { data: qrcodes = [], isLoading } = useGetAllQRCodes()
+  const { mutate: deleteQRCodes, isPending: isDeleteQRCodesPending } = useDeleteQRCodes()
 
   const openActivateDialog = (qr: QRCode) => {
     setActiveQRCode(qr)
@@ -30,46 +34,61 @@ export const QrCodeGenerationPage = () => {
     setSeeOpen(true)
   }
 
-  const navigate = useNavigate();
-  const columns = useMemo(() => getColumns(openActivateDialog, openSeeDialog), [navigate]);
+  const handleDeleteMany = () => {
+    const idsToDelete = selectedIds;
+    deleteQRCodes(
+      { data: { ids: idsToDelete.map(Number) } },
+      {
+        onSuccess: () => {
+          setSelectedIds((prev) => prev.filter((sid) => !idsToDelete.includes(sid)));
+        },
+      },
+    );
+  }
+
+  const columns = getColumns(openActivateDialog, openSeeDialog);
 
   const handlePrintSelected = () => {
-    if (!tableRef.current) return;
-    const selected = tableRef.current
-      .getFilteredSelectedRowModel()
-      .rows.map((r) => r.original);
-    if (selected.length > 0) printMultipleQRCodes(selected);
+    console.log()
   };
 
-  const [selectedCount, setSelectedCount] = useState(0);
-
   const toolbarExtras = (
-    <Button
-      variant="outline"
-      size="sm"
-      disabled={selectedCount === 0}
-      onClick={handlePrintSelected}
-    >
-      <Printer className="mr-2 h-4 w-4" />
-      Print Selected {selectedCount > 0 && `(${selectedCount})`}
-    </Button>
-  );
+    <div className="flex flex-row w-full">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={selectedIds.length === 0}
+        onClick={handlePrintSelected}
+      >
+        <Printer className="mr-2 h-4 w-4" />
+        Print Selected {selectedIds.length > 0 && `(${selectedIds.length})`}
+      </Button>
+      {selectedIds.length > 1 && (
+        <ConfirmDeleteManyDialog
+          isPending={isDeleteQRCodesPending}
+          selectedIds={selectedIds}
+          handleDeleteMany={handleDeleteMany}
+        />
+      )}
+      <Button className="h-8 ml-auto" variant="outline" onClick={() => setAddOpen(true)}>
+        Додати
+        <CirclePlus />
+      </Button>
+    </div>
+  )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
+  if (isLoading) return <div>Loading</div>
 
   return (
     <div>
       <DataTable
         columns={columns}
-        searchValues={"name"}
-        data={qrcodes ?? []}
-        contentForm={<QRCodeForm onSuccess={() => { refetch() }} />}
+        searchValues={"id"}
+        data={qrcodes}
         toolbarExtras={toolbarExtras}
-        tableRef={tableRef}
-        onRowSelectionChange={setSelectedCount}
-      />    <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
+        onRowSelectionChange={setSelectedIds}
+      />    
+      <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Activate QR Code</DialogTitle>

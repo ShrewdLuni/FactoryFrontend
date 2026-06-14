@@ -5,7 +5,6 @@ import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/com
 import type { ProductInsert } from "@/api/generated/models";
 import { Textarea } from "@/components/ui/textarea";
 import { SwitchCell } from "@/components/data-table/switch-cell";
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox";
 
 interface ProductAddFormProps {
   onSubmit: (data: ProductInsert) => void;

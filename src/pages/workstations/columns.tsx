@@ -62,7 +62,7 @@ export const getWorkstationColumns = ({ handlePatch, handleDelete, onEditDialogO
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>Дії</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => onEditDialogOpenClick(row.original)}>
                   <SquarePen />
                   <p className="">Редагувати</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, SquarePen, Trash } from "lucide-react";
+import { MoreHorizontal, PackageCheck, SquarePen, Trash, Truck } from "lucide-react";
 import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,11 @@ interface ProductColumnsProps {
   handlePatch: (id: number, data: ProductPatch) => void;
   handleDelete: (id: number) => void;
   onEditDialogOpenClick: (data: Product) => void;
+  onMoveDialogOpenClick: (data: Product) => void;
   packedStock: PackedStock[] | undefined;
 }
 
-export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick, packedStock }: ProductColumnsProps) => {
+export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick, onMoveDialogOpenClick, packedStock }: ProductColumnsProps) => {
   const columns: ColumnDef<Product>[] = [
     createSelectColumn<Product>(),
     createIdColumn<Product>(),
@@ -111,6 +112,10 @@ export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenC
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Дії</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => onMoveDialogOpenClick(row.original)}>
+                  <Truck/>
+                  <p className="">Перемістити на склад</p>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onEditDialogOpenClick(row.original)}>
                   <SquarePen/>
                   <p className="">Редагувати</p>
