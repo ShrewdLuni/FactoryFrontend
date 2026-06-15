@@ -8,8 +8,14 @@ import { BASE_URL } from "@/config"
 import { Button } from "@/components/ui/button"
 import { CirclePlus, Printer } from "lucide-react"
 import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog"
-import type { QRCode } from "@/api/generated/models"
-import { useDeleteQRCodes, useGetAllQRCodes } from "@/api/generated/qrcode/qrcode"
+import type { QRCode, QRCodeBulkPatch, QRCodeInsert, QRCodePatch } from "@/api/generated/models"
+import { getGetAllQRCodesQueryKey, useGetAllQRCodes, usePatchQRCode, useCreateQRCode, useCreateQRCodes, useDeleteQRCode, useDeleteQRCodes, usePatchQRCodes } from "@/api/generated/qrcode/qrcode"
+import { ConfirmEditManyDialog } from "@/components/dialogs/confirm-edit-many-dialog"
+import { FormDialog } from "@/components/dialogs/form-dialog"
+import { QRCodeAddForm } from "./forms/add"
+import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud"
+import { useQueryClient } from "@tanstack/react-query";
+import { printMultipleQRCodes } from "./utils"
 
 export const QrCodeGenerationPage = () => {
 
@@ -21,8 +27,19 @@ export const QrCodeGenerationPage = () => {
 
   const [activeQRCode, setActiveQRCode] = useState<QRCode | null>(null)
 
-  const { data: qrcodes = [], isLoading } = useGetAllQRCodes()
-  const { mutate: deleteQRCodes, isPending: isDeleteQRCodesPending } = useDeleteQRCodes()
+  const queryClient = useQueryClient();
+  const queryKey = getGetAllQRCodesQueryKey();
+
+  const optimistic = createOptimisticCrudHandlers<QRCode, QRCodePatch, QRCode, QRCodeBulkPatch>(queryClient, queryKey, "QRCode");
+  const invalidated = createInvalidateCrudHandlers<QRCode>(queryClient, queryKey, "QRCode");
+
+  const { data: qrcodes = [], isLoading } = useGetAllQRCodes();
+  const { mutate: patchWorkstation, isPending: isPatchQRCodePending } = usePatchQRCode({ mutation: optimistic.patch });
+  const { mutate: patchQRCodes, isPending: isPatchQRCodesPending } = usePatchQRCodes({ mutation: optimistic.patchMany });
+  const { mutate: deleteQRCode } = useDeleteQRCode({ mutation: invalidated.delete });
+  const { mutate: deleteQRCodes, isPending: isDeleteQRCodesPending } = useDeleteQRCodes({ mutation: invalidated.deleteMany });
+  const { mutate: createQRCode, isPending: isCreateQRCodePending } = useCreateQRCode({ mutation: invalidated.create });
+  const { mutate: createQRCodes, isPending: isCreateQRCodesPending } = useCreateQRCodes({ mutation: invalidated.createMany });
 
   const openActivateDialog = (qr: QRCode) => {
     setActiveQRCode(qr)
@@ -46,14 +63,30 @@ export const QrCodeGenerationPage = () => {
     );
   }
 
+  const handleCreateMany = (qr: QRCodeInsert, amount: number) => {
+    const qrCodes: QRCodeInsert[] = Array.from({ length: amount }, () => ({ ...qr }));
+    createQRCodes({ data: qrCodes },
+      {
+        onSuccess: (createdQRCodes) => {
+          printMultipleQRCodes(createdQRCodes);
+          setAddOpen(false);
+        },
+      }
+    );
+  };
+
   const columns = getColumns(openActivateDialog, openSeeDialog);
 
   const handlePrintSelected = () => {
-    console.log()
+    const selected = qrcodes.filter((qr) =>
+      selectedIds.includes(String(qr.id))
+    );
+
+    printMultipleQRCodes(selected);
   };
 
   const toolbarExtras = (
-    <div className="flex flex-row w-full">
+    <div className="flex flex-row gap-2 w-full">
       <Button
         variant="outline"
         size="sm"
@@ -61,7 +94,7 @@ export const QrCodeGenerationPage = () => {
         onClick={handlePrintSelected}
       >
         <Printer className="mr-2 h-4 w-4" />
-        Print Selected {selectedIds.length > 0 && `(${selectedIds.length})`}
+        Друкувати вибрані QR-коди{selectedIds.length > 0 && `(${selectedIds.length})`}
       </Button>
       {selectedIds.length > 1 && (
         <ConfirmDeleteManyDialog
@@ -88,19 +121,10 @@ export const QrCodeGenerationPage = () => {
         toolbarExtras={toolbarExtras}
         onRowSelectionChange={setSelectedIds}
       />    
-      <Dialog open={activateOpen} onOpenChange={setActivateOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Activate QR Code</DialogTitle>
-          </DialogHeader>
-            {activeQRCode && (
-              <ActivateQRCodeForm
-                qrcode={activeQRCode}
-                onDone={() => setActivateOpen(false)}
-              />
-            )}
-        </DialogContent>
-      </Dialog>
+      {/* <ConfirmEditManyDialog/> */}
+      <FormDialog title={"Додати QR-коди"} open={addOpen} onOpenChange={setAddOpen}>
+        <QRCodeAddForm onSubmit={handleCreateMany}/>
+      </FormDialog>
        <Dialog open={seeOpen} onOpenChange={setSeeOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>

@@ -131,7 +131,7 @@ export const WorkstationsPage = () => {
           </div>
         }
       />
-      <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
+      <FormDialog title={"Додати машину"} open={addOpen} onOpenChange={setAddOpen}>
         <WorkstationAddForm isPending={isCreatePending} onSubmit={handleCreate} />
       </FormDialog >
       <FormDialog title={"Редагування запису"} open={editOpen} onOpenChange={setEditOpen}>
