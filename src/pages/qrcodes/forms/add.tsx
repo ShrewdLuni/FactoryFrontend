@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
@@ -7,7 +7,7 @@ import { SwitchCell } from "@/components/data-table/switch-cell";
 import { useRandomId } from "@/hooks/useRandomId";
 
 interface QRCodeAddFormProps {
-  onSubmit: (data: QRCodeInsert, amount: number) => void;
+  onSubmit: (data: QRCodeInsert, amount: number, shouldPrint: boolean) => void;
   isPending?: boolean;
 }
 
@@ -35,7 +35,7 @@ export const QRCodeAddForm = ({ onSubmit, isPending }: QRCodeAddFormProps) => {
           </div>
           <FieldDescription>Відкриє діалог друку після створення.</FieldDescription>        
         </Field>
-        <Button disabled={isPending} onClick={() => onSubmit({ name }, amount)}>
+        <Button disabled={isPending} onClick={() => onSubmit({ name }, amount, shouldPrint)}>
           {isPending ? "Триває додавання..." : "Додати"}
         </Button>
       </FieldGroup>
