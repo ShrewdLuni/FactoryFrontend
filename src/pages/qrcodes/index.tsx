@@ -183,7 +183,11 @@ export const QrCodeGenerationPage = () => {
         <QRCodeAddForm onSubmit={handleCreateMany} />
       </FormDialog>
       <FormDialog title={"Прив’язати QR-код"} open={linkOpen} onOpenChange={setLinkOpen}>
-        <QRCodeLinkForm/>
+        <QRCodeLinkForm
+          qrcode={activeQRCode!}
+          qrcodes={qrcodes}
+          onSubmit={console.log}
+        />
       </FormDialog>
       <QRCodeSeeDialog open={seeOpen} onOpenChange={setSeeOpen} qrCode={activeQRCode} />
     </div>
