@@ -8,22 +8,24 @@ import {
   useDeleteProduct,
   useDeleteProducts,
   useGetAllProducts,
+  usePackProduct,
   usePatchProduct,
   usePatchProducts,
   useUpdateProduct,
 } from "@/api/generated/product/product";
 import { useGetAllPackedStock } from "@/api/generated/packed-stock/packed-stock";
-import type { Product, ProductBulkPatch, ProductInsert, ProductPatch } from "@/api/generated/models";
+import type { PackProduct, Product, ProductBulkPatch, ProductInsert, ProductPatch } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
 import { ConfirmEditManyDialog } from "@/components/dialogs/confirm-edit-many-dialog";
 import { FormDialog } from "@/components/dialogs/form-dialog";
-import { ProductMoveForm } from "./forms/move";
 import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog";
 import { Button } from "@/components/ui/button";
 import { ProductEditForm } from "./forms/edit";
 import { ProductAddForm } from "./forms/add";
+import { MoveForm } from "../storage/forms/add";
+
 
 const isActiveFilter = {
   column: "isActive",
@@ -64,7 +66,6 @@ export const ProductsPage = () => {
   const invalidated = createInvalidateCrudHandlers<Product>(queryClient, queryKey, "Product");
 
   const { data: products = [], isLoading } = useGetAllProducts();
-  const { data: packedStock } = useGetAllPackedStock();
 
   const { mutate: patchProduct, isPending: isPatchProductPending } = usePatchProduct({ mutation: optimistic.patch });
   const { mutate: patchProducts, isPending: isPatchProductsPending } = usePatchProducts({ mutation: optimistic.patchMany });
@@ -72,7 +73,20 @@ export const ProductsPage = () => {
   const { mutate: deleteProduct, isPending: isDeleteProdcutPending } = useDeleteProduct({ mutation: invalidated.delete });
   const { mutate: deleteProducts, isPending: isDeleteProdcutsPendings } = useDeleteProducts({ mutation: invalidated.deleteMany });
   const { mutate: createProduct, isPending: isCreateProdcutPendings } = useCreateProduct({ mutation: invalidated.create });
-  // const { mutate: createProducts, isPending: isCreateProductsPendings } = useCreateProducts({ mutation: invalidated.createMany });
+  const { mutate: packProducts } = usePackProduct({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: queryKey,
+        })
+        setMoveOpen(false)
+      },
+    },
+  })
+
+  const handlePack = (id: number, boxSize: number, quantity: number) => {
+    packProducts({ id, data: { boxSize, quantity }})
+  }
 
   const handleCreate = (data: ProductInsert) => {
     createProduct({ data });
@@ -128,7 +142,6 @@ export const ProductsPage = () => {
   };
 
   const columns = getProductColumns({
-    packedStock,
     handlePatch,
     handleDelete,
     onEditDialogOpenClick: (data: Product) => {
@@ -140,6 +153,7 @@ export const ProductsPage = () => {
       setMoveData(data)
     }
   });
+
 
   if (isLoading) <div>Loading...</div>;
 
@@ -164,7 +178,7 @@ export const ProductsPage = () => {
         }
       />
       <FormDialog title="Перемістити на склад" open={moveOpen} onOpenChange={setMoveOpen}>
-        <ProductMoveForm product={moveData} products={products}/>
+        <MoveForm product={moveData} products={products} onSubmit={handlePack}/>
       </FormDialog>
       <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
         <ProductAddForm isPending={isCreateProdcutPendings} onSubmit={handleCreate} />

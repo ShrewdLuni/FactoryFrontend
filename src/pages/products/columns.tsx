@@ -6,9 +6,8 @@ import { createColumn, createIdColumn, createSelectColumn } from "@/components/d
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import type { PackedStock, Product, ProductInsert, ProductPatch } from "@/api/generated/models";
+import type { Product, ProductPatch } from "@/api/generated/models";
 import { InputCell } from "@/components/data-table/input-cell";
-import { ToggleCell } from "@/components/data-table/toggle-cell";
 import { SwitchCell } from "@/components/data-table/switch-cell";
 
 interface ProductColumnsProps {
@@ -16,10 +15,9 @@ interface ProductColumnsProps {
   handleDelete: (id: number) => void;
   onEditDialogOpenClick: (data: Product) => void;
   onMoveDialogOpenClick: (data: Product) => void;
-  packedStock: PackedStock[] | undefined;
 }
 
-export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick, onMoveDialogOpenClick, packedStock }: ProductColumnsProps) => {
+export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenClick, onMoveDialogOpenClick }: ProductColumnsProps) => {
   const columns: ColumnDef<Product>[] = [
     createSelectColumn<Product>(),
     createIdColumn<Product>(),
@@ -64,13 +62,14 @@ export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenC
     {
       id: "Packed",
       accessorFn: (row) => {
-        const stock = packedStock?.find((s) => s.product.id === row.id);
-        return stock?.quantity ?? 0;
+        // const stock = packedStock?.find((s) => s.product.id === row.id);
+        // return stock?.quantity ?? 0;
+        return row.quantity;
       },
       header: ({ column }) => { return <SortableHeader column={column} field={"Упакований товар"} />; },
       cell: ({ row }) => {
-        const stock = (packedStock ?? []).find((s) => s.product.id === row.original.id);
-        return <div className="text-center text-nowrap">{stock?.quantity ?? 0}</div>;
+        // const stock = (packedStock ?? []).find((s) => s.product.id === row.original.id);
+        return <div className="text-center text-nowrap">{row.original.quantity ?? 0}</div>;
       },
     },
     {
