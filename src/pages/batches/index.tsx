@@ -1,25 +1,42 @@
 import { getBatchColumns } from "./columns";
 import { DataTable } from "@/components/data-table";
-import type { Row } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
-import { useCreateBatch, useCreateBatches, useGetAllBatches, usePatchBatch, useUpdateBatch } from "@/api/generated/batch/batch";
+import { useState } from "react";
+import { getGetAllBatchesQueryKey, useCreateBatch, useCreateBatches, useDeleteBatch, useGetAllBatchesWithAll, usePatchBatch, usePatchBatches } from "@/api/generated/batch/batch";
 import { useGetAllProducts } from "@/api/generated/product/product";
 import { useGetAllUsers } from "@/api/generated/user/user";
 import { useGetAllWorkstations } from "@/api/generated/workstation/workstation";
 import { useBatchStatusFilters } from "@/hooks/useBatchStatusOptions";
 import { useGetAllDepartments } from "@/api/generated/department/department";
+import { useQueryClient } from "@tanstack/react-query";
+import type { Batch, BatchBulkPatch, BatchPatch } from "@/api/generated/models";
+import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
 
 export const BatchPage = () => {
-  const { data: batches = [] } = useGetAllBatches();
-  const { data: products } = useGetAllProducts();
-  const { data: users } = useGetAllUsers();
-  const { data: workstations } = useGetAllWorkstations();
-  const { mutate: patchBatch } = usePatchBatch();
-  const { mutateAsync: createBatch, isPending: isCreateBatchPending } = useCreateBatch();
-  const { mutateAsync: createBatches, isPending: isCreateBatchesPending } = useCreateBatches();
+
+  const [showArchive, setShowArchive] = useState(false);
+
+  const { data: batches = [] } = useGetAllBatchesWithAll()
+
+  const { data: products = [] } = useGetAllProducts();
+  const { data: users = [] } = useGetAllUsers();
+  const { data: workstations = [] } = useGetAllWorkstations();
+
   const { data: statuses = [], options } = useBatchStatusFilters()
-  const { data: departments } = useGetAllDepartments()
+  const { data: departments = [] } = useGetAllDepartments()
+
+  const queryClient = useQueryClient();
+  const queryKey = getGetAllBatchesQueryKey();
+
+  const optimistic = createOptimisticCrudHandlers<Batch, BatchPatch, Batch, BatchBulkPatch>(queryClient, queryKey, "Batch");
+  const invalidated = createInvalidateCrudHandlers<Batch>(queryClient, queryKey, "Batch");
+
+  const { mutate: patchBatch, isPending: isPatchBatchPending } = usePatchBatch({ mutation: optimistic.patch });  
+  const { mutate: patchBatches, isPending: isPatchBatchesPending } = usePatchBatches({ mutation: optimistic.patchMany });
+  const { mutate: deleteBatch } = useDeleteBatch({ mutation: invalidated.delete });
+  const { mutate: deleteBatches, isPending: isDeletBatchesPending } = useDeleteBatch({ mutation: invalidated.deleteMany });
+  const { mutateAsync: createBatch, isPending: isCreateBatchPending } = useCreateBatch({ mutation: invalidated.create });
+  const { mutateAsync: createBatches, isPending: isCreateBatchesPending } = useCreateBatches({ mutation: invalidated.createMany });
 
   const filters = [{ column: "status", title: "Статус", options: options }];
 
@@ -32,21 +49,18 @@ export const BatchPage = () => {
     createBatches({ data: workstationIds.map((id) => ({ workstation: { id }}))})
   };
 
-  // const columns = getBatchColumns("", products ?? [], users ?? [], workstations ?? [], departments ?? [], statuses, patchBatch);
-  const columns = useMemo(
-    () => getBatchColumns("", products ?? [], users ?? [], workstations ?? [], departments ?? [], statuses, patchBatch),
-    [products, users, workstations, departments, statuses, patchBatch]
-  );
+  const handlePatch = (id: number, data: BatchPatch) => {
+    patchBatch({ id: String(id), data})
+  }
 
-  const [showArchive, setShowArchive] = useState(false);
+  const columns = getBatchColumns(products, users, workstations, departments, statuses, handlePatch)
 
   const resultBatches = !showArchive ? batches.filter((b) => !b.status.isTerminal) : batches.filter((b) => b.status.isTerminal);
 
   return (
     <DataTable
       columns={columns}
-      data={resultBatches ?? []}
-      isAddSection={false}
+      data={resultBatches}
       toolbarExtras={
         <div className="flex justify-between w-full">
           <Button className="h-8" variant="outline" onClick={() => setShowArchive(!showArchive)}>
@@ -64,9 +78,6 @@ export const BatchPage = () => {
       }
       filters={filters}
       searchValues={"name"}
-      initialState={{
-        columnVisibility: { plannedFor: false, updatedAt: false },
-      }}
     />
   );
 };

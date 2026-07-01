@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 
-export interface SelectOption<TValue = string> {
+export interface SelectOption {
   id: number;
   label: string;
-  value: TValue;
+  value: string;
   icon: LucideIcon;
 }

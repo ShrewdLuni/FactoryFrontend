@@ -7,28 +7,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
-import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { MoreHorizontal, SquarePen, Trash } from "lucide-react";
+import { createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { InputCell } from "@/components/data-table/input-cell";
 import { SelectCell } from "@/components/data-table/select-cell";
-import type { UseMutateFunction } from "@tanstack/react-query";
-import type { Batch, BatchInsert, BatchPatch, BatchStatus, Department, Product, User, Workstation } from "@/api/generated/models";
+import type { Batch, BatchPatch, BatchStatus, Department, Product, User, Workstation } from "@/api/generated/models";
+import { SelectCellSearch } from "@/components/data-table/select-cell-search";
 
-type patchBatch = UseMutateFunction<
-  Batch,
-  unknown,
-  {
-    id: string;
-    data?: BatchPatch;
-  },
-  unknown
->;
+type patchFunction = (id: number, data: BatchPatch) => void;
 
-function createNameColumn(patch: patchBatch, isChangable: boolean): ColumnDef<Batch> {
+function createNameColumn(patch: patchFunction, isChangable: boolean): ColumnDef<Batch> {
   return {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} field={"Назва"} />,
@@ -38,7 +29,7 @@ function createNameColumn(patch: patchBatch, isChangable: boolean): ColumnDef<Ba
           defaultValue={row.original.name || undefined}
           onBlur={(e) => {
             e.preventDefault();
-            patch({ id: String(row.original.id), data: { name: String(e.target.value) } });
+            patch(row.original.id, { name: String(e.target.value) });
           }}
         />
       ) : (
@@ -48,80 +39,85 @@ function createNameColumn(patch: patchBatch, isChangable: boolean): ColumnDef<Ba
   };
 }
 
-function createWorkstationColumn(patch: patchBatch, isChangable: boolean, workstations: Workstation[]): ColumnDef<Batch> {
+function createWorkstationColumn(patch: patchFunction, workstations: Workstation[], isChangable: boolean ): ColumnDef<Batch> {
+  const workstationData = workstations.map((workstation) => {
+    return {
+      label: workstation.name,
+      value: String(workstation.id),
+    };
+  });
+
   return {
     accessorKey: "workstation",
+    accessorFn: (row) => (row.workstation.id || 0),
     header: ({ column }) => <SortableHeader column={column} field={"Машина"} />,
     cell: ({ row }) => {
       const selectedWorkstation = workstations?.find((w) => w.id === row.original.workstation.id);
-      const workstationData = workstations.map((workstation) => {
-        return {
-          label: workstation.name,
-          value: String(workstation.id),
-        };
-      });
 
       return isChangable ? (
-        <SelectCell
-          row={row}
-          defaultValue={selectedWorkstation !== undefined ? String(selectedWorkstation.id) : "Select product"}
-          data={workstationData ? workstationData : []}
-          placeholder="Select workstation"
-          onChange={(value) => {
-            patch({ id: String(row.original.id), data: { workstation: { id: Number(value) } } });
-          }}
-        />
+        <div className="flex">
+          <SelectCellSearch 
+            data={workstationData} 
+            defaultValue={selectedWorkstation && String(selectedWorkstation.id)}
+            inputPlaceholder="Виберіть машину"
+            onChange={(e) => {
+              if (e == null) return
+              patch(row.original.id, { workstation: { id: Number(e.value) }});
+            }}/>
+        </div>
       ) : (
-        <div>{`${row.original.workstation.name}`}</div>
-      );
+          <div>{`${row.original.workstation.id}`}</div>
+      )
     },
   };
 }
 
-function createProductColumn(patch: patchBatch, isChangable: boolean, products: Product[]): ColumnDef<Batch> {
+function createProductColumn(patch: patchFunction, products: Product[], isChangable: boolean): ColumnDef<Batch> {
+  const productsData = products
+  ?.filter((product) => product.isActive)
+  .map((product) => {
+    return {
+      label: product.name,
+      value: String(product.id),
+    };
+  });
+
   return {
     accessorKey: "productId",
     header: ({ column }) => <SortableHeader column={column} field={"Продукт"} />,
     cell: ({ row }) => {
       const selectedProduct = products?.find((p) => p.id === row.original.product.id);
-      const productsData = products
-        ?.filter((product) => product.isActive)
-        .map((product) => {
-          return {
-            label: product.name,
-            value: String(product.id),
-          };
-        });
-
       return isChangable ? (
-        <SelectCell
-          row={row}
-          defaultValue={selectedProduct !== undefined ? String(selectedProduct.id) : "Select product"}
-          data={productsData ? productsData : []}
-          placeholder="Select product"
-          onChange={(value) => {
-            patch({ id: String(row.original.id), data: { product: { id: Number(value) } } });
-          }}
-        />
+        <div className="w-full flex min-w-20">
+          <SelectCellSearch 
+            data={productsData} 
+            defaultValue={selectedProduct && String(selectedProduct.id)}
+            inputPlaceholder="Виберіть продукт"
+            onChange={(e) => {
+              if (e == null) return
+              patch(row.original.id, { product: { id: Number(e.value) } });
+            }}/>
+        </div>
       ) : (
-        <div>{`${selectedProduct?.name}`}</div>
-      );
+          <div>{`${row.original.product.id}`}</div>
+      )
     },
   };
 }
 
-function createWorkerColumn(handleCellUpdate: UpdateFunction, users: User[], department: Department): ColumnDef<Batch> {
+function createWorkerColumn(handleCellUpdate: patchFunction, users: User[], department: Department, isChangable: boolean): ColumnDef<Batch> {
+  const usersData = users
+  .filter((u) => u.role?.label === "Admin" || u.departments?.some((d) => d.id === department.id))
+  .map((u) => ({ label: u.fullName ?? "", value: String(u.id) }));
+
   return {
     accessorKey: `${department.label}`,
     header: ({ column }) => <SortableHeader column={column} field={department.label} />,
     cell: ({ row }) => {
       const entry = row.original.workers?.find((w) => w.department.id === department.id);
 
-      const usersData = users
-        .filter((u) => u.role?.label === "Admin" || u.departments?.some((d) => d.id === department.id))
-        .map((u) => ({ label: u.fullName ?? "", value: String(u.id) }));
 
-      return (
+      return isChangable ? (
         // <div className="flex flex-col justify-center gap-2">
         //   <p className="font-semibold">Кобля Альона Станіславівна</p>
         //   <p className="font-semibold">Фактичний розмір: 120</p>
@@ -135,95 +131,123 @@ function createWorkerColumn(handleCellUpdate: UpdateFunction, users: User[], dep
           placeholder="Select worker"
           // onChange={(value) => handleCellUpdate("workers", { departmentId: department.id, workerId: Number(value) }, row)}
         />
+      ) : (
+        <div>{`${entry?.worker.fullName}`}</div>
       );
     },
   };
 }
 
-function createActualSizeColumn(handleCellUpdate: UpdateFunction): ColumnDef<Batch> {
+function createActualSizeColumn(patch: patchFunction, isChangable: boolean = false): ColumnDef<Batch> {
   return {
     accessorKey: "size",
     header: ({ column }) => <SortableHeader column={column} field={"Розмір партії"} />,
-    cell: ({ row }) => (
-      <InputCell
-        defaultValue={String(row.original.size)}
-        onBlur={(e) => {
-          e.preventDefault();
-          // handleCellUpdate("size", Number(e.target.value), row);
-        }}
-      />
-    ),
+    cell: ({ row }) => {
+      return isChangable ? (
+        <InputCell
+          defaultValue={String(row.original.size)}
+          onBlur={(e) => {
+            e.preventDefault();
+            patch(row.original.id, { size: Number(e.target.value)});
+          }}/>
+      ) : (
+          <div className="text-center">
+            {row.original.size}
+          </div>
+        )
+    },
   };
 }
 
-function createStatusColumn(patch: patchBatch, statuses: BatchStatus[]): ColumnDef<Batch> {
+function createStatusColumn(patch: patchFunction, statuses: BatchStatus[], isChangable: boolean): ColumnDef<Batch> {
+  const statusData = statuses.map((s) => ({ label: s.label, value: String(s.id) }));
+
   return {
     id: "status",
-    accessorFn: (row) => row.status?.label ?? "",
+    accessorFn: (row) => row.status.label || row.name || row.id,
     header: ({ column }) => <SortableHeader column={column} field="Статус" />,
     cell: ({ row }) => {
-      const statusData = statuses.map((s) => ({
-        label: s.label,
-        value: String(s.id),
-      }));
-
-      return (
-        <SelectCell
-          row={row}
-          defaultValue={String(row.original.status?.id ?? "")}
-          data={statusData}
-          placeholder="Select status"
-          onChange={(value) => {
-            patch({ id: String(row.original.id), data: { status: { id: Number(value) } } });
-          }}
-        />
-      );
+      return (<div>{row.original.status.label}</div>)
+      // return false? (
+      //   <SelectCell
+      //     row={row}
+      //     defaultValue={String(row.original.status?.id ?? "")}
+      //     data={statusData}
+      //     placeholder="Виберіть статус"
+      //     onChange={(value) => {
+      //       patch(row.original.id, { status: { id: Number(value) }});
+      //     }}
+      //   />
+      // ) : (
+      //     <div>
+      //       {row.original.status.label ?? statuses.find(s => s.id === row.original.status.id)?.label ?? row.original.status.id}
+      //     </div>
+      //   )
     },
   };
 }
 
 export const getBatchColumns = (
-  onChange: UpdateFunction,
   products: Product[],
   users: User[],
   workstations: Workstation[],
   departments: Department[],
   statuses: BatchStatus[],
-  patch: patchBatch,
+  handlePatch: patchFunction,
 ): ColumnDef<Batch>[] => {
+
+  const isChangable: boolean = false;
+
   const columns: ColumnDef<Batch>[] = [
     createSelectColumn<Batch>(),
-    createIdColumn<Batch>(),
-    createStatusColumn(patch, statuses),
-    createActualSizeColumn(onChange),
-    createNameColumn(patch, true),
-    createWorkstationColumn(patch, true, workstations),
-    createProductColumn(patch, true, products),
-    ...departments.map((dept) => createWorkerColumn(onChange, users, dept)),
+    {
+      accessorKey: "id",
+      accessorFn: (data) => data.id,
+      header: ({ column }) => { return <SortableHeader column={column} field={"ID"} />; },
+      cell: ({ row }) => { return <div className="text-center">{`${row.original.id || 0}`.padStart(5, "0")}</div>; },
+    },
+    createStatusColumn(handlePatch, statuses, isChangable),
+    createActualSizeColumn(handlePatch, true),
+    createNameColumn(handlePatch, true),
+    createWorkstationColumn(handlePatch, workstations, true),
+    createProductColumn(handlePatch, products, true),
+    // ...departments.map((dept) => createWorkerColumn(console.log, users, dept, false)),
     {
       id: "actions",
-      cell: ({ row }) => (
-        <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-end">
+            <DropdownMenu>
+              <Button
+                variant="ghost"
+                className="text-destructive hover:text-destructive h-8 w-8 p-0"
+                onClick={() => handleDelete(row.original.id)}
+              >
+                <span className="sr-only">Видалити</span>
+                <Trash />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem disabled>Link to QR</DropdownMenuItem>
-              <DropdownMenuItem disabled>See QR</DropdownMenuItem>
-              <DropdownMenuItem disabled>Print</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem disabled>Edit</DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={() => console.log("deleteBatch(row.original.id)")}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Дії</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => openEditDialog(row.original)}>
+                  <SquarePen />
+                  <p className="">Редагувати</p>
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>
+                  <Trash className="text-red-500" />
+                  <p className="text-red-500">Видалити</p>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      },
     },
   ];
 
