@@ -18,6 +18,7 @@ import type { Batch, BatchPatch, BatchStatus, Department, Product, User, Worksta
 import { SelectCellSearch } from "@/components/data-table/select-cell-search";
 
 type patchFunction = (id: number, data: BatchPatch) => void;
+type deleteFunction = (id: number) => void;
 
 function createNameColumn(patch: patchFunction, isChangable: boolean): ColumnDef<Batch> {
   return {
@@ -145,7 +146,7 @@ function createActualSizeColumn(patch: patchFunction, isChangable: boolean = fal
     cell: ({ row }) => {
       return isChangable ? (
         <InputCell
-          defaultValue={String(row.original.size)}
+          defaultValue={(row.original.size != null) ? String(row.original.size) : "Не встановлено"}
           onBlur={(e) => {
             e.preventDefault();
             patch(row.original.id, { size: Number(e.target.value)});
@@ -164,7 +165,7 @@ function createStatusColumn(patch: patchFunction, statuses: BatchStatus[], isCha
 
   return {
     id: "status",
-    accessorFn: (row) => row.status.label || row.name || row.id,
+    accessorFn: (row) => String(row.status.id),
     header: ({ column }) => <SortableHeader column={column} field="Статус" />,
     cell: ({ row }) => {
       return (<div>{row.original.status.label}</div>)
@@ -184,6 +185,39 @@ function createStatusColumn(patch: patchFunction, statuses: BatchStatus[], isCha
       //     </div>
       //   )
     },
+    filterFn: (row, columnId, selectedValues: string[]) => selectedValues.includes(row.getValue(columnId))
+  };
+}
+
+function createMilestoneColumn(department: Department): ColumnDef<Batch> {
+  return {
+    id: `milestone-${department.id}`,
+    accessorFn: (row) => {
+      const transition = row.transitions.find(
+        (t) => t.toStatus.isMilestone && t.toStatus.department?.id === department.id
+      );
+      return transition?.occuredAt ?? "";
+    },
+    header: ({ column }) => <SortableHeader column={column} field={department.label} />,
+    cell: ({ row }) => {
+      const transition = row.original.transitions.find(
+        (t) => t.toStatus.isMilestone && t.toStatus.department?.id === department.id
+      );
+
+      if (!transition) {
+        return <div className="text-center text-muted-foreground">—</div>;
+      }
+
+      return (
+        <div className="flex flex-col items-center text-sm">
+          <span className="font-medium">{transition.actor.fullName}</span>
+          <span className="font-medium">Кількість: {transition.batch.size}</span>
+          <span className="text-muted-foreground">
+            {new Date(transition.occuredAt).toLocaleDateString("uk-UA")}
+          </span>
+        </div>
+      );
+    },
   };
 }
 
@@ -194,6 +228,7 @@ export const getBatchColumns = (
   departments: Department[],
   statuses: BatchStatus[],
   handlePatch: patchFunction,
+  handleDelete: deleteFunction,
 ): ColumnDef<Batch>[] => {
 
   const isChangable: boolean = false;
@@ -211,6 +246,7 @@ export const getBatchColumns = (
     createNameColumn(handlePatch, true),
     createWorkstationColumn(handlePatch, workstations, true),
     createProductColumn(handlePatch, products, true),
+    ...departments.map((dept) => createMilestoneColumn(dept)),
     // ...departments.map((dept) => createWorkerColumn(console.log, users, dept, false)),
     {
       id: "actions",
