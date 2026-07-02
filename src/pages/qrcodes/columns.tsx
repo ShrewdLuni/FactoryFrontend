@@ -29,7 +29,16 @@ interface QRCodeColumnsProps {
 
 export const getColumns = ({ openLinkDialog, openSeeDialog, openEditDialog, handlePatch, handleDelete }: QRCodeColumnsProps): ColumnDef<QRCode>[] => [
   createSelectColumn<QRCode>(),
-  createIdColumn<QRCode>(),
+  {
+    accessorKey: "id",
+    accessorFn: (row) => (row.id),
+    header: ({ column }) => {
+      return <SortableHeader column={column} field={"ID"} />;
+    },
+    cell: ({ row }) => {
+      return <div className="text-center">{`${row.original.id || 0}`.padStart(5, "0")}</div>;
+    },
+  },
   {
     accessorKey: "name",
     header: ({ column }) => <SortableHeader column={column} field={"Назва"} />,
@@ -96,7 +105,7 @@ export const getColumns = ({ openLinkDialog, openSeeDialog, openEditDialog, hand
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Дії</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => openLinkDialog(row.original)}>
+              <DropdownMenuItem disabled={row.original.isTaken} onClick={() => openLinkDialog(row.original)}>
                 <Link />
                 Прив’язати QR-код
               </DropdownMenuItem>
