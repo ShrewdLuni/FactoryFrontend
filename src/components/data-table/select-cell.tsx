@@ -1,20 +1,18 @@
-import type { LucideIcon } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
-import type { ReactNode } from "react";
 import { renderIcon } from "@/lib/renderIcon";
+import type { SelectOption } from "@/hooks/types";
 
 interface SelectCellProps {
-  row: any;
-  data: { label: string; value: string; icon?: LucideIcon | ReactNode }[];
+  data: SelectOption[];
   placeholder: string;
-  onChange?: (value: string, row: any) => void;
   defaultValue: string;
+  onChange: (e: any) => void;
 }
 
-export const SelectCell = ({ row, data, placeholder, onChange, defaultValue }: SelectCellProps) => {
+export const SelectCell = ({ data, placeholder, defaultValue, onChange }: SelectCellProps) => {
   return (
     <div className="w-full flex justify-center">
-      <Select defaultValue={defaultValue} onValueChange={(value) => {onChange?.(value, row);}}>
+      <Select defaultValue={defaultValue} onValueChange={onChange}>
         <SelectTrigger className="w-full min-w-full **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate" size="sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

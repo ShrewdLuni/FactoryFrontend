@@ -7,7 +7,6 @@ import { TablePagination } from "./pagination"
 import { TableToolbar } from "./toolbar"
 import { TableContent } from "./content"
 import { AddRecordDialog } from "./add-record-dialog"
-import { type JSX } from "react"
 import type { LucideIcon } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {

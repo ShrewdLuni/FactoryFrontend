@@ -1,13 +1,13 @@
-import { useWorkstations } from "@/hooks/useWorkstations";
 import { useParams } from "react-router-dom"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useEffect } from "react";
+import { useGetWorkstation } from "@/api/generated/workstation/workstation";
+import { toast } from "sonner";
 
 export const WorkstationPreviewPage = () => {
 
   const { id } = useParams();
-
-  const { data: workstation, isLoading  } = useWorkstations.get(parseInt(id ?? "0", 10))
+  const { data: workstation, isLoading  } = useGetWorkstation(id ?? "0")
 
   useEffect(() => {
     if (workstation) {
@@ -18,9 +18,9 @@ export const WorkstationPreviewPage = () => {
   }, [workstation]);
 
   if (id === undefined || isNaN(parseInt(id))) {
-    return <div>Something went wrong</div>
+    toast.error("Щось пішло не так", { position: "top-right" });
+    return <div>Щось пішло не так</div>
   }
-
 
   return (
    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -28,18 +28,18 @@ export const WorkstationPreviewPage = () => {
         <div className="flex flex-col gap-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">{`Сканирование рабочего места`}</CardTitle>
+              <CardTitle className="text-xl">{`Сканування робочого місця`}</CardTitle>
             </CardHeader>
             <CardContent>
-                {isLoading && <p>Loading workstation...</p>}
+                {isLoading && <p>Дані машини завантажуються</p>}
                 {workstation && (
                   <div className="flex flex-col gap-2">
-                    <p className="text-lg"><strong>Вы успешно отсканировали свое рабочее место:</strong></p>
+                    <p className="text-lg"><strong>Ви успішно відсканували своє робоче місце:</strong></p>
                     <div className="border p-4 rounded-md shadow-sm space-y-2">
                       <p><strong>ID:</strong> {workstation.id}</p>
-                      <p><strong>Название:</strong> {workstation.name}</p>
+                      <p><strong>Назва:</strong> {workstation.name}</p>
                     </div>
-                    <p className="mt-4 text-lg"><strong>Пожалуйста отсканируйте пyстой QR-Код что бы продолжить</strong></p>
+                    <p className="mt-4 text-lg"><strong>Будь ласка, відскануйте порожній QR-код, щоб продовжити.</strong></p>
                   </div>
                 )}
             </CardContent>
