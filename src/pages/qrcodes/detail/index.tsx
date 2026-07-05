@@ -3,106 +3,130 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useBatches } from "@/hooks/useBatch";
 import { useAuth } from "@/AuthProvider";
 import { BASE_URL } from "@/config";
-import { useQR } from "@/hooks/useQR";
-import type { Batch } from "@/types/batches";
+import { useGetAllBatches } from "@/api/generated/batch/batch";
+import { useGetQRCode, usePatchQRCode } from "@/api/generated/qrcode/qrcode";
+import type { Batch } from "@/api/generated/models";
 
-const ProductSelectItem = ({ batch }: { batch: Batch }) => {
-  return <SelectItem value={String(batch.id)}>{batch.product.name}</SelectItem>;
-};
+const INACTIVE_STATUS_ID = 1;
+
+const ProductSelectItem = ({ batch }: { batch: Batch }) => (
+<SelectItem value={String(batch.id)}>
+  <div className="flex items-center gap-2 justify-between">
+    <img
+      src="https://static.vecteezy.com/system/resources/previews/004/240/295/non_2x/warm-socks-linear-icon-sox-wardrobe-element-contour-symbol-socks-pair-thin-line-illustration-isolated-outline-drawing-vector.jpg"
+      alt=""
+      className="h-20 rounded-sm object-cover shrink-0"
+    />
+    <span className="whitespace-normal ">
+      {`${batch.product.name}`}
+    </span>
+  </div>
+</SelectItem>
+);
 
 export const QRCodePreviewPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeBatchId, setActiveBatch] = useState<string | undefined>(undefined);
+  const [activeBatchId, setActiveBatchId] = useState<string | undefined>(undefined);
 
-  const { data: batches, isLoading: isBatchLoading } = useBatches.getAll();
-  const { data: qrcode, isLoading } = useQR.get(parseInt(id || "0"));
-  const { mutate: advance } = useBatches.advance();
-  const { mutate: activateQRCode } = useQR.activate();
+  const { data: batches = [], isLoading: isBatchLoading } = useGetAllBatches();
+  const { data: qrcode, isLoading: isQrCodeLoading } = useGetQRCode(id || "0");
+  const { mutateAsync: patchQRCode } = usePatchQRCode();
 
-  if (isLoading || isBatchLoading) {
-    return <div>Loading</div>;
+  const workstationId = Number(localStorage.getItem("workstationId"));
+  const hasWorkstation = Boolean(workstationId);
+
+  const seenProducts = new Set<number>();
+
+  const availableBatches = batches.filter((batch) => {
+    const productId = batch.product.id;
+
+    if (
+      batch.status.id !== INACTIVE_STATUS_ID ||
+        batch.workstation.id !== workstationId ||
+        !batch.product.name ||
+        productId == null
+    ) {
+      return false;
+    }
+
+    if (seenProducts.has(productId)) {
+      return false;
+    }
+
+    seenProducts.add(productId);
+    return true;
+  });
+
+  if (!id || isNaN(parseInt(id)) || !user || qrcode?.isTaken) {
+    return <div>Щось пішло не так</div>;
   }
 
-  if (id === undefined || isNaN(parseInt(id)) || !user) {
-    return <div>Something went wrong</div>;
+  if (isQrCodeLoading || isBatchLoading) {
+    return <div>Завантаження...</div>;
   }
 
-
-  const normalizedBatches = batches ?? []
-
-  const savedWorkstationId = Number(localStorage.getItem("workstationId")) ;
-
-  const filteredBatches = normalizedBatches.filter((batch) => batch.status.label === "Inactive" && batch.workstation.id === savedWorkstationId);
-
-  const handleClick = async (e: any) => {
-    e.preventDefault();
+  const handleConfirm = async () => {
     if (!activeBatchId) return;
-    advance(
-      { id: Number(activeBatchId), defects: [] },
-      {
-        onSuccess: () => {
-          activateQRCode({ id: Number(id), resource: `${BASE_URL}/batch/${activeBatchId}` });
-          localStorage.removeItem("workstationId");
-          navigate(`/batch/${activeBatchId}`);
-        },
-      },
-    );
+
+    await patchQRCode({ id, data: { resource: `${BASE_URL}/batch/${activeBatchId}` } });
+    localStorage.removeItem("workstationId");
+    navigate(`/batch/${activeBatchId}`);
   };
+
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">{`Привязывание QR-Кода к партии`}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {!savedWorkstationId ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Прив'язка QR-коду до партії</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!hasWorkstation ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-lg">
+                  <strong>Робочу станцію не знайдено</strong>
+                </p>
+                <p className="mt-4 text-lg">
+                  <strong>Будь ласка, відскануйте своє робоче місце, щоб продовжити</strong>
+                </p>
+              </div>
+            ) : (
+              qrcode && (
                 <div className="flex flex-col gap-2">
                   <p className="text-lg">
-                    <strong>Рабочая станция не найдена</strong>
+                    <strong>QR-код:</strong>
                   </p>
-                  <p className="mt-4 text-lg">
-                    <strong>Пожалуйста отсканируете свое рабочее место что бы продолжить</strong>
-                  </p>
-                </div>
-              ) : (
-                qrcode && (
-                  <div className="flex flex-col gap-2">
-                    <p className="text-lg">
-                      <strong>QR-Код:</strong>
+                  <div className="border p-4 rounded-md shadow-sm space-y-2">
+                    <p>
+                      <strong>ID:</strong> {qrcode.id}
                     </p>
-                    <div className="border p-4 rounded-md shadow-sm space-y-2">
-                      <p>
-                        <strong>ID:</strong> {qrcode.id}
-                      </p>
-                      <p>
-                        <strong>Название:</strong> {qrcode.name}
-                      </p>
-                    </div>
-                    <p className="mt-4 text-md">
-                      <strong>Пожалуйста выберите партию что бы продолжить</strong>
+                    <p>
+                      <strong>Назва:</strong> {qrcode.name}
                     </p>
-                    <Select value={activeBatchId} onValueChange={setActiveBatch}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите партию" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredBatches && filteredBatches.map((batch) => <ProductSelectItem key={batch.id} batch={batch} />)}
-                      </SelectContent>
-                    </Select>
-                    <Button onClick={handleClick}>Подтвердить</Button>
                   </div>
-                )
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                  <p className="mt-4 text-md">
+                    <strong>Будь ласка, оберіть партію, щоб продовжити</strong>
+                  </p>
+                  <Select value={activeBatchId} onValueChange={setActiveBatchId}>
+                    <SelectTrigger className="w-full h-full min-h-26" size="default">
+                      <SelectValue placeholder="Оберіть партію" />
+                    </SelectTrigger>
+                    <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                      {availableBatches.map((batch) => (
+                        <ProductSelectItem key={batch.id} batch={batch} />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleConfirm}>Підтвердити</Button>
+                </div>
+              )
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

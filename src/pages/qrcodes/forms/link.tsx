@@ -62,19 +62,19 @@ export const QRCodeLinkForm = ({ qrcode, qrcodes, onSubmit, isPending }: QRCodeL
     (batch) => !takenResources.has(`${BASE_URL}/batch/${batch.id}`)
   );
   const normalizedDevices = devices.filter(
-    (device) => !takenResources.has(`${BASE_URL}/device/${device.id}`)
+    (device) => !takenResources.has(`${BASE_URL}/devices/${device.id}`)
   );
   const normalizedWorkstations = workstations.filter(
-    (workstation) => !takenResources.has(`${BASE_URL}/workstation/${workstation.id}`)
+    (workstation) => !takenResources.has(`${BASE_URL}/workstations/${workstation.id}`)
   );
 
   const resourceUrl =
     resource === RESOURCE_TYPES.BATCH && selectedBatch
       ? `${BASE_URL}/batch/${selectedBatch.id}`
       : resource === RESOURCE_TYPES.DEVICE && selectedDevice
-      ? `${BASE_URL}/device/${selectedDevice.id}`
+      ? `${BASE_URL}/devices/${selectedDevice.id}`
       : resource === RESOURCE_TYPES.WORKSTATION && selectedWorkstation
-      ? `${BASE_URL}/workstation/${selectedWorkstation.id}`
+      ? `${BASE_URL}/workstations/${selectedWorkstation.id}`
       : undefined;
 
   const handleResourceChange = (value: string) => {

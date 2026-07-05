@@ -31,7 +31,6 @@ import { QRCodeLinkForm } from "./forms/link";
 
 export const QrCodeGenerationPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [activateOpen, setActivateOpen] = useState(false);
 
   const [seeOpen, setSeeOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -71,6 +70,11 @@ export const QrCodeGenerationPage = () => {
   const openEditDialog = (qr: QRCode) => {
     setEditedRecord(qr);
     setEditOpen(true);
+  }
+
+  const handleLink = (id: number, resource: string) => {
+    patchQRCode({ id: String(id), data: { resource: resource }})
+    setLinkOpen(false)
   }
 
   const handlePatch = (id: number, data: QRCodePatch) => {
@@ -186,7 +190,7 @@ export const QrCodeGenerationPage = () => {
         <QRCodeLinkForm
           qrcode={activeQRCode!}
           qrcodes={qrcodes}
-          onSubmit={console.log}
+          onSubmit={handleLink}
         />
       </FormDialog>
       <QRCodeSeeDialog open={seeOpen} onOpenChange={setSeeOpen} qrCode={activeQRCode} />
