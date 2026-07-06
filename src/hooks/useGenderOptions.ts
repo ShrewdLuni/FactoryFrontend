@@ -8,7 +8,7 @@ const GENDER_ICONS = {
   Other: CircleSmall,
 } satisfies Record<UserGender, LucideIcon>;
 
-const GENDER_OPTIONS: SelectOption<UserGender>[] = (
+const GENDER_OPTIONS: SelectOption[] = (
   Object.keys(GENDER_ICONS) as UserGender[]
 ).map((g) => ({
   id: 0,

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/AuthProvider";
 import { BASE_URL } from "@/config";
-import { useGetAllBatches } from "@/api/generated/batch/batch";
+import { useAdvanceBatch, useGetAllBatches } from "@/api/generated/batch/batch";
 import { useGetQRCode, usePatchQRCode } from "@/api/generated/qrcode/qrcode";
 import type { Batch } from "@/api/generated/models";
 
@@ -35,6 +35,7 @@ export const QRCodePreviewPage = () => {
   const { data: batches = [], isLoading: isBatchLoading } = useGetAllBatches();
   const { data: qrcode, isLoading: isQrCodeLoading } = useGetQRCode(id || "0");
   const { mutateAsync: patchQRCode } = usePatchQRCode();
+  const { mutateAsync: advanceBatch } = useAdvanceBatch()
 
   const workstationId = Number(localStorage.getItem("workstationId"));
   const hasWorkstation = Boolean(workstationId);
@@ -72,6 +73,7 @@ export const QRCodePreviewPage = () => {
   const handleConfirm = async () => {
     if (!activeBatchId) return;
 
+    await advanceBatch({ id: Number(activeBatchId), data: { actorId: user.id }})
     await patchQRCode({ id, data: { resource: `${BASE_URL}/batch/${activeBatchId}` } });
     localStorage.removeItem("workstationId");
     navigate(`/batch/${activeBatchId}`);

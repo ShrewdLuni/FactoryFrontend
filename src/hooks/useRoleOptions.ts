@@ -20,7 +20,7 @@ export function useRoleOptions() {
         .map((r) => ({
           id: r.id,
           label: r.label,
-          value: r.label,
+          value: String(r.id),
           icon: ROLE_ICONS[r.id] ?? DEFAULT_ROLE_ICON,
         })),
     [data],

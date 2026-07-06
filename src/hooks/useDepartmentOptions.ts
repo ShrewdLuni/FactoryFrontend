@@ -21,7 +21,7 @@ export function useDepartmentOptions() {
       (data ?? []).map((d) => ({
         id: d.id,
         label: d.label,
-        value: d.label,
+        value: String(d.id),
         icon: DEPARTMENT_ICONS[d.id] ?? DEFAULT_DEPARTMENT_ICON,
       })),
     [data],

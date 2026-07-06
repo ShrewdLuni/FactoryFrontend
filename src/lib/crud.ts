@@ -23,18 +23,23 @@ export function createOptimisticCrudHandlers<
     updateFn: (old: T[], vars: V) => T[],
     successMsg: string,
     errorFallback: string,
+    options?: { resync?: boolean },
   ) => ({
-    onMutate: async (vars: V) => {
-      const previous = queryClient.getQueryData<T[]>(queryKey);
-      queryClient.setQueryData<T[]>(queryKey, (old = []) => updateFn(old, vars));
-      return { previous };
-    },
-    onError: (error: any, _vars: V, context?: { previous?: T[] }) => {
-      queryClient.setQueryData(queryKey, context?.previous);
-      toast.error(getErrorMessage(error, errorFallback));
-    },
-    onSuccess: () => toast.success(successMsg),
-  });
+      onMutate: async (vars: V) => {
+        await queryClient.cancelQueries({ queryKey });
+        const previous = queryClient.getQueryData<T[]>(queryKey);
+        queryClient.setQueryData<T[]>(queryKey, (old = []) => updateFn(old, vars));
+        return { previous };
+      },
+      onError: (error: any, _vars: V, context?: { previous?: T[] }) => {
+        queryClient.setQueryData(queryKey, context?.previous);
+        toast.error(getErrorMessage(error, errorFallback));
+      },
+      onSuccess: () => toast.success(successMsg),
+      ...(options?.resync && {
+        onSettled: () => queryClient.invalidateQueries({ queryKey }),
+      }),
+    });
 
   return {
     patch: withOptimistic<{ id: string; data?: TPatch }>(
