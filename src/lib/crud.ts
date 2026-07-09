@@ -78,7 +78,7 @@ export function createOptimisticCrudHandlers<
   };
 }
 
-export function createInvalidateCrudHandlers<T extends WithId>(
+export function createInvalidateCrudHandlers(
   queryClient: QueryClient,
   queryKey: QueryKey,
   entityName: string,

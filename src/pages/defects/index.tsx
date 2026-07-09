@@ -1,9 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { DataTable } from "@/components/data-table";
 import { getColumns, type FlatDefectRow } from "./columns";
 import { useGetProductDefects } from "@/api/generated/product/product";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 
 export const DefectPage = () => {
   const { data: defects = [], isLoading } = useGetProductDefects();
@@ -31,7 +29,7 @@ export const DefectPage = () => {
 
   const filters = useMemo(() => [defectTypeFilter], [defectTypeFilter]);
 
-  const columns = getColumns({ something: "" });
+  const columns = getColumns();
 
   if (isLoading) return <div>Loading...</div>;
 

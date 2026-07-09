@@ -7,8 +7,7 @@ import { MoveForm } from "./forms/add"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { CirclePlus } from "lucide-react"
-import type { PackProduct } from "@/api/generated/models"
-import { QueryClient, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const StoragePage = () => {
   const [moveOpen, setMoveOpen] = useState<boolean>(false)
@@ -33,7 +32,7 @@ export const StoragePage = () => {
     packProducts({ id, data: { boxSize, quantity }})
   }
 
-  const columns = getStorageColumns({ something: "" })
+  const columns = getStorageColumns()
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -53,7 +52,7 @@ export const StoragePage = () => {
         }
       />
       <FormDialog title="Перемістити на склад" open={moveOpen} onOpenChange={setMoveOpen}>
-        <MoveForm products={products} onSubmit={handlePack}/>
+        <MoveForm  products={products} onSubmit={handlePack}/>
       </FormDialog>
     </div>
   )

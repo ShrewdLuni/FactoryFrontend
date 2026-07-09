@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, PackageCheck, SquarePen, Trash, Truck } from "lucide-react";
+import { MoreHorizontal, SquarePen, Trash, Truck } from "lucide-react";
 import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenC
     {
       accessorKey: "image",
       header: ({ column }) => <SortableHeader column={column} field={"Зображення"} />,
-      cell: ({ row }) => {
+      cell: () => {
         return (
           <div className="flex justify-center h-16 hover:h-28 transition-all duration-300 delay-0 hover:delay-200 rounded-sm">          
             <img 

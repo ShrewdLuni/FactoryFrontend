@@ -3,8 +3,8 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { CopyPlus, Edit, MoreHorizontal, SquarePen, Trash } from "lucide-react";
-import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { MoreHorizontal, SquarePen, Trash } from "lucide-react";
+import { createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import type { Workstation, WorkstationPatch } from "@/api/generated/models";
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import { InputCell } from "@/components/data-table/input-cell";

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Table } from "@tanstack/react-table";
-import type { JSX, ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronDown, CirclePlus } from "lucide-react";
 
@@ -27,7 +27,7 @@ interface TableToolbarProps<TData> {
   searchBarValue?: string | null;
   filters?: TableFilterConfig[];
   onAddRecord: () => void;
-  toolbarExtras?: JSX.Element;
+  toolbarExtras?: ReactNode;
   isAddSection?: boolean;
 }
 

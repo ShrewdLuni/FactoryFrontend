@@ -1,13 +1,9 @@
 import {
   Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxItem,
   ComboboxList,
-  ComboboxValue,
   useComboboxAnchor,
   ComboboxInput
 } from "@/components/ui/combobox"

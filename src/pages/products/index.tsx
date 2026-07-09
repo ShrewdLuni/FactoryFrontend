@@ -4,19 +4,16 @@ import { CircleCheck, CirclePlus, CircleX } from "lucide-react";
 import {
   getGetAllProductsQueryKey,
   useCreateProduct,
-  useCreateProducts,
   useDeleteProduct,
   useDeleteProducts,
   useGetAllProducts,
   usePackProduct,
   usePatchProduct,
   usePatchProducts,
-  useUpdateProduct,
 } from "@/api/generated/product/product";
-import { useGetAllPackedStock } from "@/api/generated/packed-stock/packed-stock";
-import type { PackProduct, Product, ProductBulkPatch, ProductInsert, ProductPatch } from "@/api/generated/models";
+import type { Product, ProductBulkPatch, ProductInsert, ProductPatch } from "@/api/generated/models";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
 import { ConfirmEditManyDialog } from "@/components/dialogs/confirm-edit-many-dialog";
 import { FormDialog } from "@/components/dialogs/form-dialog";
@@ -63,14 +60,14 @@ export const ProductsPage = () => {
   const queryKey = getGetAllProductsQueryKey();
 
   const optimistic = createOptimisticCrudHandlers<Product, ProductPatch, Product, ProductBulkPatch>(queryClient, queryKey, "Product");
-  const invalidated = createInvalidateCrudHandlers<Product>(queryClient, queryKey, "Product");
+  const invalidated = createInvalidateCrudHandlers(queryClient, queryKey, "Product");
 
   const { data: products = [], isLoading } = useGetAllProducts();
 
   const { mutate: patchProduct, isPending: isPatchProductPending } = usePatchProduct({ mutation: optimistic.patch });
   const { mutate: patchProducts, isPending: isPatchProductsPending } = usePatchProducts({ mutation: optimistic.patchMany });
 
-  const { mutate: deleteProduct, isPending: isDeleteProdcutPending } = useDeleteProduct({ mutation: invalidated.delete });
+  const { mutate: deleteProduct } = useDeleteProduct({ mutation: invalidated.delete });
   const { mutate: deleteProducts, isPending: isDeleteProdcutsPendings } = useDeleteProducts({ mutation: invalidated.deleteMany });
   const { mutate: createProduct, isPending: isCreateProdcutPendings } = useCreateProduct({ mutation: invalidated.create });
   const { mutate: packProducts } = usePackProduct({
@@ -178,19 +175,19 @@ export const ProductsPage = () => {
         }
       />
       <FormDialog title="Перемістити на склад" open={moveOpen} onOpenChange={setMoveOpen}>
-        <MoveForm product={moveData} products={products} onSubmit={handlePack}/>
+        <MoveForm product={moveData || undefined} products={products} onSubmit={handlePack}/>
       </FormDialog>
       <FormDialog title={"Додати запис"} open={addOpen} onOpenChange={setAddOpen}>
         <ProductAddForm isPending={isCreateProdcutPendings} onSubmit={handleCreate} />
       </FormDialog>
       <FormDialog open={editOpen} onOpenChange={setEditOpen}>
-        <ProductEditForm
+        {editedRecord && <ProductEditForm
           previous={editedRecord}
           isPending={isPatchProductPending}
           onSubmit={(data) => {
             if (editedRecord != null) handlePatch(editedRecord.id, data);
           }}
-        />
+        />}
       </FormDialog>
       <ConfirmEditManyDialog
         isPending={isPatchProductsPending}

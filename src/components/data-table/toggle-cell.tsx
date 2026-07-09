@@ -1,4 +1,4 @@
-import { Bookmark, Square } from "lucide-react"
+import { Square } from "lucide-react"
 import { Toggle } from "../ui/toggle"
 import { cn } from "@/lib/utils"
 

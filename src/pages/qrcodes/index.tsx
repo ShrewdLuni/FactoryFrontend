@@ -1,10 +1,6 @@
 import { DataTable } from "@/components/data-table";
-import { useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { getColumns } from "./columns";
-import { Dialog, DialogHeader, DialogTitle, DialogContent } from "@/components/ui/dialog";
-import { ActivateQRCodeForm } from "@/components/forms/activateQRCode";
-import { QRCodeCanvas } from "qrcode.react";
-import { BASE_URL } from "@/config";
 import { Button } from "@/components/ui/button";
 import { CirclePlus, Printer } from "lucide-react";
 import { ConfirmDeleteManyDialog } from "@/components/dialogs/confirm-delete-many-dialog";
@@ -13,7 +9,6 @@ import {
   getGetAllQRCodesQueryKey,
   useGetAllQRCodes,
   usePatchQRCode,
-  useCreateQRCode,
   useCreateQRCodes,
   useDeleteQRCode,
   useDeleteQRCodes,
@@ -47,15 +42,14 @@ export const QrCodeGenerationPage = () => {
   const queryKey = getGetAllQRCodesQueryKey();
 
   const optimistic = createOptimisticCrudHandlers<QRCode, QRCodePatch, QRCode, QRCodeBulkPatch>(queryClient, queryKey, "QRCode");
-  const invalidated = createInvalidateCrudHandlers<QRCode>(queryClient, queryKey, "QRCode");
+  const invalidated = createInvalidateCrudHandlers(queryClient, queryKey, "QRCode");
 
   const { data: qrcodes = [], isLoading } = useGetAllQRCodes();
   const { mutate: patchQRCode, isPending: isPatchQRCodePending } = usePatchQRCode({ mutation: optimistic.patch });  
   const { mutate: patchQRCodes, isPending: isPatchQRCodesPending } = usePatchQRCodes({ mutation: optimistic.patchMany });
   const { mutate: deleteQRCode } = useDeleteQRCode({ mutation: invalidated.delete });
   const { mutate: deleteQRCodes, isPending: isDeleteQRCodesPending } = useDeleteQRCodes({ mutation: invalidated.deleteMany });
-  const { mutate: createQRCode, isPending: isCreateQRCodePending } = useCreateQRCode({ mutation: invalidated.create });
-  const { mutate: createQRCodes, isPending: isCreateQRCodesPending } = useCreateQRCodes({ mutation: invalidated.createMany });
+  const { mutate: createQRCodes  } = useCreateQRCodes({ mutation: invalidated.createMany });
 
   const openLinkDialog = (qr: QRCode) => {
     setActiveQRCode(qr);
@@ -175,13 +169,13 @@ export const QrCodeGenerationPage = () => {
       <DataTable columns={columns} searchValues={"id"} data={qrcodes} toolbarExtras={toolbarExtras} onRowSelectionChange={setSelectedIds} />
       <ConfirmEditManyDialog isPending={isPatchQRCodesPending} open={isEditRequested} onOpenChange={setIsEditRequested} selectedIds={selectedIds} handlePatchMany={handlePatchMany}/>
       <FormDialog title={"Редагування запису"} open={editOpen} onOpenChange={setEditOpen}>
-        <QRCodeEditForm
+        {editedRecord && <QRCodeEditForm
           previous={editedRecord}
           isPending={isPatchQRCodePending}
           onSubmit={(data) => {
             if (editedRecord != null) handlePatch(editedRecord.id, data);
           }}
-        />
+        />}
       </FormDialog>
       <FormDialog title={"Додати QR-коди"} open={addOpen} onOpenChange={setAddOpen}>
         <QRCodeAddForm onSubmit={handleCreateMany} />

@@ -46,7 +46,7 @@ export const DevicesPage = () => {
   const queryKey = getGetAllDevicesQueryKey();
 
   const optimistic = createOptimisticCrudHandlers<Device, DevicePatch, Device, DeviceBulkPatch>(queryClient, queryKey, "Device");
-  const invalidated = createInvalidateCrudHandlers<Device>(queryClient, queryKey, "Device");
+  const invalidated = createInvalidateCrudHandlers(queryClient, queryKey, "Device");
 
   const { data: devices = [], isLoading } = useGetAllDevices();
 

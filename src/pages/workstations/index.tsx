@@ -35,7 +35,7 @@ export const WorkstationsPage = () => {
   const queryKey = getGetAllWorkstationsQueryKey();
 
   const optimistic = createOptimisticCrudHandlers<Workstation, WorkstationPatch, Workstation, WorkstationBulkPatch>(queryClient, queryKey, "Workstation");
-  const invalidated = createInvalidateCrudHandlers<Workstation>(queryClient, queryKey, "Workstation");
+  const invalidated = createInvalidateCrudHandlers(queryClient, queryKey, "Workstation");
 
   const { data: workstations = [], isLoading } = useGetAllWorkstations();
   const { mutate: patchWorkstation, isPending: isPatchWorkstationPending } = usePatchWorkstation({ mutation: optimistic.patch });
@@ -135,13 +135,13 @@ export const WorkstationsPage = () => {
         <WorkstationAddForm isPending={isCreatePending} onSubmit={handleCreate} />
       </FormDialog >
       <FormDialog title={"Редагування запису"} open={editOpen} onOpenChange={setEditOpen}>
-        <WorkstationEditForm
+        {editedRecord && <WorkstationEditForm
           previous={editedRecord}
           isPending={isPatchWorkstationPending}
           onSubmit={(data) => {
             if (editedRecord != null) handlePatchWithDialog(editedRecord.id, data);
           }}
-        />
+        />}
       </FormDialog >
       <ConfirmEditManyDialog
         isPending={isPatchWorkstationsPending}

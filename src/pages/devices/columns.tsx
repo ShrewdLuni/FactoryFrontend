@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { InputCell } from "@/components/data-table/input-cell";
-import { SwitchCell } from "@/components/data-table/switch-cell";
 import type { Device, DevicePatch } from "@/api/generated/models";
 
 interface DeviceColumnsProps {

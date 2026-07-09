@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
-import { SwitchCell } from "@/components/data-table/switch-cell";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { DeviceInsert } from "@/api/generated/models";
 import { useGetAllDepartments } from "@/api/generated/department/department";

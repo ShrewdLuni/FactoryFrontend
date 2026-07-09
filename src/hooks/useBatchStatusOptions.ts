@@ -18,7 +18,7 @@ const ICONS: Record<number, typeof CircleX> = {
   14: CircleCheck,
 };
 
-const DEFAULT__ICON = Layers;
+// const DEFAULT__ICON = Layers;
 
 export function useBatchStatusFilters() {
   const { data, isLoading } = useGetAllBatchStatuses();

@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
-import type { PackProduct, Product, ProductInsert } from "@/api/generated/models";
+import type { Product } from "@/api/generated/models";
 import {
   Select,
   SelectContent,
@@ -21,13 +21,13 @@ import {
 } from "@/components/ui/combobox"
 interface MoveFormProps {
   onSubmit: (id: number, boxSize: number, quantity: number) => void;
-  product: Product;
+  product?: Product;
   products: Product[];
   isPending?: boolean;
 }
 export const MoveForm = ({ onSubmit, product, products, isPending }: MoveFormProps) => {
   const [boxSize, setBoxSize] = useState<string>("60")
-  const [activeProduct, setActiveProduct] = useState<Product | null>(product)
+  const [activeProduct, setActiveProduct] = useState<Product | null>(product || null)
   const [quantity, setQuantity] = useState<number>(1)
   return (
     <FieldSet className="p-2">

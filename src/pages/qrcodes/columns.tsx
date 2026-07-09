@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Image, Link, MoreHorizontal, Printer, SquarePen, Trash } from "lucide-react";
 import { IconCircleFilled } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
-import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { createColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { printQRCode } from "./utils";
 import { InputCell } from "@/components/data-table/input-cell";
 import type { QRCode, QRCodePatch } from "@/api/generated/models";

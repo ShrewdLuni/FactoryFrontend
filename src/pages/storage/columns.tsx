@@ -1,13 +1,9 @@
 import type { StorageEntry } from "@/api/generated/models";
-import { createColumn, createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
+import { createIdColumn, createSelectColumn } from "@/components/data-table/common-columns";
 import { SortableHeader } from "@/components/data-table/sortable-header";
 import type { ColumnDef } from "@tanstack/react-table";
 
-interface StorageColumnsProps {
-  something: any;
-}
-
-export const getStorageColumns = ({ something }: StorageColumnsProps) => {
+export const getStorageColumns = () => {
   const columns: ColumnDef<StorageEntry>[] = [
     createSelectColumn<StorageEntry>(),
     createIdColumn<StorageEntry>(),

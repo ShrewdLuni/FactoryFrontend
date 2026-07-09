@@ -1,11 +1,9 @@
 
-import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
-import type { Product, ProductInsert, QRCode, QRCodeInsert } from "@/api/generated/models";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import type { QRCode, QRCodeInsert } from "@/api/generated/models";
 import { Textarea } from "@/components/ui/textarea";
-import { SwitchCell } from "@/components/data-table/switch-cell";
 
 interface QRCodeEditFormProps {
   previous: QRCode;

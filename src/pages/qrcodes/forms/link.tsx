@@ -10,12 +10,12 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Batch, Device, Workstation, QRCode, QRCodePatch } from "@/api/generated/models";
+import type { Batch, Device, Workstation, QRCode } from "@/api/generated/models";
 import { useGetAllBatches } from "@/api/generated/batch/batch";
 import { BASE_URL } from "@/config";
 import { useGetAllWorkstations } from "@/api/generated/workstation/workstation";
 import { useGetAllDevices } from "@/api/generated/device/device";
-import { Bolt, Box, Package, Unplug } from "lucide-react";
+import { Bolt, Package, Unplug } from "lucide-react";
 
 interface QRCodeLinkFormProps {
   qrcode: QRCode;
@@ -89,7 +89,7 @@ export const QRCodeLinkForm = ({ qrcode, qrcodes, onSubmit, isPending }: QRCodeL
       <FieldGroup>
         <Field>
           <FieldLabel>Тип ресурсу</FieldLabel>
-          <Select value={resource} onValueChange={handleResourceChange}>
+          <Select value={resource || undefined} onValueChange={handleResourceChange}>
             <SelectTrigger>
               <SelectValue placeholder="Оберіть ресурс" />
             </SelectTrigger>
@@ -112,7 +112,7 @@ export const QRCodeLinkForm = ({ qrcode, qrcodes, onSubmit, isPending }: QRCodeL
                 `ID: ${batch.id} | Назва: ${batch.name} | Продукт: ${batch.product.id}`
               }
               value={selectedBatch}
-              onValueChange={(e) => setSelectedBatch(e ?? undefined)}
+              onValueChange={(e) => setSelectedBatch(e ?? null)}
             >
               <ComboboxInput placeholder="Виберіть партію" />
               <ComboboxContent onWheel={(e) => e.stopPropagation()} className="pointer-events-auto">
@@ -135,7 +135,7 @@ export const QRCodeLinkForm = ({ qrcode, qrcodes, onSubmit, isPending }: QRCodeL
               items={normalizedDevices}
               itemToStringLabel={(device) => `ID: ${device.id} | Назва: ${device.name}`}
               value={selectedDevice}
-              onValueChange={(e) => setSelectedDevice(e ?? undefined)}
+              onValueChange={(e) => setSelectedDevice(e ?? null)}
             >
               <ComboboxInput placeholder="Виберіть пристрій" />
               <ComboboxContent onWheel={(e) => e.stopPropagation()} className="pointer-events-auto">
@@ -158,7 +158,7 @@ export const QRCodeLinkForm = ({ qrcode, qrcodes, onSubmit, isPending }: QRCodeL
               items={normalizedWorkstations}
               itemToStringLabel={(workstation) => `ID: ${workstation.id} | Назва: ${workstation.name}`}
               value={selectedWorkstation}
-              onValueChange={(e) => setSelectedWorkstation(e ?? undefined)}
+              onValueChange={(e) => setSelectedWorkstation(e ?? null)}
             >
               <ComboboxInput placeholder="Виберіть машину" />
               <ComboboxContent onWheel={(e) => e.stopPropagation()} className="pointer-events-auto">

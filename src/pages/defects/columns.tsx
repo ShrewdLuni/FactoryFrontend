@@ -8,11 +8,7 @@ export interface FlatDefectRow {
   defect: DefectsByProductDefectsItem;
 }
 
-interface DefectColumnProps {
-  something?: string
-}
-
-export const getColumns = ({ something }: DefectColumnProps) => {
+export const getColumns = () => {
   const columns: ColumnDef<FlatDefectRow>[] = [
     {
       accessorKey: "id",
