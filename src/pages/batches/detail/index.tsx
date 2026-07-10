@@ -52,20 +52,29 @@ export const BatchPreviewPage = () => {
     if (!batch || !id || !user) return;
 
     const defectsPayload = Object.entries(defects)
-      .filter(([, quantity]) => quantity > 0)
-      .map(([defect_type_id, quantity]) => ({
-        defectTypeId: Number(defect_type_id),
-        quantity,
-      }));
+    .filter(([, quantity]) => quantity > 0)
+    .map(([defect_type_id, quantity]) => ({
+      defectTypeId: Number(defect_type_id),
+      quantity,
+    }));
 
-    await advanceBatch({id: Number(id), data: {
-      actorId: user.id,
-      defects: defectsPayload,
-      sizeOverride: batch.status.requiresSizeInput ? sizeOverride : undefined,
-      remainder: batch.status.isPackaging ? remain : undefined,
-    }} );
-    navigate("/");
-    toast.success("OK", { position: "top-right" });
+    try {
+      await advanceBatch({
+        id: Number(id),
+        data: {
+          actorId: user.id,
+          defects: defectsPayload,
+          sizeOverride: batch.status.requiresSizeInput ? sizeOverride : undefined,
+          remainder: batch.status.isPackaging ? remain : undefined,
+        },
+      });
+
+      toast.success("OK", { position: "top-right" });
+      navigate("/");
+    } catch (err: any) {
+      const message = err.message ?? "Щось пішло не так";
+      toast.error(message, { position: "top-right" });
+    }
   };
 
   return (
