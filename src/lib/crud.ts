@@ -18,7 +18,13 @@ export function createOptimisticCrudHandlers<
     ids: (string | number)[];
     data?: TUpdate;
   },
->(queryClient: QueryClient, queryKey: QueryKey, entityName: string) {
+>(queryClient: QueryClient, 
+  queryKey: QueryKey, 
+  entityName: string, 
+  options?: { toOptimistic?: (data: Partial<TPatch>) => Partial<T> }) {
+
+  const toOptimistic = options?.toOptimistic ?? ((data: any) => data)
+
   const withOptimistic = <V,>(
     updateFn: (old: T[], vars: V) => T[],
     successMsg: string,
@@ -44,14 +50,14 @@ export function createOptimisticCrudHandlers<
   return {
     patch: withOptimistic<{ id: string; data?: TPatch }>(
       (old, { id, data }) =>
-        old.map((i) => (String(i.id) === id ? { ...i, ...(data ?? {}) } : i)),
+        old.map((i) => (String(i.id) === id ? { ...i, ...toOptimistic(data ?? {}) } : i)),
       `${entityName} змінено`, `Не вдалося змінити ${entityName}`,
     ),
     patchMany: withOptimistic<{ data?: TBulkPatch }>(
       (old, { data }) => {
         if (!data) return old;
         const { ids, data: patchData } = data;
-        return old.map((i) => (ids.includes(i.id) ? { ...i, ...(patchData ?? {}) } : i));
+        return old.map((i) => (ids.includes(i.id) ? { ...i, ...toOptimistic(patchData ?? {}) } : i));
       },
       `${entityName} змінено`, `Не вдалося змінити ${entityName}`,
     ),
