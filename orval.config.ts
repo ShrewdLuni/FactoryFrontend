@@ -1,6 +1,6 @@
 import { defineConfig } from "orval";
 
-const API_URL = process.env.ORVAL_API_URL ?? "http://192.168.0.101:3000/openapi.json";
+const API_URL = process.env.ORVAL_API_URL ?? "http://192.168.0.100:3000/openapi.json";
 
 export default defineConfig({
   api: {
