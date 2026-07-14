@@ -27,5 +27,5 @@ export function useDepartmentOptions() {
     [data],
   );
 
-  return { data: options, ...rest };
+  return { data: options, raw: data ?? [], ...rest };
 }

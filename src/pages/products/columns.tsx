@@ -60,6 +60,20 @@ export const getProductColumns = ({ handlePatch, handleDelete, onEditDialogOpenC
       },
     },
     {
+      accessorKey: "boxSize",
+      header: ({ column }) => <SortableHeader column={column} field={"Розмір коробки"} />,
+      cell: ({ row }) => {
+        return (
+          <InputCell
+            defaultValue={(row.original.boxSize != null) ? String(row.original.boxSize) : "Не встановлено"}
+            onBlur={(e) => {
+              e.preventDefault();
+              handlePatch(row.original.id, { boxSize: Number(e.target.value)});
+            }}/>
+        ) 
+      },
+    },
+    {
       id: "Packed",
       accessorFn: (row) => {
         // const stock = packedStock?.find((s) => s.product.id === row.id);

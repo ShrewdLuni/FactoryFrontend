@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/data-table";
 import { getDeviceColumns } from "./columns";
-import { CircleCheck, CirclePlus, CircleX } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import {
   getGetAllDevicesQueryKey,
   useCreateDevice,
@@ -21,16 +21,16 @@ import { Button } from "@/components/ui/button";
 import { DeviceAddForm } from "./forms/add";
 import { DeviceEditForm } from "./forms/edit";
 
-const isActiveFilter = {
-  column: "isActive",
-  title: "Статус активності",
-  options: [
-    { label: "Активні", value: "true", icon: CircleCheck },
-    { label: "Неактивні", value: "false", icon: CircleX },
-  ],
-};
-
-const filters = [isActiveFilter];
+// const isActiveFilter = {
+//   column: "isActive",
+//   title: "Статус активності",
+//   options: [
+//     { label: "Активні", value: "true", icon: CircleCheck },
+//     { label: "Неактивні", value: "false", icon: CircleX },
+//   ],
+// };
+//
+// const filters = [isActiveFilter];
 
 export const DevicesPage = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -128,7 +128,6 @@ export const DevicesPage = () => {
         columns={columns}
         data={devices}
         searchValues="name"
-        filters={filters}
         onRowSelectionChange={setSelectedIds}
         toolbarExtras={
           <div className="flex flex-row w-full">

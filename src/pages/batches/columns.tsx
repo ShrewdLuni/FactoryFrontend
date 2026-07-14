@@ -91,7 +91,8 @@ function createProductColumn(patch: patchFunction, products: Product[], isChanga
     header: ({ column }) => <SortableHeader column={column} field={"Продукт"} />,
     cell: ({ row }) => {
       const selectedProduct = products?.find((p) => p.id === row.original.product.id);
-      isChangable = row.original.status.id === 1;
+      // isChangable = row.original.status.id === 1;
+      isChangable = true;
       return isChangable ? (
         <div className="w-full flex min-w-20">
           <SelectCellSearch 
@@ -170,7 +171,8 @@ function createActualSizeColumn(patch: patchFunction, isChangable: boolean = fal
     accessorKey: "size",
     header: ({ column }) => <SortableHeader column={column} field={"Розмір партії"} />,
     cell: ({ row }) => {
-      isChangable = row.original.status.id === 1;
+      // isChangable = row.original.status.id === 1;
+      isChangable = true;
       return isChangable ? (
         <InputCell
           defaultValue={(row.original.size != null) ? String(row.original.size) : "Не встановлено"}
