@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   Combobox,
   ComboboxChip,
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/combobox"
 import type { LucideIcon } from "lucide-react";
 import { renderIcon } from "@/lib/renderIcon";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface SelectCellProps {
   row: any;
@@ -23,30 +23,43 @@ interface SelectCellProps {
   defaultValue: any;
 }
 
-export const MultipleSelectCell = ({ row, data, onChange, defaultValue }: SelectCellProps) =>  {
-  const anchor = useComboboxAnchor()
+export const MultipleSelectCell = ({ row, data, onChange, defaultValue }: SelectCellProps) => {
+  const anchor = useComboboxAnchor();
 
-  const resolvedDefaultValue = React.useMemo(() => {
+  const resolvedDefaultValue = useMemo(() => {
     if (!defaultValue) return [];
     const values = Array.isArray(defaultValue) ? defaultValue : [defaultValue].filter(Boolean);
     return data.filter((item) => values.includes(item.value));
   }, [defaultValue, data]);
+
+  const [selected, setSelected] = useState(resolvedDefaultValue);
+
+  useEffect(() => {
+    setSelected(resolvedDefaultValue);
+  }, [resolvedDefaultValue]);
+
+  const committedRef = useRef(selected);
+  committedRef.current = selected;
+
+  const commit = () => {
+    onChange?.(committedRef.current.map((v) => v.value), row);
+  };
 
   return (
     <Combobox
       multiple
       autoHighlight
       items={data}
-      defaultValue={resolvedDefaultValue}
-      onValueChange={(value: typeof data) => {
-        const update = value.map(value => value.value);
-        onChange?.(update, row);
+      value={selected}
+      onValueChange={setSelected}
+      onOpenChange={(open) => {
+        if (!open) commit(); 
       }}
     >
       <ComboboxChips ref={anchor} className="w-full flex-nowrap">
         <ComboboxValue>
           {(values) => (
-            <React.Fragment>
+            <>
               {values.map((value: any) => (
                 <ComboboxChip key={`${value.label}-chip`}>
                   {renderIcon(value.icon)}
@@ -54,7 +67,7 @@ export const MultipleSelectCell = ({ row, data, onChange, defaultValue }: Select
                 </ComboboxChip>
               ))}
               <ComboboxChipsInput />
-            </React.Fragment>
+            </>
           )}
         </ComboboxValue>
       </ComboboxChips>
@@ -70,6 +83,5 @@ export const MultipleSelectCell = ({ row, data, onChange, defaultValue }: Select
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-  )
-}
-
+  );
+};

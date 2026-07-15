@@ -1,12 +1,13 @@
 "use client"
 
-import { format } from "date-fns"
+import { format, isSameDay } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { type DateRange } from "react-day-picker"
+import { uk } from "date-fns/locale"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { Field } from "@/components/ui/field"
+
 import {
   Popover,
   PopoverContent,
@@ -21,22 +22,23 @@ interface DatePickerWithRangeProps {
 export function DatePickerWithRange({ date, onDateChange}: DatePickerWithRangeProps) {
 
   return (
-    <Field className="mx-auto w-auto h-8">
       <Popover>
         <PopoverTrigger>          
           <Button
             variant="outline"
             id="date-picker-range"
-            className="justify-start px-2.5 font-normal gap-2"
+            className="justify-start px-2.5 font-normal gap-2 h-8"
           >
             <CalendarIcon className="h-4 w-4" />
             {date?.from ? (
-              date.to ? (
+              date.to && !isSameDay(date.from, date.to) ? (
                 <>
-                  {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  {/* {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")} */}
+                  {format(date.from, "dd MMMM yyyy", { locale: uk })} -{" "}
+                  {format(date.to, "dd MMMM yyyy", { locale: uk })}
                 </>
               ) : (
-                  format(date.from, "LLL dd, y")
+                  format(date.from, "dd MMMM yyyy", { locale: uk })
                 )
             ) : (
                 <span>Виберіть дату</span>
@@ -53,7 +55,6 @@ export function DatePickerWithRange({ date, onDateChange}: DatePickerWithRangePr
           />
         </PopoverContent>
       </Popover>
-    </Field>
   )
 }
 
