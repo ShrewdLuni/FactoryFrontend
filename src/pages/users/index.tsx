@@ -1,82 +1,107 @@
 import { getUserColumns } from "./columns";
-import { useUsers } from "@/hooks/useUsers";
-import { useCallback, useMemo } from "react";
-import type { User, UserGender, InsertUser } from "@/types/users";
-import type { Row } from "@tanstack/react-table";
-import { useGetAllUsers } from "@/api/generated/user/user";
+// import { getGetAllUsersQueryKey, useCreateUser, useDeleteUser, useDeleteUsers, useGetAllUsers, usePatchUser, usePatchUsers } from "@/api/generated/user/user";
+import { getGetAllUsersQueryKey, useGetAllUsers, usePatchUser } from "@/api/generated/user/user";
 import { useRoleOptions } from "@/hooks/useRoleOptions";
 import { useDepartmentOptions } from "@/hooks/useDepartmentOptions";
 import { useGenderOptions } from "@/hooks/useGenderOptions";
 import { DataTable } from "@/components/data-table";
+import { useQueryClient } from "@tanstack/react-query";
+// import { createInvalidateCrudHandlers, createOptimisticCrudHandlers } from "@/lib/crud";
+import { createOptimisticCrudHandlers } from "@/lib/crud";
+import type { User, UserBulkPatch, UserPatch } from "@/api/generated/models";
+import { useState } from "react";
 
+export const UsersPage = () => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserPatch>()
 
-export function userToInsert(user: User): InsertUser {
-  return {
-    code: user.code,
-    username: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    patronymic: user.patronymic,
-    email: user.email,
-    phone: user.phone,
-    gender: user.gender ?? "Other",
-    dateOfBirth: user.dateOfBirth,
-    isActive: user.isActive,
-    roleId: user.role?.id ?? null,
-    departmentIds: user.departments?.map((d) => d.id) ?? [],
-  };
-}
+  // const [addOpen, setAddOpen] = useState<boolean>(false);
+  const [editOpen, setEditOpen] = useState<boolean>(false);
 
-export const EmployeesPage = () => {
-  const { data: roles, isLoading } = useRoleOptions();
-  const { data: departments } = useDepartmentOptions();
+  const [isEditRequested, setIsEditRequested] = useState<boolean>(false);
+  console.log(selectedUser, isEditRequested, editOpen)
+
+  const { data: roles } = useRoleOptions();
+  const { data: departments, raw: rawDepartments } = useDepartmentOptions();
   const { data: gender } = useGenderOptions();
 
   const filters = [
-    { column: "role", title: "Role", options: roles },
-    { column: "gender", title: "Gender", options: gender },
-    { column: "departments", title: "Departments", options: departments },
+    { column: "role", title: "Роль", options: roles },
+    { column: "gender", title: "Стать", options: gender },
+    { column: "departments", title: "Відділи", options: departments },
   ];
 
-  const { data: users } = useGetAllUsers();
-  const { mutate: updateUser } = useUsers.update();
+  const queryClient = useQueryClient();
+  const queryKey = getGetAllUsersQueryKey();
 
-  const handleCellUpdate = useCallback(
-    (field: string, value: unknown, row: Row<User>) => {
-      const base = userToInsert(row.original);
-
-      let patch: Partial<InsertUser> = {};
-
-      if (field === "role") {
-        const match = roles.find((r) => r.value === value);
-        patch = { roleId: match?.id ?? null };
-      } else if (field === "departments") {
-        const ids = (value as string[])
-        .map((v) => departments.find((d) => d.value === v)?.id)
-        .filter((id): id is number => id !== undefined);
-        patch = { departmentIds: ids };
-      } else if (field === "gender") {
-        patch = { gender: value as UserGender };
-      }
-
-      updateUser({ id: row.original.id, data: { ...base, ...patch } });
+  const optimistic = createOptimisticCrudHandlers<User, UserPatch, User, UserBulkPatch>(
+    queryClient,
+    queryKey,
+    "User",
+    {
+      toOptimistic: (data) => {
+        const { departmentIds, role, ...rest } = data as UserPatch & { departmentIds?: number[] };
+        return {
+          ...rest,
+          ...(departmentIds && {
+            departments: rawDepartments.filter((d) => departmentIds.includes(d.id)),
+          }),
+          // ...(role?.id != null && {
+          //   role: rawRoles.find((r) => r.id === role.id) ?? undefined,
+          // }),
+        };
+      },
     },
-    [updateUser],
   );
 
-  const columns = useMemo(
-    () =>
-      getUserColumns({
-        roleSelect: roles,
-        genderSelect: gender,
-        departmentsSelect: departments,
-        onCellUpdate: handleCellUpdate,
-      }),
-    [handleCellUpdate, roles, departments, gender],
+  // const invalidated = createInvalidateCrudHandlers(queryClient, queryKey, "User");
+
+  const { data: users = [], isLoading } = useGetAllUsers();
+  const { mutate: patchUser, isPending: isPatchUserPending } = usePatchUser({ mutation: optimistic.patch });  
+  // const { mutate: patchUsers, isPending: isPatchUsersPending } = usePatchUsers({ mutation: optimistic.patchMany });
+  // const { mutate: deleteUser } = useDeleteUser({ mutation: invalidated.delete });
+  // const { mutate: deleteUsers, isPending: isDeleteUsersPending } = useDeleteUsers({ mutation: invalidated.deleteMany });
+  // const { mutate: createUser, isPending: isCreateUserPending } = useCreateUser({ mutation: invalidated.create });
+
+
+  const handlePatch = (id: number, data: UserPatch) => {
+    console.log(isPatchUserPending)
+    if (selectedIds.length < 2) {
+      patchUser({ id: String(id), data });
+      setEditOpen(false);
+    } else {
+      setEditOpen(false);
+      setIsEditRequested(true);
+      setSelectedUser(data);
+    }
+  }
+
+  const handleDelete = () => {
+
+  }
+
+  const openEditDialog = () => {
+
+  }
+
+  const columns = getUserColumns({
+    roleSelect: roles,
+    genderSelect: gender,
+    departmentsSelect: departments,
+    handlePatch,
+    handleDelete,
+    openEditDialog,
+  })
+
+  if (isLoading) return <div>Loading</div>
+
+  return (
+    <DataTable 
+      columns={columns} 
+      data={users} 
+      filters={filters} 
+      searchValues={"fullName"} 
+      onRowSelectionChange={setSelectedIds}
+      initialState={{columnVisibility: { code: false, email: false, phone: false }}} />
   );
-
-  if (isLoading)
-    return <div>Loading</div>
-
-  return <DataTable columns={columns} isAddSection={false} data={users ? users : []} filters={filters} searchValues={"fullName"} initialState={{columnVisibility: { code: false, email: false, phone: false }}} />;
 };
